@@ -13,7 +13,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
+@Testcontainers
 @SpringBootTest
 class OrderServiceTest {
 
@@ -104,7 +106,7 @@ class OrderServiceTest {
 			.forEach(e -> {
 				executorService.submit(() -> {
 					try {
-						orderService.purchaseByPessimisticLock(testProduct.getId(), 1);
+						orderService.purchaseByPessimisticLock(testProduct.getId(), 10);
 					} finally {
 						countDownLatch.countDown();
 					}
@@ -115,6 +117,7 @@ class OrderServiceTest {
 
 		//then
 		Product product = orderService.findById(testProduct.getId());
+
 		assertThat(product.getQuantity()).isEqualTo(1);
 	}
 
@@ -124,7 +127,7 @@ class OrderServiceTest {
 		//given
 		Product testProduct = getTestProduct(2001L);
 
-		final int totalThread = 2000;
+		final int totalThread = 200;
 		ExecutorService executorService = Executors.newFixedThreadPool(totalThread);
 		CountDownLatch countDownLatch = new CountDownLatch(totalThread);
 
@@ -133,7 +136,7 @@ class OrderServiceTest {
 			.forEach(e -> {
 				executorService.submit(() -> {
 					try {
-						orderService.purchaseByNative(testProduct.getId(), 1);
+						orderService.purchaseByNative(testProduct.getId(), 10);
 					} finally {
 						countDownLatch.countDown();
 					}

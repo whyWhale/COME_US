@@ -1,15 +1,14 @@
 spring:
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    username: ${MYSQL_USERNAME:root}
-    password: ${MYSQL_PASSWORD:password}
-    url: jdbc:mysql://localhost:3306/${MYSQL_SCHEMA:order-renewal}
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:mysql:8.0.24:///test-mysql
   jpa:
-    show-sql: ${SHOW_SQL:true}
     properties:
-      hibernate:
-        ddl-auto: validate
-        format_sql: ${SHOW_SQL:true}
+      hibernate.format_sql: ${SHOW_SQL:true}
+    hibernate:
+      ddl-auto: create
+    show-sql: ${SHOW_SQL:true}
+
 logging:
   level:
     com.zaxxer.hikari.HikariConfig: DEBUG
