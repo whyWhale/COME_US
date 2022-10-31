@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:password}
+    url: jdbc:mysql://localhost:3306/${MYSQL_SCHEMA:order-renewal}
+  jpa:
+    show-sql: ${SHOW_SQL:true}
+    properties:
+      hibernate:
+        ddl-auto: validate
+        format_sql: ${SHOW_SQL:true}
+logging:
+  level:
+    com.zaxxer.hikari.HikariConfig: DEBUG
+    com.zaxxer.hikari: TRACE
