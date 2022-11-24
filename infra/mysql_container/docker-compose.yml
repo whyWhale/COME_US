@@ -1,0 +1,42 @@
+version: '3.8'
+
+networks:
+  default:
+    name: order-renewal
+
+volumes:
+  data:
+    driver: local
+  config:
+    driver: local
+
+services:
+  order-mysql:
+    image: mysql:latest
+    container_name: order-mysql
+    ports:
+      - 3306:3306
+    environment:
+      TZ: Asia/Seoul
+      MYSQL_DATABASE: order-renewal
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_USER: order
+      MYSQL_PASSWORD: password
+    volumes:
+      - ./db/mysql/data:/var/lib/mysql
+      - ./db/mysql/init:/docker-entrypoint-initdb.d
+    platform: linux/amd64
+    restart: always
+
+  order-mysql-phpmyadmin:
+    depends_on:
+      - order-mysql
+    image: phpmyadmin/phpmyadmin
+    container_name: order-mysql-phpmyadmin
+    ports:
+      - 8082:80
+    environment:
+      PMA_HOST: order-mysql
+      MYSQL_ROOT_PASSWORD: password 
+    platform: linux/amd64
+    restart: always
