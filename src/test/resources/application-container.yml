@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:mysql:8.0.24:///test-mysql
+  jpa:
+    properties:
+      hibernate.format_sql: ${SHOW_SQL:true}
+    hibernate:
+      ddl-auto: create
+    show-sql: ${SHOW_SQL:true}
+
+logging:
+  level:
+    com.zaxxer.hikari.HikariConfig: DEBUG
+    com.zaxxer.hikari: TRACE
