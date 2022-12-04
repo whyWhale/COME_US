@@ -1,4 +1,4 @@
-package com.platform.order;
+package com.platform.order.config;
 
 import org.springframework.boot.test.context.SpringBootTest;
 import org.testcontainers.containers.MySQLContainer;

@@ -5,8 +5,9 @@ import java.text.MessageFormat;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.platform.order.order.exception.BusinessException;
-import com.platform.order.order.exception.NotFoundResource;
+import com.platform.order.common.exception.BusinessException;
+import com.platform.order.common.exception.ErrorCode;
+import com.platform.order.common.exception.NotFoundResource;
 
 @Transactional(readOnly = true)
 @Service
@@ -14,16 +15,18 @@ public class OrderService {
 
 	private static final int SUCCESS_STOCK_DECREASE = 1;
 	private final ProductRepository productRepository;
+	private final StockRepository stockRepository;
 
-	public OrderService(ProductRepository productRepository) {
+	public OrderService(ProductRepository productRepository, StockRepository stockRepository) {
 		this.productRepository = productRepository;
+		this.stockRepository = stockRepository;
 	}
 
 	public Product findById(Long id) {
 		return productRepository.findById(id).orElseThrow(
 			() -> new NotFoundResource(
-				MessageFormat.format("product id:{0} is not found.", 1)
-			)
+				MessageFormat.format("product id:{0} is not found.", 1),
+				ErrorCode.NOT_FOUND_RESOURCES)
 		);
 	}
 
@@ -32,7 +35,8 @@ public class OrderService {
 		productRepository.findById(productId)
 			.orElseThrow(
 				() -> new NotFoundResource(
-					MessageFormat.format("product id:{0} is not found.", productId))
+					MessageFormat.format("product id:{0} is not found.", productId),
+					ErrorCode.NOT_FOUND_RESOURCES)
 			).decrese(amount);
 	}
 
@@ -41,7 +45,8 @@ public class OrderService {
 		productRepository.findByIdForUpdate(productId)
 			.orElseThrow(
 				() -> new NotFoundResource(
-					MessageFormat.format("product id:{0} is not found.", productId))
+					MessageFormat.format("product id:{0} is not found.", productId),
+					ErrorCode.NOT_FOUND_RESOURCES)
 			).decrese(amount);
 	}
 
@@ -51,7 +56,20 @@ public class OrderService {
 
 		if (affectedRow != SUCCESS_STOCK_DECREASE) {
 			throw new BusinessException(
-				MessageFormat.format("product id:{0} is out of stock.", productId)
+				MessageFormat.format("product id:{0} is out of stock.", productId),
+				ErrorCode.NOT_FOUND_RESOURCES
+			);
+		}
+	}
+
+	@Transactional
+	public void divideModel(Long productId, long amout) {
+		Integer changedResult = stockRepository.updateQuantity(productId, amout);
+
+		if (changedResult != SUCCESS_STOCK_DECREASE) {
+			throw new BusinessException(
+				MessageFormat.format("product id:{0} is out of stock.", productId),
+				ErrorCode.NOT_FOUND_RESOURCES
 			);
 		}
 	}
