@@ -23,6 +23,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.utility.DockerImageName;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,6 +41,16 @@ import com.platform.order.security.property.JwtConfig;
 class AuthenticationRestControllerIntegrationTest {
 
 	static final String URI_PREFIX = "/api/users";
+
+	@Container
+	static final GenericContainer<?> redis = new GenericContainer<>(
+		DockerImageName.parse("redis:latest")).withExposedPorts(6379);
+
+	static {
+		redis.start();
+		System.setProperty("spring.redis.host", redis.getHost());
+		System.setProperty("spring.redis.port", redis.getMappedPort(6379).toString());
+	}
 
 	@Autowired
 	MockMvc mockMvc;

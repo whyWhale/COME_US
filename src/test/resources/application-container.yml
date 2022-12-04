@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
-    url: jdbc:tc:mysql:8.0.24:///test-mysql
+    url: jdbc:tc:mysql:8.0.24:///test-mysql?TC_REUSABLE=true
   jpa:
     properties:
       hibernate.format_sql: ${SHOW_SQL:true}
