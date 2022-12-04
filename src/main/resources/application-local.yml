@@ -1,11 +1,61 @@
 spring:
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
     username: ${MYSQL_USERNAME:root}
     password: ${MYSQL_PASSWORD:password}
-    url: jdbc:mysql://localhost:3306/${MYSQL_SCHEMA:order-renewal}
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/${MYSQL_SCHEMA:order-renewal}
   jpa:
-    show-sql: ${SHOW_SQL:true}
+    hibernate:
+      ddl-auto: create-drop
     properties:
       hibernate:
-        format_sql: ${SHOW_SQL:true}
+        format_sql: true
+
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+
+jwt:
+  issuer: order-renewal
+  access-token:
+    header: access-token
+    expiry-seconds: ${ACCESS_EXPIRY_SECOND:ENC(43VpAPQWzFtX6I2vbopM+Q==)}
+  refresh-token:
+    header: refresh-token
+    expiry-seconds: ${REFRESH_EXPIRY_SECOND:ENC(jGxk7kBP4xV+MkSyHX/Sjg==)}
+  secret-key: ${SECRET_KEY:ENC(E9Of+Ca7DdsBBGMfwKam9M7ty9QsAvgw)}
+
+security:
+  url-pattern-config:
+    ignoring:
+      GET:
+        - /v3/api-docs/**
+        - /swagger-ui/**
+        - /swagger-ui.html/**
+        - /health
+      POST:
+        - /api/users/login
+        - /api/users/sign-up
+      PATCH: [ ]
+      PUT: [ ]
+      DELETE: [ ]
+    permit-all:
+      GET: [ ]
+      POST: [ ]
+      PATCH: [ ]
+      PUT: [ ]
+      DELETE: [ ]
+      OPTIONS: /**
+
+cookie:
+  secure: ${COOKIE_SECURE:false}
+  same-site: ${COOKIE_SAME_SITE:lax}
+  domain: ${DOMAIN:}
+
+encryptor:
+  key: ${ENCRYPTOR_KEY:order-renewal}
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type: trace
