@@ -1,6 +1,0 @@
-#!/usr/bin/env sh
-docker start redis
-docker start redis-commander
-
-
-
