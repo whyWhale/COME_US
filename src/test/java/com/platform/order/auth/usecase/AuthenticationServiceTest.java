@@ -5,6 +5,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.util.Optional;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,9 +19,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.platform.order.auth.domain.UserDomain;
-import com.platform.order.auth.domain.entity.Role;
-import com.platform.order.auth.domain.entity.User;
 import com.platform.order.auth.usecase.converter.AuthConverter;
 import com.platform.order.auth.view.dto.AuthDto;
 import com.platform.order.common.exception.BusinessException;
@@ -27,6 +26,9 @@ import com.platform.order.common.exception.NotFoundResource;
 import com.platform.order.security.JwtProviderManager;
 import com.platform.order.security.Token;
 import com.platform.order.security.property.JwtConfig;
+import com.platform.order.user.domain.entity.Role;
+import com.platform.order.user.domain.entity.UserEntity;
+import com.platform.order.user.domain.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 class AuthenticationServiceTest {
@@ -35,7 +37,7 @@ class AuthenticationServiceTest {
 	AuthService authService;
 
 	@Mock
-	UserDomain userDomain;
+	UserRepository userRepository;
 	@Mock
 	JwtProviderManager jwtProviderManager;
 	@Mock
@@ -61,23 +63,23 @@ class AuthenticationServiceTest {
 	void testLogin() {
 		//given
 		AuthDto.LoginRequest loginRequest = new AuthDto.LoginRequest("whyWhale", "whywhale1234!");
-		User savedUser = User.builder()
+		UserEntity savedUserEntity = UserEntity.builder()
 			.id(1L)
 			.username(loginRequest.username())
 			.password(loginRequest.password())
 			.role(Role.USER)
 			.build();
 
-		AuthDto.Response userResponse = new AuthDto.Response(
-			savedUser.getId(),
-			savedUser.getUsername(),
-			savedUser.getRole(),
-			loginRequest.password()
-		);
+		UserEntity user = UserEntity.builder()
+			.id(savedUserEntity.getId())
+			.username(savedUserEntity.getUsername())
+			.role(savedUserEntity.getRole())
+			.password(loginRequest.password())
+			.build();
 
 		JwtProviderManager.CustomClaim claim = JwtProviderManager.CustomClaim.builder()
-			.userId(savedUser.getId())
-			.roles(new String[] {savedUser.getRole().getKey()})
+			.userId(savedUserEntity.getId())
+			.roles(new String[] {savedUserEntity.getRole().getKey()})
 			.build();
 
 		String expectedToken = claim.toString();
@@ -95,10 +97,10 @@ class AuthenticationServiceTest {
 			)
 		);
 
-		given(userDomain.findByUsername(loginRequest.username())).willReturn(userResponse);
-		given(passwordEncoder.matches(loginRequest.password(), savedUser.getPassword())).willReturn(true);
+		given(userRepository.findByUsername(loginRequest.username())).willReturn(Optional.of(user));
+		given(passwordEncoder.matches(loginRequest.password(), savedUserEntity.getPassword())).willReturn(true);
 		given(jwtProviderManager.generateAccessToken(claim)).willReturn(expectedToken);
-		given(jwtProviderManager.generateRefreshToken(savedUser.getId())).willReturn(expectedToken);
+		given(jwtProviderManager.generateRefreshToken(savedUserEntity.getId())).willReturn(expectedToken);
 		given(
 			authConverter.toLoginResponse(expectedToken, expectedToken, concreteJwtConfig)
 		).willReturn(expectedResponse);
@@ -107,7 +109,7 @@ class AuthenticationServiceTest {
 		AuthDto.LoginResponse loginResponse = authService.login(loginRequest);
 
 		//then
-		verify(userDomain, times(1)).findByUsername(any(String.class));
+		verify(userRepository, times(1)).findByUsername(any(String.class));
 		verify(passwordEncoder, times(1)).matches(any(String.class), any(String.class));
 		verify(jwtProviderManager, times(1)).generateAccessToken(any(JwtProviderManager.CustomClaim.class));
 		verify(jwtProviderManager, times(1)).generateRefreshToken(any(Long.class));
@@ -126,7 +128,7 @@ class AuthenticationServiceTest {
 			String notExistUsername = "kora";
 			AuthDto.LoginRequest requestDto = new AuthDto.LoginRequest(notExistUsername, "password");
 
-			given(userDomain.findByUsername(requestDto.username())).willThrow(NotFoundResource.class);
+			given(userRepository.findByUsername(requestDto.username())).willThrow(NotFoundResource.class);
 			//when
 			//then
 			Assertions.assertThatThrownBy(() -> {
@@ -140,14 +142,14 @@ class AuthenticationServiceTest {
 			//given
 			String notExistUsername = "kora";
 			AuthDto.LoginRequest requestDto = new AuthDto.LoginRequest(notExistUsername, "password");
-			AuthDto.Response foundUser = new AuthDto.Response(
-				1L,
-				requestDto.username(),
-				Role.USER,
-				"asdjk039-+0d9a");
+			UserEntity foundUser = UserEntity
+				.builder()
+				.username(requestDto.username())
+				.password("amksd1ju23iu12")
+				.build();
 
-			given(userDomain.findByUsername(requestDto.username())).willReturn(foundUser);
-			given(passwordEncoder.matches(requestDto.password(), foundUser.encodingPassword())).willReturn(false);
+			given(userRepository.findByUsername(requestDto.username())).willReturn(Optional.of(foundUser));
+			given(passwordEncoder.matches(requestDto.password(), foundUser.getPassword())).willReturn(false);
 
 			//when
 			//then

@@ -26,8 +26,8 @@ security:
       GET:
         - /health
       POST:
-        - /api/users/login
-        - /api/users/sign-up
+        - /api/auth/login
+        - /api/users
       PATCH: [ ]
       PUT: [ ]
       DELETE: [ ]

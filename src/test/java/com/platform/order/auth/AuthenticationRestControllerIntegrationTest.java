@@ -29,8 +29,8 @@ import org.testcontainers.utility.DockerImageName;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.platform.order.auth.domain.entity.Role;
-import com.platform.order.auth.domain.entity.User;
+import com.platform.order.user.domain.entity.Role;
+import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.auth.view.dto.AuthDto;
 import com.platform.order.security.JwtProviderManager;
 import com.platform.order.security.WithJwtMockUser;
@@ -40,7 +40,7 @@ import com.platform.order.security.property.JwtConfig;
 @AutoConfigureMockMvc
 class AuthenticationRestControllerIntegrationTest {
 
-	static final String URI_PREFIX = "/api/users";
+	static final String URI_PREFIX = "/api/auth";
 
 	@Container
 	static final GenericContainer<?> redis = new GenericContainer<>(
@@ -75,17 +75,17 @@ class AuthenticationRestControllerIntegrationTest {
 	void testLogin() throws Exception {
 		//given
 		String rawPassword = "1";
-		User user = User.builder()
+		UserEntity userEntity = UserEntity.builder()
 			.username("whyWhale")
 			.password(passwordEncoder.encode(rawPassword))
 			.nickName("whale")
 			.role(Role.USER)
 			.build();
 
-		entityManager.persist(user);
+		entityManager.persist(userEntity);
 		entityManager.clear();
 
-		AuthDto.LoginRequest request = new AuthDto.LoginRequest(user.getUsername(), rawPassword);
+		AuthDto.LoginRequest request = new AuthDto.LoginRequest(userEntity.getUsername(), rawPassword);
 		String requestBody = objectMapper.writeValueAsString(request);
 		//when
 		ResultActions perform = mockMvc.perform(
@@ -119,17 +119,17 @@ class AuthenticationRestControllerIntegrationTest {
 		//given
 		int expectedExpirySeconds = 0;
 		String rawPassword = "1";
-		User user = User.builder()
+		UserEntity userEntity = UserEntity.builder()
 			.username("whyWhale")
 			.password(passwordEncoder.encode(rawPassword))
 			.nickName("whale")
 			.role(Role.USER)
 			.build();
 
-		entityManager.persist(user);
+		entityManager.persist(userEntity);
 		entityManager.clear();
 
-		AuthDto.LoginRequest request = new AuthDto.LoginRequest(user.getUsername(), rawPassword);
+		AuthDto.LoginRequest request = new AuthDto.LoginRequest(userEntity.getUsername(), rawPassword);
 		String requestBody = objectMapper.writeValueAsString(request);
 		ResultActions loginPerform = mockMvc.perform(
 			post(URI_PREFIX + "/login")

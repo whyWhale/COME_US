@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 
 import org.springframework.security.test.context.support.WithSecurityContext;
 
-import com.platform.order.auth.domain.entity.Role;
+import com.platform.order.user.domain.entity.Role;
 
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

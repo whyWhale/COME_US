@@ -11,7 +11,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -24,8 +23,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.platform.order.auth.domain.entity.Role;
-import com.platform.order.auth.domain.entity.User;
+import com.platform.order.user.domain.entity.Role;
+import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.auth.usecase.AuthService;
 import com.platform.order.auth.view.dto.AuthDto;
 import com.platform.order.common.ApiResponse;
@@ -44,7 +43,7 @@ import com.platform.order.security.property.JwtConfig;
 	JwtConfig.class})
 class AuthenticationRestControllerTest {
 
-	static final String URI_PREFIX = "/api/users";
+	static final String URI_PREFIX = "/api/auth";
 	@Autowired
 	MockMvc mockMvc;
 	@Autowired
@@ -67,10 +66,9 @@ class AuthenticationRestControllerTest {
 
 	@Test
 	@DisplayName("로그인에 성공한다.")
-	void
-	testLogin() throws Exception {
+	void testLogin() throws Exception {
 		//given
-		User loginUser = User.builder()
+		UserEntity loginUserEntity = UserEntity.builder()
 			.id(1L)
 			.username("whyWhale")
 			.password("wls23333")
@@ -78,12 +76,12 @@ class AuthenticationRestControllerTest {
 			.build();
 
 		AuthDto.LoginRequest requestDto = new AuthDto.LoginRequest(
-			loginUser.getUsername(), loginUser.getPassword()
+			loginUserEntity.getUsername(), loginUserEntity.getPassword()
 		);
 		String requestBody = objectMapper.writeValueAsString(requestDto);
 
 		String expectedResponse = objectMapper.writeValueAsString(new ApiResponse<>("success-login"));
-		AuthDto.LoginRequest loginDto = new AuthDto.LoginRequest(loginUser.getUsername(), loginUser.getPassword());
+		AuthDto.LoginRequest loginDto = new AuthDto.LoginRequest(loginUserEntity.getUsername(), loginUserEntity.getPassword());
 		AuthDto.TokenResponse accessTokenResponse = new AuthDto.TokenResponse("access-token", "access-token", 1000);
 		AuthDto.TokenResponse refreshTokenResponse = new AuthDto.TokenResponse("refresh-token", "refresh-token", 60000);
 		AuthDto.LoginResponse loginResponse = new AuthDto.LoginResponse(accessTokenResponse, refreshTokenResponse);
