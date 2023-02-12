@@ -1,4 +1,4 @@
-package com.platform.order.auth.controller.request;
+package com.platform.order.auth.controller.dto.request;
 
 import javax.validation.constraints.NotBlank;
 

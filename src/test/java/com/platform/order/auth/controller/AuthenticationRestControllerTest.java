@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.platform.order.auth.controller.dto.response.LoginAuthResponseDto;
 import com.platform.order.auth.controller.dto.response.LogoutAuthResponseDto;
 import com.platform.order.auth.controller.dto.response.TokenResponseDto;
-import com.platform.order.auth.controller.request.LoginAuthRequestDto;
+import com.platform.order.auth.controller.dto.request.LoginAuthRequestDto;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.auth.service.AuthService;

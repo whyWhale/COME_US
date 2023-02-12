@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.platform.order.auth.controller.dto.response.LoginAuthResponseDto;
 import com.platform.order.auth.controller.dto.response.LogoutAuthResponseDto;
-import com.platform.order.auth.controller.request.LoginAuthRequestDto;
+import com.platform.order.auth.controller.dto.request.LoginAuthRequestDto;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
 import com.platform.order.auth.service.converter.AuthConverter;

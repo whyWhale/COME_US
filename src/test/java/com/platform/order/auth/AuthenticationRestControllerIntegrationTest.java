@@ -29,7 +29,7 @@ import org.testcontainers.utility.DockerImageName;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.platform.order.auth.controller.request.LoginAuthRequestDto;
+import com.platform.order.auth.controller.dto.request.LoginAuthRequestDto;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.security.JwtProviderManager;

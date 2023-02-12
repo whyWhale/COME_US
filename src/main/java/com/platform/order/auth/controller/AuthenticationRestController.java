@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.platform.order.auth.controller.dto.response.LoginAuthResponseDto;
 import com.platform.order.auth.controller.dto.response.LogoutAuthResponseDto;
-import com.platform.order.auth.controller.request.LoginAuthRequestDto;
+import com.platform.order.auth.controller.dto.request.LoginAuthRequestDto;
 import com.platform.order.auth.service.AuthService;
 import com.platform.order.common.ApiResponse;
 import com.platform.order.security.JwtAuthentication;

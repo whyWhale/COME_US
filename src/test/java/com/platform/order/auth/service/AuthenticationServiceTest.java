@@ -21,7 +21,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import com.platform.order.auth.controller.dto.response.LoginAuthResponseDto;
 import com.platform.order.auth.controller.dto.response.TokenResponseDto;
-import com.platform.order.auth.controller.request.LoginAuthRequestDto;
+import com.platform.order.auth.controller.dto.request.LoginAuthRequestDto;
 import com.platform.order.auth.service.converter.AuthConverter;
 import com.platform.order.common.exception.BusinessException;
 import com.platform.order.common.exception.NotFoundResource;
