@@ -1,4 +1,4 @@
-package com.platform.order.auth.view;
+package com.platform.order.auth.controller;
 
 import static org.springframework.http.HttpHeaders.SET_COOKIE;
 
@@ -8,7 +8,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import com.platform.order.auth.view.dto.AuthDto;
+import com.platform.order.auth.controller.dto.response.LogoutAuthResponseDto;
 import com.platform.order.security.property.CookieProperty;
 
 @Component
@@ -19,7 +19,7 @@ public class LogoutHandler {
 		this.cookieProperty = cookieProperty;
 	}
 
-	public void clearToCookie(HttpServletResponse response, AuthDto.LogoutResponse logoutResponse) {
+	public void clearToCookie(HttpServletResponse response, LogoutAuthResponseDto logoutResponse) {
 		Assert.notNull(logoutResponse.accessTokenHeader(), "access token header is cannot be null");
 		Assert.notNull(logoutResponse.accessTokenHeader(), "refresh token header is cannot be null");
 

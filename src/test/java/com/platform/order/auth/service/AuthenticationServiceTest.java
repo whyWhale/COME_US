@@ -1,4 +1,4 @@
-package com.platform.order.auth.usecase;
+package com.platform.order.auth.service;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -19,8 +19,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.platform.order.auth.usecase.converter.AuthConverter;
-import com.platform.order.auth.view.dto.AuthDto;
+import com.platform.order.auth.controller.dto.response.LoginAuthResponseDto;
+import com.platform.order.auth.controller.dto.response.TokenResponseDto;
+import com.platform.order.auth.controller.request.LoginAuthRequestDto;
+import com.platform.order.auth.service.converter.AuthConverter;
 import com.platform.order.common.exception.BusinessException;
 import com.platform.order.common.exception.NotFoundResource;
 import com.platform.order.security.JwtProviderManager;
@@ -62,7 +64,7 @@ class AuthenticationServiceTest {
 	@DisplayName("등록된 사용자가 로그인에 성공한다.")
 	void testLogin() {
 		//given
-		AuthDto.LoginRequest loginRequest = new AuthDto.LoginRequest("whyWhale", "whywhale1234!");
+		LoginAuthRequestDto loginRequest = new LoginAuthRequestDto("whyWhale", "whywhale1234!");
 		UserEntity savedUserEntity = UserEntity.builder()
 			.id(1L)
 			.username(loginRequest.username())
@@ -84,13 +86,13 @@ class AuthenticationServiceTest {
 
 		String expectedToken = claim.toString();
 
-		AuthDto.LoginResponse expectedResponse = new AuthDto.LoginResponse(
-			new AuthDto.TokenResponse(
+		LoginAuthResponseDto expectedResponse = new LoginAuthResponseDto(
+			new TokenResponseDto(
 				concreteJwtConfig.accessToken().header(),
 				expectedToken,
 				concreteJwtConfig.accessToken().expirySeconds()
 			),
-			new AuthDto.TokenResponse(
+			new TokenResponseDto(
 				concreteJwtConfig.refreshToken().header(),
 				expectedToken,
 				concreteJwtConfig.refreshToken().expirySeconds()
@@ -106,7 +108,7 @@ class AuthenticationServiceTest {
 		).willReturn(expectedResponse);
 
 		//when
-		AuthDto.LoginResponse loginResponse = authService.login(loginRequest);
+		LoginAuthResponseDto loginResponse = authService.login(loginRequest);
 
 		//then
 		verify(userRepository, times(1)).findByUsername(any(String.class));
@@ -126,7 +128,7 @@ class AuthenticationServiceTest {
 		void testFailNotExistUsername() {
 			//given
 			String notExistUsername = "kora";
-			AuthDto.LoginRequest requestDto = new AuthDto.LoginRequest(notExistUsername, "password");
+			LoginAuthRequestDto requestDto = new LoginAuthRequestDto(notExistUsername, "password");
 
 			given(userRepository.findByUsername(requestDto.username())).willThrow(NotFoundResource.class);
 			//when
@@ -141,7 +143,7 @@ class AuthenticationServiceTest {
 		void testFailNotMatchPassword() {
 			//given
 			String notExistUsername = "kora";
-			AuthDto.LoginRequest requestDto = new AuthDto.LoginRequest(notExistUsername, "password");
+			LoginAuthRequestDto requestDto = new LoginAuthRequestDto(notExistUsername, "password");
 			UserEntity foundUser = UserEntity
 				.builder()
 				.username(requestDto.username())

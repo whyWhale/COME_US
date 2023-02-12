@@ -29,9 +29,9 @@ import org.testcontainers.utility.DockerImageName;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.platform.order.auth.controller.request.LoginAuthRequestDto;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
-import com.platform.order.auth.view.dto.AuthDto;
 import com.platform.order.security.JwtProviderManager;
 import com.platform.order.security.WithJwtMockUser;
 import com.platform.order.security.property.JwtConfig;
@@ -85,7 +85,7 @@ class AuthenticationRestControllerIntegrationTest {
 		entityManager.persist(userEntity);
 		entityManager.clear();
 
-		AuthDto.LoginRequest request = new AuthDto.LoginRequest(userEntity.getUsername(), rawPassword);
+		LoginAuthRequestDto request = new LoginAuthRequestDto(userEntity.getUsername(), rawPassword);
 		String requestBody = objectMapper.writeValueAsString(request);
 		//when
 		ResultActions perform = mockMvc.perform(
@@ -129,7 +129,7 @@ class AuthenticationRestControllerIntegrationTest {
 		entityManager.persist(userEntity);
 		entityManager.clear();
 
-		AuthDto.LoginRequest request = new AuthDto.LoginRequest(userEntity.getUsername(), rawPassword);
+		LoginAuthRequestDto request = new LoginAuthRequestDto(userEntity.getUsername(), rawPassword);
 		String requestBody = objectMapper.writeValueAsString(request);
 		ResultActions loginPerform = mockMvc.perform(
 			post(URI_PREFIX + "/login")

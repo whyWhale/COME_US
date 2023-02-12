@@ -1,4 +1,4 @@
-package com.platform.order.auth.view;
+package com.platform.order.auth.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -23,10 +23,13 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.platform.order.auth.controller.dto.response.LoginAuthResponseDto;
+import com.platform.order.auth.controller.dto.response.LogoutAuthResponseDto;
+import com.platform.order.auth.controller.dto.response.TokenResponseDto;
+import com.platform.order.auth.controller.request.LoginAuthRequestDto;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
-import com.platform.order.auth.usecase.AuthService;
-import com.platform.order.auth.view.dto.AuthDto;
+import com.platform.order.auth.service.AuthService;
 import com.platform.order.common.ApiResponse;
 import com.platform.order.security.JwtProviderManager;
 import com.platform.order.security.TokenService;
@@ -75,16 +78,16 @@ class AuthenticationRestControllerTest {
 			.role(Role.OWNER)
 			.build();
 
-		AuthDto.LoginRequest requestDto = new AuthDto.LoginRequest(
+		LoginAuthRequestDto requestDto = new LoginAuthRequestDto(
 			loginUserEntity.getUsername(), loginUserEntity.getPassword()
 		);
 		String requestBody = objectMapper.writeValueAsString(requestDto);
 
 		String expectedResponse = objectMapper.writeValueAsString(new ApiResponse<>("success-login"));
-		AuthDto.LoginRequest loginDto = new AuthDto.LoginRequest(loginUserEntity.getUsername(), loginUserEntity.getPassword());
-		AuthDto.TokenResponse accessTokenResponse = new AuthDto.TokenResponse("access-token", "access-token", 1000);
-		AuthDto.TokenResponse refreshTokenResponse = new AuthDto.TokenResponse("refresh-token", "refresh-token", 60000);
-		AuthDto.LoginResponse loginResponse = new AuthDto.LoginResponse(accessTokenResponse, refreshTokenResponse);
+		LoginAuthRequestDto loginDto = new LoginAuthRequestDto(loginUserEntity.getUsername(), loginUserEntity.getPassword());
+		TokenResponseDto accessTokenResponse = new TokenResponseDto("access-token", "access-token", 1000);
+		TokenResponseDto refreshTokenResponse = new TokenResponseDto("refresh-token", "refresh-token", 60000);
+		LoginAuthResponseDto loginResponse = new LoginAuthResponseDto(accessTokenResponse, refreshTokenResponse);
 
 		BDDMockito.given(authService.login(loginDto)).willReturn(loginResponse);
 
@@ -123,7 +126,7 @@ class AuthenticationRestControllerTest {
 	@DisplayName("인증된 사용자가 로그아웃 한다.")
 	void testLogout() throws Exception {
 		//given
-		AuthDto.LogoutResponse logoutResponse = new AuthDto.LogoutResponse(
+		LogoutAuthResponseDto logoutResponse = new LogoutAuthResponseDto(
 			jwtConfig.accessToken().header(),
 			jwtConfig.refreshToken().header()
 		);
@@ -153,7 +156,7 @@ class AuthenticationRestControllerTest {
 	})
 	void testFailNotProperArguments(String username, String password) throws Exception {
 		//given
-		AuthDto.LoginRequest loginRequest = new AuthDto.LoginRequest(username, password);
+		LoginAuthRequestDto loginRequest = new LoginAuthRequestDto(username, password);
 		String requestBody = objectMapper.writeValueAsString(loginRequest);
 
 		//when
