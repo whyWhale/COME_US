@@ -3,7 +3,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ${MYSQL_USERNAME:root}
     password: ${MYSQL_PASSWORD:password}
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/${MYSQL_SCHEMA:order-renewal}
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/${MYSQL_DATABASE:order-renewal}
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -34,8 +34,8 @@ security:
         - /swagger-ui.html/**
         - /health
       POST:
-        - /api/users/login
-        - /api/users/sign-up
+        - /api/auth/login
+        - /api/users
       PATCH: [ ]
       PUT: [ ]
       DELETE: [ ]

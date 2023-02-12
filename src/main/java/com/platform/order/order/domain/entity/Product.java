@@ -1,4 +1,4 @@
-package com.platform.order.order;
+package com.platform.order.order.domain.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

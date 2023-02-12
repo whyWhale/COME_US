@@ -1,9 +1,11 @@
-package com.platform.order.order;
+package com.platform.order.order.domain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import com.platform.order.order.domain.entity.Stock;
 
 public interface StockRepository extends JpaRepository<Stock, Long> {
 	@Modifying(clearAutomatically = true)

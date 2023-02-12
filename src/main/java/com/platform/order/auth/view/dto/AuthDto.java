@@ -3,7 +3,7 @@ package com.platform.order.auth.view.dto;
 import javax.validation.constraints.NotBlank;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.platform.order.auth.domain.entity.Role;
+import com.platform.order.user.domain.entity.Role;
 
 public class AuthDto {
 	public record Response(

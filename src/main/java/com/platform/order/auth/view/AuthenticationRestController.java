@@ -16,8 +16,10 @@ import com.platform.order.common.ApiResponse;
 import com.platform.order.security.JwtAuthentication;
 
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.RequiredArgsConstructor;
 
-@RequestMapping("/api/users")
+@RequiredArgsConstructor
+@RequestMapping("/api/auth")
 @RestController
 public class AuthenticationRestController {
 	private static final String SUCCESS_LOGIN = "success-login";
@@ -27,13 +29,6 @@ public class AuthenticationRestController {
 	private final LoginSuccessHandler loginSuccessHandler;
 
 	private final LogoutHandler logoutHandler;
-
-	public AuthenticationRestController(AuthService authService, LoginSuccessHandler loginSuccessHandler,
-		LogoutHandler logoutHandler) {
-		this.authService = authService;
-		this.loginSuccessHandler = loginSuccessHandler;
-		this.logoutHandler = logoutHandler;
-	}
 
 	@Operation(summary = "로그인", description = "사용자가 아이디와 패스워드를 가지고 로그인을 한다.")
 	@PostMapping("/login")

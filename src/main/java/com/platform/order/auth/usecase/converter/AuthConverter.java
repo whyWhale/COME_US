@@ -2,19 +2,19 @@ package com.platform.order.auth.usecase.converter;
 
 import org.springframework.stereotype.Component;
 
-import com.platform.order.auth.domain.entity.User;
+import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.auth.view.dto.AuthDto;
 import com.platform.order.security.property.JwtConfig;
 
 @Component
 public class AuthConverter {
 
-	public AuthDto.Response toUserResponse(User user) {
+	public AuthDto.Response toUserResponse(UserEntity userEntity) {
 		return new AuthDto.Response(
-			user.getId(),
-			user.getUsername(),
-			user.getRole(),
-			user.getPassword()
+			userEntity.getId(),
+			userEntity.getUsername(),
+			userEntity.getRole(),
+			userEntity.getPassword()
 		);
 	}
 

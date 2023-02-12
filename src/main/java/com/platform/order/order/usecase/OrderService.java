@@ -1,4 +1,4 @@
-package com.platform.order.order;
+package com.platform.order.order.usecase;
 
 import java.text.MessageFormat;
 
@@ -8,6 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.platform.order.common.exception.BusinessException;
 import com.platform.order.common.exception.ErrorCode;
 import com.platform.order.common.exception.NotFoundResource;
+import com.platform.order.order.domain.entity.Product;
+import com.platform.order.order.domain.ProductRepository;
+import com.platform.order.order.domain.StockRepository;
 
 @Transactional(readOnly = true)
 @Service

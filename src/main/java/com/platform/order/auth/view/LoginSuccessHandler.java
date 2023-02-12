@@ -13,7 +13,6 @@ import com.platform.order.security.property.CookieProperty;
 public class LoginSuccessHandler {
 
 	private final CookieProperty cookieProperty;
-
 	public LoginSuccessHandler(CookieProperty cookieProperty) {
 		this.cookieProperty = cookieProperty;
 	}

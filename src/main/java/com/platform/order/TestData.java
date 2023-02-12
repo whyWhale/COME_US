@@ -8,9 +8,9 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.platform.order.auth.domain.entity.Role;
-import com.platform.order.auth.usecase.UserService;
-import com.platform.order.auth.view.dto.UserDto;
+import com.platform.order.user.controller.request.SignUpUserRequestDto;
+import com.platform.order.user.domain.entity.Role;
+import com.platform.order.user.service.UserService;
 
 @Profile("local")
 @Component
@@ -45,7 +45,7 @@ public class TestData {
 
 			IntStream.rangeClosed(1, 10)
 				.forEach(value -> {
-					userService.save(new UserDto.SignUpRequest(
+					userService.register(new SignUpUserRequestDto(
 						username+String.valueOf(value),
 						password,
 						nickName+String.valueOf(value),

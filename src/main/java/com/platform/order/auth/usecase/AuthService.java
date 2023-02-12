@@ -5,7 +5,8 @@ import java.text.MessageFormat;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.platform.order.auth.domain.UserDomain;
+import com.platform.order.user.domain.entity.UserEntity;
+import com.platform.order.user.domain.repository.UserRepository;
 import com.platform.order.auth.usecase.converter.AuthConverter;
 import com.platform.order.auth.view.dto.AuthDto;
 import com.platform.order.common.exception.BusinessException;
@@ -14,33 +15,25 @@ import com.platform.order.common.exception.NotFoundResource;
 import com.platform.order.security.JwtProviderManager;
 import com.platform.order.security.property.JwtConfig;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Service
 public class AuthService {
+	private final UserRepository userRepository;
 	private final JwtProviderManager jwtProviderManager;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtConfig jwtConfig;
-	private final UserDomain userDomain;
-
 	private final AuthConverter authConverter;
 
-	public AuthService(
-		JwtProviderManager jwtProviderManager,
-		PasswordEncoder passwordEncoder,
-		JwtConfig jwtConfig,
-		UserDomain userDomain,
-		AuthConverter authConverter) {
-		this.jwtProviderManager = jwtProviderManager;
-		this.passwordEncoder = passwordEncoder;
-		this.jwtConfig = jwtConfig;
-		this.userDomain = userDomain;
-		this.authConverter = authConverter;
-	}
-
 	public AuthDto.LoginResponse login(AuthDto.LoginRequest loginDto) {
-		AuthDto.Response principal = null;
+		UserEntity principal = null;
 
 		try {
-			principal = userDomain.findByUsername(loginDto.username());
+			principal = userRepository.findByUsername(loginDto.username()).orElseThrow(() -> new NotFoundResource(
+				MessageFormat.format("not found user, username :{0}", loginDto.username()),
+				ErrorCode.NOT_FOUND_RESOURCES)
+			);
 		} catch (NotFoundResource notFoundResource) {
 			throw new BusinessException(
 				MessageFormat.format("not exist User username: {0}", loginDto.username()),
@@ -48,7 +41,7 @@ public class AuthService {
 			);
 		}
 
-		boolean isMatchCredential = passwordEncoder.matches(loginDto.password(), principal.encodingPassword());
+		boolean isMatchCredential = passwordEncoder.matches(loginDto.password(), principal.getPassword());
 
 		if (!isMatchCredential) {
 			throw new BusinessException(
@@ -58,12 +51,12 @@ public class AuthService {
 		}
 
 		JwtProviderManager.CustomClaim claim = JwtProviderManager.CustomClaim.builder()
-			.userId(principal.userId())
-			.roles(new String[] {principal.role().getKey()})
+			.userId(principal.getId())
+			.roles(new String[] {principal.getRole().getKey()})
 			.build();
 
 		String accessToken = jwtProviderManager.generateAccessToken(claim);
-		String refreshToken = jwtProviderManager.generateRefreshToken(principal.userId());
+		String refreshToken = jwtProviderManager.generateRefreshToken(principal.getId());
 
 		return authConverter.toLoginResponse(accessToken, refreshToken, jwtConfig);
 	}

@@ -32,9 +32,7 @@ public class WebSecurityConfig {
 	private final JwtProviderManager jwtProviderManager;
 	private final CookieProperty cookieProperty;
 	private final SecurityUrlProperty securityUrlProperty;
-
 	private final JwtConfig jwtConfig;
-
 	public WebSecurityConfig(
 		JwtProviderManager jwtProviderManager,
 		CookieProperty cookieProperty,

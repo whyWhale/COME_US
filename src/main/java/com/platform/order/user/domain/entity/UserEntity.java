@@ -1,4 +1,4 @@
-package com.platform.order.auth.domain.entity;
+package com.platform.order.user.domain.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,11 +15,19 @@ import javax.validation.constraints.Size;
 
 import com.platform.order.common.BaseEntity;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Table(name = "users")
 @Entity
-public class User extends BaseEntity {
+public class UserEntity extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,43 +52,6 @@ public class User extends BaseEntity {
 
 	@Enumerated(EnumType.STRING)
 	private Role role;
-
-	protected User() {
-	}
-
-	@Builder
-	public User(Long id, String username, String password, String nickName, String email, Role role) {
-		this.id = id;
-		this.username = username;
-		this.password = password;
-		this.nickName = nickName;
-		this.email = email;
-		this.role = role;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public String getNickName() {
-		return nickName;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public Role getRole() {
-		return role;
-	}
 }
 
 

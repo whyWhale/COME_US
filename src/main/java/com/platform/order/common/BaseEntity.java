@@ -13,6 +13,9 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import lombok.Getter;
+
+@Getter
 @EntityListeners(AuditingEntityListener.class)
 @MappedSuperclass
 public abstract class BaseEntity {
@@ -29,30 +32,4 @@ public abstract class BaseEntity {
 
 	@LastModifiedBy
 	private String updatedBy;
-
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
-
-	public LocalDateTime getUpdatedAt() {
-		return updatedAt;
-	}
-
-	public String getCreatedBy() {
-		return createdBy;
-	}
-
-	public String getUpdatedBy() {
-		return updatedBy;
-	}
-
-	@Override
-	public String toString() {
-		return new ToStringBuilder(this)
-			.append("createdAt", createdAt)
-			.append("updatedAt", updatedAt)
-			.append("createdBy", createdBy)
-			.append("updatedBy", updatedBy)
-			.toString();
-	}
 }
