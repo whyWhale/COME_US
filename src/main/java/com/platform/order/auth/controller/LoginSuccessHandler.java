@@ -1,4 +1,4 @@
-package com.platform.order.auth.view;
+package com.platform.order.auth.controller;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -6,7 +6,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
-import com.platform.order.auth.view.dto.AuthDto;
+import com.platform.order.auth.controller.dto.response.LoginAuthResponseDto;
+import com.platform.order.auth.controller.dto.response.TokenResponseDto;
 import com.platform.order.security.property.CookieProperty;
 
 @Component
@@ -19,7 +20,7 @@ public class LoginSuccessHandler {
 
 	public void onAuthenticationSuccess(
 		HttpServletResponse response,
-		AuthDto.LoginResponse loginResponse
+		LoginAuthResponseDto loginResponse
 	) {
 		ResponseCookie accessCookie = createCookie(loginResponse.accessToken());
 		ResponseCookie refreshCookie = createCookie(loginResponse.refreshToken());
@@ -28,7 +29,7 @@ public class LoginSuccessHandler {
 		response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 	}
 
-	private ResponseCookie createCookie(AuthDto.TokenResponse tokenResponse) {
+	private ResponseCookie createCookie(TokenResponseDto tokenResponse) {
 		return ResponseCookie.from(tokenResponse.header(), tokenResponse.token())
 			.path("/")
 			.httpOnly(true)

@@ -1,14 +1,16 @@
-package com.platform.order.auth.usecase;
+package com.platform.order.auth.service;
 
 import java.text.MessageFormat;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.platform.order.auth.controller.dto.response.LoginAuthResponseDto;
+import com.platform.order.auth.controller.dto.response.LogoutAuthResponseDto;
+import com.platform.order.auth.controller.dto.request.LoginAuthRequestDto;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
-import com.platform.order.auth.usecase.converter.AuthConverter;
-import com.platform.order.auth.view.dto.AuthDto;
+import com.platform.order.auth.service.converter.AuthConverter;
 import com.platform.order.common.exception.BusinessException;
 import com.platform.order.common.exception.ErrorCode;
 import com.platform.order.common.exception.NotFoundResource;
@@ -26,7 +28,7 @@ public class AuthService {
 	private final JwtConfig jwtConfig;
 	private final AuthConverter authConverter;
 
-	public AuthDto.LoginResponse login(AuthDto.LoginRequest loginDto) {
+	public LoginAuthResponseDto login(LoginAuthRequestDto loginDto) {
 		UserEntity principal = null;
 
 		try {
@@ -61,7 +63,7 @@ public class AuthService {
 		return authConverter.toLoginResponse(accessToken, refreshToken, jwtConfig);
 	}
 
-	public AuthDto.LogoutResponse logout(Long id) {
+	public LogoutAuthResponseDto logout(Long id) {
 		jwtProviderManager.removeRefreshToken(id);
 
 		return authConverter.toLogoutResponse(jwtConfig);

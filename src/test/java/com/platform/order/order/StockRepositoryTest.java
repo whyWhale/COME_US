@@ -6,6 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import com.platform.order.order.domain.entity.Stock;
+import com.platform.order.order.domain.StockRepository;
+
 @DataJpaTest
 class StockRepositoryTest {
 

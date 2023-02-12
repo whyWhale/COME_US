@@ -16,6 +16,12 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import com.platform.order.order.domain.entity.Product;
+import com.platform.order.order.domain.ProductRepository;
+import com.platform.order.order.domain.entity.Stock;
+import com.platform.order.order.domain.StockRepository;
+import com.platform.order.order.usecase.OrderService;
+
 @ActiveProfiles("container")
 @Testcontainers
 @SpringBootTest
