@@ -7,8 +7,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Arrays;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.servlet.http.Cookie;
 
 import org.assertj.core.api.Assertions;
@@ -30,11 +28,12 @@ import org.testcontainers.utility.DockerImageName;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.platform.order.auth.controller.dto.request.LoginAuthRequestDto;
-import com.platform.order.user.domain.entity.Role;
-import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.security.JwtProviderManager;
 import com.platform.order.security.WithJwtMockUser;
 import com.platform.order.security.property.JwtConfig;
+import com.platform.order.user.domain.entity.Role;
+import com.platform.order.user.domain.entity.UserEntity;
+import com.platform.order.user.domain.repository.UserRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -55,8 +54,9 @@ class AuthenticationRestControllerIntegrationTest {
 	@Autowired
 	MockMvc mockMvc;
 
-	@PersistenceContext
-	EntityManager entityManager;
+	@Autowired
+	UserRepository userRepository;
+
 	@Autowired
 	PasswordEncoder passwordEncoder;
 
@@ -70,20 +70,19 @@ class AuthenticationRestControllerIntegrationTest {
 	JwtConfig jwtConfig;
 
 	@Test
-	@Transactional
 	@DisplayName("사용자가 로그인한다.")
 	void testLogin() throws Exception {
 		//given
 		String rawPassword = "1";
 		UserEntity userEntity = UserEntity.builder()
 			.username("whyWhale")
+			.email("koko@kakao.com")
 			.password(passwordEncoder.encode(rawPassword))
 			.nickName("whale")
 			.role(Role.USER)
 			.build();
 
-		entityManager.persist(userEntity);
-		entityManager.clear();
+		userRepository.save(userEntity);
 
 		LoginAuthRequestDto request = new LoginAuthRequestDto(userEntity.getUsername(), rawPassword);
 		String requestBody = objectMapper.writeValueAsString(request);
@@ -112,7 +111,6 @@ class AuthenticationRestControllerIntegrationTest {
 	}
 
 	@WithJwtMockUser
-	@Transactional
 	@Test
 	@DisplayName("로그아웃을 한다")
 	void testLogout() throws Exception {
@@ -120,14 +118,14 @@ class AuthenticationRestControllerIntegrationTest {
 		int expectedExpirySeconds = 0;
 		String rawPassword = "1";
 		UserEntity userEntity = UserEntity.builder()
-			.username("whyWhale")
+			.username("ckco1as2")
+			.email("cocoa@kakao.com")
 			.password(passwordEncoder.encode(rawPassword))
 			.nickName("whale")
 			.role(Role.USER)
 			.build();
 
-		entityManager.persist(userEntity);
-		entityManager.clear();
+		userRepository.save(userEntity);
 
 		LoginAuthRequestDto request = new LoginAuthRequestDto(userEntity.getUsername(), rawPassword);
 		String requestBody = objectMapper.writeValueAsString(request);

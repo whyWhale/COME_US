@@ -1,4 +1,4 @@
-package com.platform.order.auth.controller;
+package com.platform.order.auth.controller.handler;
 
 import static org.springframework.http.HttpHeaders.SET_COOKIE;
 

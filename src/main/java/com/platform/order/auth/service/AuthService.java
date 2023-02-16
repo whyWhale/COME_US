@@ -11,9 +11,9 @@ import com.platform.order.auth.controller.dto.request.LoginAuthRequestDto;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
 import com.platform.order.auth.service.converter.AuthConverter;
-import com.platform.order.common.exception.BusinessException;
-import com.platform.order.common.exception.ErrorCode;
-import com.platform.order.common.exception.NotFoundResource;
+import com.platform.order.common.exception.custom.BusinessException;
+import com.platform.order.common.exception.custom.ErrorCode;
+import com.platform.order.common.exception.custom.NotFoundResource;
 import com.platform.order.security.JwtProviderManager;
 import com.platform.order.security.property.JwtConfig;
 

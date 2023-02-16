@@ -1,4 +1,6 @@
-package com.platform.order.common.exception;
+package com.platform.order.common.exception.custom;
+
+import com.platform.order.common.exception.ErrorModel;
 
 public class BusinessException extends RuntimeException {
 	private final ErrorModel errorModel;

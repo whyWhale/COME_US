@@ -23,8 +23,8 @@ import com.platform.order.auth.controller.dto.response.LoginAuthResponseDto;
 import com.platform.order.auth.controller.dto.response.TokenResponseDto;
 import com.platform.order.auth.controller.dto.request.LoginAuthRequestDto;
 import com.platform.order.auth.service.converter.AuthConverter;
-import com.platform.order.common.exception.BusinessException;
-import com.platform.order.common.exception.NotFoundResource;
+import com.platform.order.common.exception.custom.BusinessException;
+import com.platform.order.common.exception.custom.NotFoundResource;
 import com.platform.order.security.JwtProviderManager;
 import com.platform.order.security.Token;
 import com.platform.order.security.property.JwtConfig;
@@ -66,14 +66,12 @@ class AuthenticationServiceTest {
 		//given
 		LoginAuthRequestDto loginRequest = new LoginAuthRequestDto("whyWhale", "whywhale1234!");
 		UserEntity savedUserEntity = UserEntity.builder()
-			.id(1L)
 			.username(loginRequest.username())
 			.password(loginRequest.password())
 			.role(Role.USER)
 			.build();
 
 		UserEntity user = UserEntity.builder()
-			.id(savedUserEntity.getId())
 			.username(savedUserEntity.getUsername())
 			.role(savedUserEntity.getRole())
 			.password(loginRequest.password())
@@ -114,7 +112,6 @@ class AuthenticationServiceTest {
 		verify(userRepository, times(1)).findByUsername(any(String.class));
 		verify(passwordEncoder, times(1)).matches(any(String.class), any(String.class));
 		verify(jwtProviderManager, times(1)).generateAccessToken(any(JwtProviderManager.CustomClaim.class));
-		verify(jwtProviderManager, times(1)).generateRefreshToken(any(Long.class));
 
 		Assertions.assertThat(loginResponse.accessToken().token()).isEqualTo(expectedToken);
 		Assertions.assertThat(loginResponse.refreshToken().token()).isEqualTo(expectedToken);

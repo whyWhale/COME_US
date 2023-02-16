@@ -27,10 +27,12 @@ import com.platform.order.auth.controller.dto.response.LoginAuthResponseDto;
 import com.platform.order.auth.controller.dto.response.LogoutAuthResponseDto;
 import com.platform.order.auth.controller.dto.response.TokenResponseDto;
 import com.platform.order.auth.controller.dto.request.LoginAuthRequestDto;
+import com.platform.order.auth.controller.handler.LoginSuccessHandler;
+import com.platform.order.auth.controller.handler.LogoutHandler;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.auth.service.AuthService;
-import com.platform.order.common.ApiResponse;
+import com.platform.order.common.protocal.ApiResponse;
 import com.platform.order.security.JwtProviderManager;
 import com.platform.order.security.TokenService;
 import com.platform.order.security.WebSecurityConfig;
@@ -72,7 +74,6 @@ class AuthenticationRestControllerTest {
 	void testLogin() throws Exception {
 		//given
 		UserEntity loginUserEntity = UserEntity.builder()
-			.id(1L)
 			.username("whyWhale")
 			.password("wls23333")
 			.role(Role.OWNER)

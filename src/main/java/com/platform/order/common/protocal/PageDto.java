@@ -1,4 +1,4 @@
-package com.platform.order.common;
+package com.platform.order.common.protocal;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;

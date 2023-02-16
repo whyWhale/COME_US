@@ -1,8 +1,10 @@
-package com.platform.order.common.exception;
+package com.platform.order.common.exception.custom;
 
 import static org.springframework.http.HttpStatus.*;
 
 import org.springframework.http.HttpStatus;
+
+import com.platform.order.common.exception.ErrorModel;
 
 public enum ErrorCode implements ErrorModel {
 	// COMMON
@@ -17,7 +19,7 @@ public enum ErrorCode implements ErrorModel {
 	// BUSINESS,
 	ALREADY_ISSUE_COUPON("B001", "already issue coupon", BAD_REQUEST),
 	ALREADY_USE_COUPON("B002", "already use coupon", BAD_REQUEST),
-	OUT_OF_STOCK("B003", "out of quantity", BAD_REQUEST),
+	OUT_OF_STOCK("B003", "out of orderQuantity", BAD_REQUEST),
 	NOT_AUTHENTICATE("B004", "not authenticate", UNAUTHORIZED);
 	private final String code;
 	private final String message;

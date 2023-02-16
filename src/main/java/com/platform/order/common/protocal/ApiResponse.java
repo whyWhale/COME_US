@@ -1,4 +1,4 @@
-package com.platform.order.common;
+package com.platform.order.common.protocal;
 
 public class ApiResponse<T> {
 	private T data;

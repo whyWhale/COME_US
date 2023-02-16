@@ -1,4 +1,4 @@
-package com.platform.order.auth.controller;
+package com.platform.order.auth.controller.handler;
 
 import javax.servlet.http.HttpServletResponse;
 
