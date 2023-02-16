@@ -16,9 +16,9 @@
 ### 웹 링크
 * mysql-phpAdmin
   - [mysql-client-web 접속하기](http://localhost:8082)
-  * user: root
+  * userEntity: root
   * password: password
 * redis-cli
   - [redis-cli-web 접속하기](http://localhost:8081)
 
-
+https://github.com/raahii/docker-mysql-master-slave

@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.platform.order.user.controller.request.SignUpUserRequestDto;
+import com.platform.order.user.controller.dto.request.SignUpUserRequestDto;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.service.UserService;
 
@@ -46,11 +46,7 @@ public class TestData {
 			IntStream.rangeClosed(1, 10)
 				.forEach(value -> {
 					userService.register(new SignUpUserRequestDto(
-						username+String.valueOf(value),
-						password,
-						nickName+String.valueOf(value),
-						email,
-						role
+						username+String.valueOf(value), email, password, nickName+String.valueOf(value), role
 					));
 				});
 		}
