@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import com.platform.order.order.domain.entity.OrderProductEntity;
 
@@ -17,6 +18,7 @@ public class CustomOrderProductRepositoryImpl implements CustomOrderProductRepos
 
 	private final int DEFAULT_BATCH_SIZE = 1000;
 	private final JdbcTemplate jdbcTemplate;
+	private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
 	@Override
 	public List<OrderProductEntity> saveAllInBulk(List<OrderProductEntity> orderProducts) {

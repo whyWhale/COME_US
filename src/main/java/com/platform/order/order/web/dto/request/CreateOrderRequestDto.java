@@ -2,11 +2,13 @@ package com.platform.order.order.web.dto.request;
 
 import java.util.List;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-public record CreatOrderRequestDto(
+@Valid
+public record CreateOrderRequestDto(
+	@Valid
 	@Size(min = 1)
 	List<OrderProductRequestDto> orderProducts,
 	@NotBlank

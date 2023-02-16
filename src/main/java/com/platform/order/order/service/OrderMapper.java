@@ -13,7 +13,7 @@ import com.platform.order.order.web.dto.response.CreateOrderResponseDto;
 import com.platform.order.product.domain.entity.ProductEntity;
 
 @Component
-public class OrderConverter {
+public class OrderMapper {
 	public CreateOrderResponseDto toCreateOrderResponseDto(OrderEntity order, Map<Long, Long> pickedProducts,
 		List<OrderProductEntity> savedOrderProduct) {
 		List<CreateOrderResponseDto.OrderProductResponseDto> orderProductResponseDtos = savedOrderProduct.stream().map(orderProduct -> {

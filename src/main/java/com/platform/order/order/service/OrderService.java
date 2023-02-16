@@ -15,7 +15,7 @@ import com.platform.order.order.domain.entity.OrderEntity;
 import com.platform.order.order.domain.entity.OrderProductEntity;
 import com.platform.order.order.domain.repository.OrderProductRepository;
 import com.platform.order.order.domain.repository.OrderRepository;
-import com.platform.order.order.web.dto.request.CreatOrderRequestDto;
+import com.platform.order.order.web.dto.request.CreateOrderRequestDto;
 import com.platform.order.order.web.dto.response.CreateOrderResponseDto;
 import com.platform.order.product.domain.entity.ProductEntity;
 import com.platform.order.product.domain.respository.ProductRepository;
@@ -33,15 +33,19 @@ public class OrderService {
 	private final OrderRepository orderRepository;
 	private final OrderProductRepository orderProductRepository;
 	private final ProductRepository productRepository;
-	private final OrderConverter orderConverter;
+	private final OrderMapper orderMapper;
 
 	/**
 	 * todo: 다량 상품 주문 처리시 예외 생각해야함.
+	 * edge:
+	 *  - 다량 주문시 롤백 어떻게 할 것인가?
+	 *  - 단일 다건 주문을 따로 서비스 하는 건 어떤가?
+	 *  -
 	 * @param userId
 	 * @param creatOrderRequest
 	 * @return
 	 */
-	public CreateOrderResponseDto placeOrder(Long userId, CreatOrderRequestDto creatOrderRequest) {
+	public CreateOrderResponseDto placeOrder(Long userId, CreateOrderRequestDto creatOrderRequest) {
 		UserEntity buyer = userRepository.findById(userId)
 			.orElseThrow(() -> new NotFoundResource(
 				MessageFormat.format("user id:{0} is not found.", userId),
@@ -50,13 +54,13 @@ public class OrderService {
 
 		boolean isAvailable = creatOrderRequest.orderProducts().stream()
 			.map(orderProductRequestDto -> productRepository.updateQuantity(orderProductRequestDto.productId(),
-				orderProductRequestDto.orderQuantity())).allMatch(affectedRow -> affectedRow == 1);
+				orderProductRequestDto.orderQuantity())).allMatch(orderPossibility -> orderPossibility == 1);
 
 		if (!isAvailable) {
 			throw new BusinessException(
 				MessageFormat.format("products : {0} is out of stock. Or not valid product id list",
 					creatOrderRequest.orderProducts().stream()
-						.map(CreatOrderRequestDto.OrderProductRequestDto::productId)
+						.map(CreateOrderRequestDto.OrderProductRequestDto::productId)
 						.toList()),
 				ErrorCode.NOT_FOUND_RESOURCES
 			);
@@ -68,8 +72,8 @@ public class OrderService {
 
 		Map<Long, Long> pickedProducts = creatOrderRequest.orderProducts()
 			.stream()
-			.collect(Collectors.toMap(CreatOrderRequestDto.OrderProductRequestDto::productId,
-				CreatOrderRequestDto.OrderProductRequestDto::orderQuantity));
+			.collect(Collectors.toMap(CreateOrderRequestDto.OrderProductRequestDto::productId,
+				CreateOrderRequestDto.OrderProductRequestDto::orderQuantity));
 		List<ProductEntity> productEntities = productRepository.findByIdIn(pickedProducts.keySet());
 		List<OrderProductEntity> orderProducts = productEntities.stream()
 			.map(productEntity -> OrderProductEntity.builder()
@@ -83,7 +87,7 @@ public class OrderService {
 
 		List<OrderProductEntity> savedOrderProduct = orderProductRepository.saveAllInBulk(orderProducts);
 
-		return orderConverter.toCreateOrderResponseDto(order, pickedProducts, savedOrderProduct);
+		return orderMapper.toCreateOrderResponseDto(order, pickedProducts, savedOrderProduct);
 	}
 
 }
