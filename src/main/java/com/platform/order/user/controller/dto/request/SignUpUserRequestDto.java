@@ -1,4 +1,4 @@
-package com.platform.order.user.controller.request;
+package com.platform.order.user.controller.dto.request;
 
 import com.platform.order.user.domain.entity.Role;
 

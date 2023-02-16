@@ -4,8 +4,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.platform.order.user.controller.request.SignUpUserRequestDto;
-import com.platform.order.user.controller.response.SignUpUserResponseDto;
+import com.platform.order.user.controller.dto.request.SignUpUserRequestDto;
+import com.platform.order.user.controller.dto.response.SignUpUserResponseDto;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
 
@@ -29,9 +29,9 @@ public class UserService {
 			.role(signUpRequestDto.role())
 			.build();
 
-		UserEntity registedUser = userRepository.save(user);
+		UserEntity registeredUser = userRepository.save(user);
 
-		return userConverter.toSignUpUserResponseDto(registedUser);
+		return userConverter.toSignUpUserResponseDto(registeredUser);
 	}
 
 }

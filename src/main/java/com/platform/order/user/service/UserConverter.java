@@ -2,7 +2,7 @@ package com.platform.order.user.service;
 
 import org.springframework.stereotype.Component;
 
-import com.platform.order.user.controller.response.SignUpUserResponseDto;
+import com.platform.order.user.controller.dto.response.SignUpUserResponseDto;
 import com.platform.order.user.domain.entity.UserEntity;
 
 @Component
