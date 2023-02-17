@@ -15,6 +15,7 @@ import com.platform.order.order.web.dto.request.CreateOrderRequestDto;
 import com.platform.order.order.web.dto.response.CreateOrderResponseDto;
 import com.platform.order.product.domain.entity.ProductEntity;
 import com.platform.order.product.domain.respository.ProductRepository;
+import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
 
@@ -22,10 +23,8 @@ import com.platform.order.user.domain.repository.UserRepository;
 public class OrderIntegrationTest {
 	@Autowired
 	OrderService orderService;
-
 	@Autowired
 	UserRepository userRepository;
-
 	@Autowired
 	ProductRepository productRepository;
 	ProductEntity product;
@@ -35,8 +34,19 @@ public class OrderIntegrationTest {
 
 	@BeforeEach
 	public void setUp() {
-		user = userRepository.findById(1L).orElseThrow(RuntimeException::new);
-		product = productRepository.findById(1L).orElseThrow(RuntimeException::new);
+		user = userRepository.save(UserEntity
+			.builder()
+			.email("orderIntegration@google.com")
+			.username("orderIntegration")
+			.nickName("order")
+			.role(Role.USER)
+			.password("1")
+			.build());
+		product = productRepository.save(ProductEntity.builder()
+			.name("test상품1")
+			.quantity(10L)
+			.price(4500L)
+			.build());
 	}
 
 	@Test
