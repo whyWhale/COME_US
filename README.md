@@ -7,7 +7,7 @@
 3. docker-compose up -d
 
 ### ERD V1.1
-<img src="image/erdV1,1.png" >
+<img src="image/ErdV1.png" >
 
 ### 기능 리스트
 
@@ -54,4 +54,4 @@
 
 ### 챙겨야 할 것
 - 좋아요, 싫어요, 조회수 (redis ? mysql) - ttl?
-- 
+- 카테고리 (재귀 쿼리)
