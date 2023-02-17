@@ -3,7 +3,6 @@ package com.platform.order.product.domain.entity;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Where;
@@ -20,18 +19,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Where(clause = "deleted=false")
-@Table(name = "product")
+@Table(name = "product_image")
 @Entity
-public class ProductEntity extends BaseEntity {
+public class ProductImageEntity extends BaseEntity {
+	private String originName;
 	private String name;
-	private Long quantity;
-	private Long price;
-	private boolean isDisplay;
+	private String path;
+	private String extension;
+	private Long size;
+	private Long order;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	private CategoryEntity category;
-
-	@OneToOne(fetch = FetchType.LAZY)
-	private ProductThumbnailEntity productThumbnail;
-
+	private ProductEntity product;
 }
