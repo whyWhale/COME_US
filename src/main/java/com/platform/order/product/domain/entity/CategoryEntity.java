@@ -1,5 +1,6 @@
 package com.platform.order.product.domain.entity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -22,5 +23,6 @@ import lombok.NoArgsConstructor;
 public class CategoryEntity extends BaseEntity {
 	private String name;
 	private String code;
+	private boolean isDisplay;
 
 }

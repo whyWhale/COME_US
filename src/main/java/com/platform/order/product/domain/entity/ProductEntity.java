@@ -1,5 +1,6 @@
 package com.platform.order.product.domain.entity;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
@@ -19,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Where(clause = "deleted=false")
+@Where(clause = "deleted=false AND is_display=true")
 @Table(name = "product")
 @Entity
 public class ProductEntity extends BaseEntity {
@@ -31,7 +32,7 @@ public class ProductEntity extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private CategoryEntity category;
 
-	@OneToOne(fetch = FetchType.LAZY)
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
 	private ProductThumbnailEntity productThumbnail;
 
 }

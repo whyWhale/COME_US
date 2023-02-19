@@ -3,14 +3,14 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ${MYSQL_USERNAME:root}
     password: ${MYSQL_PASSWORD:password}
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/${MYSQL_DATABASE:order-renewal}
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/${MYSQL_DATABASE:order-renewal}?rewriteBatchedStatements=true
   jpa:
     hibernate:
       ddl-auto: create-drop
-    properties:
-      hibernate:
-        format_sql: true
-
+    defer-datasource-initialization: false
+  sql:
+    init:
+      mode: always
   redis:
     host: ${REDIS_HOST:localhost}
     port: ${REDIS_PORT:6379}

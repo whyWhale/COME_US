@@ -16,11 +16,14 @@ public enum ErrorCode implements ErrorModel {
 	CONSTRAINT_VIOLATION("V002", "Validation error", BAD_REQUEST),
 	DATA_INTEGRITY_VIOLATION("V003", "Data integrity violation", BAD_REQUEST),
 
-	// BUSINESS,
+	// BUSINESS
 	ALREADY_ISSUE_COUPON("B001", "already issue coupon", BAD_REQUEST),
 	ALREADY_USE_COUPON("B002", "already use coupon", BAD_REQUEST),
 	OUT_OF_STOCK("B003", "out of orderQuantity", BAD_REQUEST),
-	NOT_AUTHENTICATE("B004", "not authenticate", UNAUTHORIZED);
+	NOT_AUTHENTICATE("B004", "not authenticate", UNAUTHORIZED),
+
+	// IO
+	FILE_IO("I0004", "File I/O fail", BAD_REQUEST);
 	private final String code;
 	private final String message;
 	private final HttpStatus httpStatus;

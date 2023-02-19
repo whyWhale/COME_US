@@ -18,7 +18,6 @@ public class CustomOrderProductRepositoryImpl implements CustomOrderProductRepos
 
 	private final int DEFAULT_BATCH_SIZE = 1000;
 	private final JdbcTemplate jdbcTemplate;
-	private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
 	@Override
 	public List<OrderProductEntity> saveAllInBulk(List<OrderProductEntity> orderProducts) {
