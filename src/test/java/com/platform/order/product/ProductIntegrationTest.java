@@ -23,7 +23,6 @@ public class ProductIntegrationTest {
 	ProductService productService;
 	@Autowired
 	UserRepository userRepository;
-
 	@Autowired
 	CategoryRepository categoryRepository;
 
@@ -35,9 +34,9 @@ public class ProductIntegrationTest {
 
 		user = userRepository.save(UserEntity
 			.builder()
-			.email("orderIntegration@google.com")
-			.username("orderIntegration")
-			.nickName("order")
+			.email("productInegration@google.com")
+			.username("productIntegration")
+			.nickName("pro")
 			.role(Role.USER)
 			.password("1")
 			.build());
@@ -48,7 +47,6 @@ public class ProductIntegrationTest {
 				.code("C032")
 				.build()
 		);
-
 	}
 
 	@Test
