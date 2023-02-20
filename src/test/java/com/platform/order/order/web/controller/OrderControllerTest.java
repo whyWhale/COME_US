@@ -1,4 +1,4 @@
-package com.platform.order.order.web;
+package com.platform.order.order.web.controller;
 
 import static org.mockito.BDDMockito.verify;
 import static org.mockito.Mockito.times;
@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.platform.order.auth.controller.handler.LoginSuccessHandler;
 import com.platform.order.auth.controller.handler.LogoutHandler;
 import com.platform.order.order.service.OrderService;
+import com.platform.order.order.web.OrderController;
 import com.platform.order.order.web.dto.request.CreateOrderRequestDto;
 import com.platform.order.security.JwtProviderManager;
 import com.platform.order.security.TokenService;
