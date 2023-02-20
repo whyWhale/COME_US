@@ -2,7 +2,6 @@ plugins {
     id 'org.springframework.boot' version '2.7.5'
     id 'io.spring.dependency-management' version '1.0.15.RELEASE'
     id 'java'
-    id 'jacoco'
 }
 
 group = 'com.platform'
@@ -17,10 +16,6 @@ configurations {
 
 repositories {
     mavenCentral()
-}
-
-jacoco {
-    toolVersion = '0.8.8'
 }
 
 dependencies {
@@ -77,15 +72,4 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
-    finalizedBy jacocoTestReport
-}
-
-jacocoTestReport {
-    executionData(fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec"))
-
-    reports {
-        html.enabled true
-        xml.enabled true
-        csv.enabled false
-    }
 }
