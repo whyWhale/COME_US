@@ -36,6 +36,7 @@ import com.platform.order.security.WebSecurityConfig;
 import com.platform.order.security.WithJwtMockUser;
 import com.platform.order.security.property.JwtConfig;
 
+@WithJwtMockUser
 @WebMvcTest({OrderController.class,
 	WebSecurityConfig.class,
 	JwtProviderManager.class,
@@ -60,7 +61,6 @@ class OrderControllerTest {
 	String zipCode = "123-12";
 
 	@Test
-	@WithJwtMockUser
 	@DisplayName("상품을 주문한다.")
 	void testOrder() throws Exception {
 		//given
@@ -80,7 +80,6 @@ class OrderControllerTest {
 		verify(orderService, times(1)).placeOrder(1L, requestDto);
 	}
 
-	@WithJwtMockUser
 	@DisplayName("상품 주문시 ")
 	@Nested
 	class CreateOrderValidation {

@@ -1,5 +1,7 @@
 package com.platform.order.order;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 import java.util.Set;
 
@@ -61,15 +63,11 @@ public class OrderIntegrationTest {
 		CreateOrderRequestDto requestDto = new CreateOrderRequestDto(orderProductsRequest, address, zipCode);
 		//when
 		CreateOrderResponseDto createOrderResponse = orderService.placeOrder(user.getId(), requestDto);
-
-		List<ProductEntity> byIdIn = productRepository.findByIdIn(Set.of(product.getId()));
-
-		System.out.println(byIdIn);
-		//then
-		// assertThat(createOrderResponse.orderId()).isNotNull();
-		// assertThat(createOrderResponse.orderProducts().size()).isEqualTo(orderProductsRequest.size());
-		// assertThat(createOrderResponse.orderProducts().get(0).productId()).isEqualTo(product.getId());
-		// assertThat(createOrderResponse.orderProducts().get(0).orderQuantity()).isEqualTo(orderQuantity);
-		// assertThat(createOrderResponse.orderProducts().get(0).price()).isEqualTo(product.getPrice());
+		// then
+		assertThat(createOrderResponse.orderId()).isNotNull();
+		assertThat(createOrderResponse.orderProducts().size()).isEqualTo(orderProductsRequest.size());
+		assertThat(createOrderResponse.orderProducts().get(0).productId()).isEqualTo(product.getId());
+		assertThat(createOrderResponse.orderProducts().get(0).orderQuantity()).isEqualTo(orderQuantity);
+		assertThat(createOrderResponse.orderProducts().get(0).price()).isEqualTo(product.getPrice());
 	}
 }

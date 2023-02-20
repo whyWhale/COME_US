@@ -23,6 +23,4 @@ import lombok.NoArgsConstructor;
 public class CategoryEntity extends BaseEntity {
 	private String name;
 	private String code;
-	private boolean isDisplay;
-
 }
