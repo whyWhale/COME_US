@@ -49,15 +49,19 @@ public class ProductEntity extends BaseEntity {
 		return this.productThumbnail;
 	}
 
-	public boolean ishOwner(UserEntity auth) {
-		return auth.getId().equals(owner.getId());
+	public boolean isOwner(UserEntity auth) {
+		return this.owner.equals(auth);
 	}
 
 	public ProductEntity update(String name, CategoryEntity category, Long price, Long quantity) {
+		if (quantity == 0) {
+			this.isDisplay = false;
+		}
+
 		this.name = name;
 		this.price = price;
 		this.quantity = quantity;
-		this.category = this.category;
+		this.category = category;
 
 		return this;
 	}

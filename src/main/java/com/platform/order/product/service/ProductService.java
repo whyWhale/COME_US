@@ -80,7 +80,7 @@ public class ProductService {
 			ErrorCode.NOT_FOUND_RESOURCES)
 		);
 
-		if (!foundProduct.ishOwner(auth)) {
+		if (!foundProduct.isOwner(auth)) {
 			throw new BusinessException(
 				MessageFormat.format("product owner is not match. auth id : {0}", authId),
 				ErrorCode.NOT_OWNER
@@ -139,7 +139,7 @@ public class ProductService {
 			ErrorCode.NOT_FOUND_RESOURCES)
 		);
 
-		if (!foundProduct.ishOwner(auth)) {
+		if (!foundProduct.isOwner(auth)) {
 			throw new BusinessException(
 				MessageFormat.format("product owner is not match. auth id : {0}", authId),
 				ErrorCode.NOT_OWNER
@@ -169,7 +169,7 @@ public class ProductService {
 			MessageFormat.format("product id :{0} is not found.", productId),
 			ErrorCode.NOT_FOUND_RESOURCES));
 
-		if (!foundProduct.ishOwner(auth)) {
+		if (!foundProduct.isOwner(auth)) {
 			throw new BusinessException(
 				MessageFormat.format("product owner is not match. auth id : {0}", authId),
 				ErrorCode.NOT_OWNER

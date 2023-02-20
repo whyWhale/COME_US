@@ -1,5 +1,6 @@
 package com.platform.order.product.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
 
@@ -15,10 +16,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.platform.order.common.storage.StorageService;
 import com.platform.order.product.domain.entity.CategoryEntity;
+import com.platform.order.product.domain.entity.ProductEntity;
 import com.platform.order.product.domain.respository.CategoryRepository;
 import com.platform.order.product.domain.respository.ProductImageRepository;
 import com.platform.order.product.domain.respository.ProductRepository;
 import com.platform.order.product.web.dto.request.CreateProductRequestDto;
+import com.platform.order.product.web.dto.request.UpdateProductRequestDto;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
@@ -77,6 +80,37 @@ class ProductServiceTest {
 		verify(userRepository, times(1)).findById(any());
 		verify(categoryRepository, times(1)).findByCode(any());
 		verify(productRepository, times(1)).save(any());
+	}
+
+	@Test
+	@DisplayName("상품을 수정한다.")
+	void testUpdate() {
+		//given
+		long price = 1000L;
+		long quantity = 10L;
+		UpdateProductRequestDto requestDto = new UpdateProductRequestDto("변경될 이름", quantity + 5, price,
+			category.getCode());
+		ProductEntity savedProduct = ProductEntity.builder()
+			.name("test 상품")
+			.quantity(quantity)
+			.price(price)
+			.owner(user)
+			.isDisplay(true)
+			.category(category)
+			.build();
+
+		given(userRepository.findById(any())).willReturn(Optional.of(user));
+		given(productRepository.findById(any())).willReturn(Optional.of(savedProduct));
+		given(categoryRepository.findByCode(any())).willReturn(Optional.of(category));
+
+		//when
+		productService.update(userId, any(), requestDto);
+		//then
+
+		assertThat(savedProduct.getName()).isEqualTo(requestDto.name());
+		assertThat(savedProduct.getPrice()).isEqualTo(requestDto.price());
+		assertThat(savedProduct.getQuantity()).isEqualTo(requestDto.quantity());
+		assertThat(savedProduct.getCategory().getCode()).isEqualTo(requestDto.categoryCode());
 	}
 
 }

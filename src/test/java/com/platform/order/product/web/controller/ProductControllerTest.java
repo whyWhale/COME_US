@@ -3,6 +3,7 @@ package com.platform.order.product.web.controller;
 import static org.mockito.BDDMockito.verify;
 import static org.mockito.Mockito.times;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -22,6 +23,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.platform.order.product.service.ProductService;
 import com.platform.order.product.web.dto.request.CreateProductRequestDto;
+import com.platform.order.product.web.dto.request.UpdateProductRequestDto;
 import com.platform.order.security.JwtProviderManager;
 import com.platform.order.security.TokenService;
 import com.platform.order.security.WebSecurityConfig;
@@ -47,6 +49,7 @@ class ProductControllerTest {
 
 	@MockBean
 	ProductService productService;
+	Long productId;
 
 	@Test
 	@DisplayName("상품을 생성한다")
@@ -79,9 +82,9 @@ class ProductControllerTest {
 			perform.andExpect(status().isBadRequest());
 		}
 
-		@DisplayName("수량이 음수이거나 0이면 BadRequest로 응답한다.")
+		@DisplayName("수량이 음수이면 BadRequest로 응답한다.")
 		@ParameterizedTest(name = "{index}: quantity: {0}")
-		@ValueSource(longs = {-1, 0})
+		@ValueSource(longs = {-1, -12})
 		void failCreateWithNegativeQuantity(Long quantity) throws Exception {
 			//given
 			CreateProductRequestDto requestDto = new CreateProductRequestDto("test 상품", quantity, 1000L, "C001");
@@ -142,6 +145,108 @@ class ProductControllerTest {
 		ResultActions getPerform(CreateProductRequestDto requestDto) throws Exception {
 			return mockMvc.perform(
 				post(URI_PREFIX)
+					.content(objectMapper.writeValueAsString(requestDto))
+					.contentType(APPLICATION_JSON)
+			);
+		}
+	}
+
+	@Test
+	@DisplayName("상품을 수정한다.")
+	void testUpdate() throws Exception {
+		//given
+		productId = 1L;
+		UpdateProductRequestDto requestDto = new UpdateProductRequestDto("updating product", 10000L, 1000L,
+			"C032");
+		//when
+		ResultActions perform = mockMvc.perform(
+			patch(URI_PREFIX + "/" + productId)
+				.content(objectMapper.writeValueAsString(requestDto))
+				.contentType(APPLICATION_JSON));
+		//then
+		perform.andExpect(status().isOk());
+		verify(productService, times(1)).update(1L, productId, requestDto);
+	}
+
+	@DisplayName("상품 수정시 ")
+	@Nested
+	class UpdateProductValidation {
+
+		@DisplayName("이름이 없으면 BadRequest로 응답한다.")
+		@ParameterizedTest(name = "{index}: name: {0}")
+		@ValueSource(strings = {"\t", "\n"})
+		void failUpdateWithBlankName(String name) throws Exception {
+			//given
+			UpdateProductRequestDto requestDto = new UpdateProductRequestDto(name, 10L, 1000L, "C001");
+			//when
+			ResultActions perform = getPerform(requestDto);
+			//then
+			perform.andExpect(status().isBadRequest());
+		}
+
+		@DisplayName("수량이 음수이거나 0이면 BadRequest로 응답한다.")
+		@ParameterizedTest(name = "{index}: quantity: {0}")
+		@ValueSource(longs = {-1, 0})
+		void failUpdateWithNegativeQuantity(Long quantity) throws Exception {
+			//given
+			UpdateProductRequestDto requestDto = new UpdateProductRequestDto("test 상품", quantity, 1000L, "C001");
+			//when
+			ResultActions perform = getPerform(requestDto);
+			//then
+			perform.andExpect(status().isBadRequest());
+		}
+
+		@Test
+		@DisplayName("수량이 없으면 BadRequest로 응답한다.")
+		@NullAndEmptySource
+		void failUpdateWithNullQuantity() throws Exception {
+			//given
+			UpdateProductRequestDto requestDto = new UpdateProductRequestDto("test 상품", null, 1000L, "C001");
+			//when
+			ResultActions perform = getPerform(requestDto);
+			//then
+			perform.andExpect(status().isBadRequest());
+		}
+
+		@DisplayName("가격이 음수이거나 0이면 BadRequest로 응답한다.")
+		@ParameterizedTest(name = "{index}: price: {0}")
+		@ValueSource(longs = {-1, 0})
+		void failUpdateWithNegativePrice(Long price) throws Exception {
+			//given
+			UpdateProductRequestDto requestDto = new UpdateProductRequestDto("test 상품", 10L, price, "C001");
+			//when
+			ResultActions perform = getPerform(requestDto);
+			//then
+			perform.andExpect(status().isBadRequest());
+		}
+
+		@Test
+		@DisplayName("가격이 없으면 BadRequest로 응답한다.")
+		@NullAndEmptySource
+		void failUpdateWithNullPrice() throws Exception {
+			//given
+			UpdateProductRequestDto requestDto = new UpdateProductRequestDto("test 상품", 10L, null, "C001");
+			//when
+			ResultActions perform = getPerform(requestDto);
+			//then
+			perform.andExpect(status().isBadRequest());
+		}
+
+		@DisplayName("카테고리 코드가 없으면 BadRequest로 응답한다.")
+		@ParameterizedTest(name = "{index}: categoryCode: {0}")
+		@ValueSource(strings = {"\t", "\n"})
+		void failUpdateWithBlankCategoryCode(String categoryCode) throws Exception {
+			//given
+			UpdateProductRequestDto requestDto = new UpdateProductRequestDto("test 상품", 10L, 1000L, categoryCode);
+			//when
+			ResultActions perform = getPerform(requestDto);
+			//then
+			perform.andExpect(status().isBadRequest());
+		}
+
+		ResultActions getPerform(UpdateProductRequestDto requestDto) throws Exception {
+			return mockMvc.perform(
+				patch(URI_PREFIX+"/"+productId)
 					.content(objectMapper.writeValueAsString(requestDto))
 					.contentType(APPLICATION_JSON)
 			);

@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.platform.order.product.domain.entity.ProductEntity;
 import com.platform.order.product.service.ProductService;
 import com.platform.order.product.web.dto.request.CreateProductRequestDto;
 import com.platform.order.product.web.dto.request.UpdateProductRequestDto;
@@ -52,7 +51,7 @@ public class ProductController {
 
 	@PatchMapping("/{productId}")
 	public UpdateProductResponseDto upadte(@AuthenticationPrincipal JwtAuthentication principal,
-		@PathVariable Long productId, UpdateProductRequestDto updateProductRequest) {
+		@PathVariable Long productId, @Valid @RequestBody UpdateProductRequestDto updateProductRequest) {
 
 		return productService.update(principal.id(), productId, updateProductRequest);
 	}
