@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.platform.order.BaseSpringBootTest;
 import com.platform.order.order.service.OrderService;
 import com.platform.order.order.web.dto.request.CreateOrderRequestDto;
 import com.platform.order.order.web.dto.response.CreateOrderResponseDto;
@@ -21,7 +22,7 @@ import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
 
 @SpringBootTest
-public class OrderIntegrationTest {
+public class OrderIntegrationTest extends BaseSpringBootTest {
 	@Autowired
 	OrderService orderService;
 	@Autowired

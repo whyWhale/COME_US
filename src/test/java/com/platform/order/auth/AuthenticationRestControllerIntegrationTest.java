@@ -27,6 +27,7 @@ import org.testcontainers.utility.DockerImageName;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.platform.order.BaseSpringBootTest;
 import com.platform.order.auth.controller.dto.request.LoginAuthRequestDto;
 import com.platform.order.security.JwtProviderManager;
 import com.platform.order.security.WithJwtMockUser;
@@ -37,19 +38,9 @@ import com.platform.order.user.domain.repository.UserRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class AuthenticationRestControllerIntegrationTest {
+class AuthenticationRestControllerIntegrationTest extends BaseSpringBootTest {
 
 	static final String URI_PREFIX = "/api/auth";
-
-	@Container
-	static final GenericContainer<?> redis = new GenericContainer<>(
-		DockerImageName.parse("redis:latest")).withExposedPorts(6379);
-
-	static {
-		redis.start();
-		System.setProperty("spring.redis.host", redis.getHost());
-		System.setProperty("spring.redis.port", redis.getMappedPort(6379).toString());
-	}
 
 	@Autowired
 	MockMvc mockMvc;
