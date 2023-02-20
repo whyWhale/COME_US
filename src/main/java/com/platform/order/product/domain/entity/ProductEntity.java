@@ -10,6 +10,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Where;
 
 import com.platform.order.common.BaseEntity;
+import com.platform.order.user.domain.entity.UserEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,9 +31,18 @@ public class ProductEntity extends BaseEntity {
 	private boolean isDisplay;
 
 	@ManyToOne(fetch = FetchType.LAZY)
+	private UserEntity owner;
+
+	@ManyToOne(fetch = FetchType.LAZY)
 	private CategoryEntity category;
 
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
 	private ProductThumbnailEntity productThumbnail;
+
+	public ProductThumbnailEntity addThumbnail(ProductThumbnailEntity thumbnailEntity) {
+		this.productThumbnail = thumbnailEntity;
+
+		return this.productThumbnail;
+	}
 
 }

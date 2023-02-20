@@ -11,6 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.platform.order.common.exception.custom.ErrorCode;
 import com.platform.order.common.exception.custom.NotFoundResource;
+import com.platform.order.common.storage.FileSuffixPath;
+import com.platform.order.common.storage.StorageService;
 import com.platform.order.common.utils.FileUtils;
 import com.platform.order.product.domain.entity.CategoryEntity;
 import com.platform.order.product.domain.entity.ProductEntity;
@@ -19,9 +21,11 @@ import com.platform.order.product.domain.entity.ProductThumbnailEntity;
 import com.platform.order.product.domain.respository.CategoryRepository;
 import com.platform.order.product.domain.respository.ProductImageRepository;
 import com.platform.order.product.domain.respository.ProductRepository;
-import com.platform.order.product.domain.respository.ProductThumbnailRepository;
 import com.platform.order.product.web.dto.request.CreateProductRequestDto;
 import com.platform.order.product.web.dto.response.CreateProductResponseDto;
+import com.platform.order.product.web.dto.response.ProductFileResponseDto;
+import com.platform.order.user.domain.entity.UserEntity;
+import com.platform.order.user.domain.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,35 +33,25 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 @Service
 public class ProductService {
+	private final UserRepository userRepository;
 	private final ProductRepository productRepository;
-	private final ProductThumbnailRepository thumbnailRepository;
 	private final CategoryRepository categoryRepository;
-	private final ProductImageRepository productImageRepository;
+	private final ProductImageRepository imageRepository;
 	private final ProductMapper productMapper;
+	private final StorageService storageService;
 
 	@Transactional
-	public CreateProductResponseDto create(Long userId, CreateProductRequestDto createProductRequest,
-		MultipartFile thumbnail, List<MultipartFile> productImages) {
-		String categoryCode = createProductRequest.categoryCode();
-		CategoryEntity category = categoryRepository.findByCode(categoryCode).orElseThrow(() ->
-			new NotFoundResource(
-				MessageFormat.format("category code :{0} is not found.", categoryCode),
-				ErrorCode.NOT_FOUND_RESOURCES)
+	public CreateProductResponseDto create(Long userId, CreateProductRequestDto createProductRequest) {
+		UserEntity owner = userRepository.findById(userId).orElseThrow(() -> new NotFoundResource(
+			MessageFormat.format("user id :{0} is not found.", userId),
+			ErrorCode.NOT_FOUND_RESOURCES)
 		);
 
-		String originalThumbnailName = thumbnail.getOriginalFilename();
-		String thumbnailExtension = FileUtils.getExtension(originalThumbnailName);
-		String thumbnailFileName = UUID.randomUUID().toString();
-		long thumbnailSize = thumbnail.getSize();
-		String thumbnailPath = "upload path"; // upload
-
-		ProductThumbnailEntity savedThumbnail = thumbnailRepository.save(ProductThumbnailEntity.builder()
-			.name(thumbnailFileName)
-			.originName(thumbnail.getOriginalFilename())
-			.path(thumbnailPath)
-			.size(thumbnailSize)
-			.extension(thumbnailExtension)
-			.build());
+		CategoryEntity category = categoryRepository.findByCode(createProductRequest.categoryCode()).orElseThrow(() ->
+			new NotFoundResource(
+				MessageFormat.format("category code :{0} is not found.", createProductRequest.categoryCode()),
+				ErrorCode.NOT_FOUND_RESOURCES)
+		);
 
 		ProductEntity savedProductEntity = productRepository.save(ProductEntity.builder()
 			.name(createProductRequest.name())
@@ -65,17 +59,43 @@ public class ProductService {
 			.price(createProductRequest.price())
 			.isDisplay(true)
 			.category(category)
-			.productThumbnail(savedThumbnail)
+			.owner(owner)
 			.build());
 
-		AtomicLong arrange = new AtomicLong();
+		return productMapper.toCreateProductResponseDto(savedProductEntity);
+	}
 
-		List<ProductImageEntity> productImageEntities = productImages.stream().map(multipartFile -> {
+	@Transactional
+	public ProductFileResponseDto createFile(Long productId, MultipartFile thumbnail, List<MultipartFile> images) {
+		ProductEntity foundProduct = productRepository.findById(productId).orElseThrow(() -> new NotFoundResource(
+			MessageFormat.format("product id :{0} is not found.", productId),
+			ErrorCode.NOT_FOUND_RESOURCES));
+
+		String originalThumbnailName = thumbnail.getOriginalFilename();
+		String thumbnailExtension = FileUtils.getExtension(originalThumbnailName);
+		String thumbnailFileName = UUID.randomUUID().toString();
+		long thumbnailSize = thumbnail.getSize();
+		String thumbnailPath = storageService.upload(thumbnail, FileSuffixPath.PRODUCT_THUMBNAIL, thumbnailFileName,
+			thumbnailExtension);
+
+		ProductThumbnailEntity productThumbnail = foundProduct.addThumbnail(ProductThumbnailEntity.builder()
+			.name(thumbnailFileName)
+			.originName(thumbnail.getOriginalFilename())
+			.path(thumbnailPath)
+			.size(thumbnailSize)
+			.extension(thumbnailExtension)
+			.build());
+
+		productRepository.save(foundProduct);
+
+		AtomicLong arrange = new AtomicLong();
+		List<ProductImageEntity> productImageEntities = images.stream().map(multipartFile -> {
 			String imageFileName = UUID.randomUUID().toString();
 			String originalImageName = multipartFile.getOriginalFilename();
 			String imageFileExtension = FileUtils.getExtension(originalImageName);
-			String imagePath = "image path"; // upload
 			long imageSize = multipartFile.getSize();
+			String imagePath = storageService.upload(multipartFile, FileSuffixPath.PRODUCT_IMAGE, imageFileName,
+				imageFileExtension);
 
 			return ProductImageEntity.builder()
 				.originName(multipartFile.getOriginalFilename())
@@ -84,13 +104,12 @@ public class ProductService {
 				.extension(imageFileExtension)
 				.size(imageSize)
 				.arrangement(arrange.incrementAndGet())
-				.product(savedProductEntity)
+				.product(foundProduct)
 				.build();
 		}).toList();
 
-		productImageRepository.saveAllInBulk(productImageEntities);
+		imageRepository.saveAllInBulk(productImageEntities);
 
-		return productMapper.toCreateProductResponseDto(savedProductEntity);
+		return productMapper.productFileResponseDto(productThumbnail, productImageEntities);
 	}
-
 }
