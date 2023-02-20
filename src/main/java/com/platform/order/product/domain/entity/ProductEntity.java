@@ -1,5 +1,7 @@
 package com.platform.order.product.domain.entity;
 
+import java.text.MessageFormat;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -10,6 +12,8 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Where;
 
 import com.platform.order.common.BaseEntity;
+import com.platform.order.common.exception.custom.BusinessException;
+import com.platform.order.common.exception.custom.ErrorCode;
 import com.platform.order.user.domain.entity.UserEntity;
 
 import lombok.AllArgsConstructor;
@@ -36,7 +40,7 @@ public class ProductEntity extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private CategoryEntity category;
 
-	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+	@OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST}, orphanRemoval = true)
 	private ProductThumbnailEntity productThumbnail;
 
 	public ProductThumbnailEntity addThumbnail(ProductThumbnailEntity thumbnailEntity) {
@@ -45,4 +49,30 @@ public class ProductEntity extends BaseEntity {
 		return this.productThumbnail;
 	}
 
+	public boolean ishOwner(UserEntity auth) {
+		return auth.getId().equals(owner.getId());
+	}
+
+	public ProductEntity update(String name, CategoryEntity category, Long price, Long quantity) {
+		this.name = name;
+		this.price = price;
+		this.quantity = quantity;
+		this.category = this.category;
+
+		return this;
+	}
+
+	public ProductThumbnailEntity updateThumbnail(ProductThumbnailEntity thumbnail) {
+		if (this.productThumbnail == null) {
+			throw new BusinessException(
+				MessageFormat.format("because thumbnail is not exist, don't update thumbnail product id : {0}]",
+					super.getId()),
+				ErrorCode.EntityConstraint
+			);
+		}
+
+		this.productThumbnail = thumbnail;
+
+		return this.productThumbnail;
+	}
 }

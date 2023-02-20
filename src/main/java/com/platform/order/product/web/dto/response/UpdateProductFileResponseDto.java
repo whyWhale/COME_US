@@ -2,7 +2,10 @@ package com.platform.order.product.web.dto.response;
 
 import java.util.List;
 
-public record ProductFileResponseDto(thumbnailResponseDto thumbnailResponseDto, List<ImageResponseDto> imageResponseDtos) {
+public record UpdateProductFileResponseDto(
+	thumbnailResponseDto thumbnailResponseDto,
+	List<ImageResponseDto> ImageResponseDtos
+) {
 
 	public record thumbnailResponseDto(String fileName,
 									   String originName,
@@ -17,5 +20,6 @@ public record ProductFileResponseDto(thumbnailResponseDto thumbnailResponseDto, 
 								   String path,
 								   Long size,
 								   Long arrangement) {
+
 	}
 }

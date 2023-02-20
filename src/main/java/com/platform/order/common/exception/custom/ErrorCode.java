@@ -10,17 +10,15 @@ public enum ErrorCode implements ErrorModel {
 	// COMMON
 	NOT_FOUND_RESOURCES("C001", "not found resources", NOT_FOUND),
 	FATAL_ERROR("C002", "[fatal] Internal Server error", INTERNAL_SERVER_ERROR),
-
+	NOT_AUTHENTICATE("C003", "not authenticate", UNAUTHORIZED),
 	//VALIDATION
 	BINDING_ERROR("V001", "Biding error", BAD_REQUEST),
 	CONSTRAINT_VIOLATION("V002", "Validation error", BAD_REQUEST),
 	DATA_INTEGRITY_VIOLATION("V003", "Data integrity violation", BAD_REQUEST),
 
 	// BUSINESS
-	ALREADY_ISSUE_COUPON("B001", "already issue coupon", BAD_REQUEST),
-	ALREADY_USE_COUPON("B002", "already use coupon", BAD_REQUEST),
-	OUT_OF_STOCK("B003", "out of orderQuantity", BAD_REQUEST),
-	NOT_AUTHENTICATE("B004", "not authenticate", UNAUTHORIZED),
+	NOT_OWNER("B001", "not owner", BAD_REQUEST),
+	EntityConstraint("B002", "entity constraint", BAD_REQUEST),
 
 	// IO
 	FILE_IO("I0004", "File I/O fail", BAD_REQUEST);

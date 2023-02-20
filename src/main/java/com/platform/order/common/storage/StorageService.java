@@ -10,11 +10,15 @@ import lombok.RequiredArgsConstructor;
 public class StorageService {
 
 	public String upload(MultipartFile multipartFile, FileSuffixPath path, String fileName, String extension) {
-
+		// todo
 		return "upload path";
 	}
 
 	private String generateKey(FileSuffixPath path, String fileName, String extension) {
 		return path + fileName + "." + extension;
+	}
+
+	public void delete(String path) {
+		// todo
 	}
 }
