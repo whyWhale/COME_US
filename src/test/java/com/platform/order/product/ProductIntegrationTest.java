@@ -1,6 +1,7 @@
 package com.platform.order.product;
 
-import org.assertj.core.api.Assertions;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.platform.order.BaseSpringBootTest;
 import com.platform.order.product.domain.entity.CategoryEntity;
 import com.platform.order.product.domain.entity.ProductEntity;
 import com.platform.order.product.domain.respository.CategoryRepository;
@@ -16,13 +18,14 @@ import com.platform.order.product.service.ProductService;
 import com.platform.order.product.web.dto.request.CreateProductRequestDto;
 import com.platform.order.product.web.dto.request.UpdateProductRequestDto;
 import com.platform.order.product.web.dto.response.CreateProductResponseDto;
+import com.platform.order.product.web.dto.response.DeleteProductResponseDto;
 import com.platform.order.product.web.dto.response.UpdateProductResponseDto;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
 
 @SpringBootTest
-public class ProductIntegrationTest {
+public class ProductIntegrationTest extends BaseSpringBootTest {
 
 	@Autowired
 	ProductService productService;
@@ -35,6 +38,7 @@ public class ProductIntegrationTest {
 
 	UserEntity user;
 	CategoryEntity category;
+	ProductEntity product;
 
 	@BeforeEach
 	public void setUp() {
@@ -53,6 +57,15 @@ public class ProductIntegrationTest {
 				.code("C032")
 				.build()
 		);
+
+		product = productRepository.save(ProductEntity.builder()
+			.name("test 상품")
+			.category(category)
+			.owner(user)
+			.quantity(10L)
+			.price(1000L)
+			.isDisplay(true)
+			.build());
 	}
 
 	@AfterEach
@@ -70,32 +83,40 @@ public class ProductIntegrationTest {
 		//when
 		CreateProductResponseDto productResponseDto = productService.create(user.getId(), requestDto);
 		//then
-		Assertions.assertThat(productResponseDto.categoryCode()).isEqualTo(requestDto.categoryCode());
-		Assertions.assertThat(productResponseDto.name()).isEqualTo(requestDto.name());
-		Assertions.assertThat(productResponseDto.price()).isEqualTo(requestDto.price());
-		Assertions.assertThat(productResponseDto.quantity()).isEqualTo(requestDto.quantity());
+		assertThat(productResponseDto.categoryCode()).isEqualTo(requestDto.categoryCode());
+		assertThat(productResponseDto.name()).isEqualTo(requestDto.name());
+		assertThat(productResponseDto.price()).isEqualTo(requestDto.price());
+		assertThat(productResponseDto.quantity()).isEqualTo(requestDto.quantity());
 	}
 
 	@Test
 	@DisplayName("상품을 수정한다.")
 	void testUpdate() {
 		//given
-		ProductEntity savedProduct = productRepository.save(ProductEntity.builder()
-			.name("test 상품")
-			.category(category)
-			.owner(user)
-			.quantity(10L)
-			.price(1000L)
-			.isDisplay(true)
-			.build());
 		UpdateProductRequestDto requestDto = new UpdateProductRequestDto("test 이름 변경", 10000L, 500L,
 			category.getCode());
 		//when
-		UpdateProductResponseDto productResponseDto = productService.update(user.getId(), savedProduct.getId(),requestDto);
+		UpdateProductResponseDto productResponseDto = productService.update(user.getId(), product.getId(),requestDto);
 		//then
-		Assertions.assertThat(productResponseDto.categoryCode()).isEqualTo(requestDto.categoryCode());
-		Assertions.assertThat(productResponseDto.name()).isEqualTo(requestDto.name());
-		Assertions.assertThat(productResponseDto.price()).isEqualTo(requestDto.price());
-		Assertions.assertThat(productResponseDto.quantity()).isEqualTo(requestDto.quantity());
+		assertThat(productResponseDto.categoryCode()).isEqualTo(requestDto.categoryCode());
+		assertThat(productResponseDto.name()).isEqualTo(requestDto.name());
+		assertThat(productResponseDto.price()).isEqualTo(requestDto.price());
+		assertThat(productResponseDto.quantity()).isEqualTo(requestDto.quantity());
+	}
+
+	@Test
+	@DisplayName("상품을 삭제한다.")
+	void testDelete(){
+	    //given
+	    //when
+		DeleteProductResponseDto deleteProductResponseDto = productService.delete(product.getId(), user.getId());
+		//then
+		assertThat(deleteProductResponseDto.name()).isEqualTo(product.getName());
+		assertThat(deleteProductResponseDto.quantity()).isEqualTo(product.getQuantity());
+		assertThat(deleteProductResponseDto.price()).isEqualTo(product.getPrice());
+		assertThat(deleteProductResponseDto.isDisplay()).isFalse();
+		assertThat(deleteProductResponseDto.categoryCode()).isEqualTo(category.getCode());
+		assertThat(deleteProductResponseDto.categoryName()).isEqualTo(category.getName());
+
 	}
 }

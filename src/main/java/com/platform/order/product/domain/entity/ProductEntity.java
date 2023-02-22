@@ -79,4 +79,9 @@ public class ProductEntity extends BaseEntity {
 
 		return this.productThumbnail;
 	}
+
+	public void delete() {
+		super.isDeleted = true;
+		this.isDisplay = false;
+	}
 }

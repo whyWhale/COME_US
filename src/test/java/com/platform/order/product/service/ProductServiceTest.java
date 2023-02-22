@@ -1,6 +1,7 @@
 package com.platform.order.product.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
 
@@ -8,12 +9,14 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.platform.order.common.exception.custom.BusinessException;
 import com.platform.order.common.storage.StorageService;
 import com.platform.order.product.domain.entity.CategoryEntity;
 import com.platform.order.product.domain.entity.ProductEntity;
@@ -102,15 +105,96 @@ class ProductServiceTest {
 		given(userRepository.findById(any())).willReturn(Optional.of(user));
 		given(productRepository.findById(any())).willReturn(Optional.of(savedProduct));
 		given(categoryRepository.findByCode(any())).willReturn(Optional.of(category));
-
 		//when
 		productService.update(userId, any(), requestDto);
 		//then
-
 		assertThat(savedProduct.getName()).isEqualTo(requestDto.name());
 		assertThat(savedProduct.getPrice()).isEqualTo(requestDto.price());
 		assertThat(savedProduct.getQuantity()).isEqualTo(requestDto.quantity());
 		assertThat(savedProduct.getCategory().getCode()).isEqualTo(requestDto.categoryCode());
 	}
 
+	@Test
+	@DisplayName("상품을 삭제한다.")
+	void testDelete() {
+		//given
+		Long productId = 1L;
+		ProductEntity savedProduct = ProductEntity.builder()
+			.name("test 상품")
+			.quantity(10L)
+			.price(1000L)
+			.owner(user)
+			.isDisplay(true)
+			.category(category)
+			.build();
+
+		given(userRepository.findById(any())).willReturn(Optional.of(user));
+		given(productRepository.findByIdWithCategory(any())).willReturn(Optional.of(savedProduct));
+		//when
+		productService.delete(productId, userId);
+		//then
+		verify(userRepository, times(1)).findById(any());
+		verify(productRepository, times(1)).findByIdWithCategory(any());
+	}
+
+	@DisplayName("상품 상태를 변경할 때, 상품을 만든 생산자가 아니면 비즈니스 예외가 발생한다. ")
+	@Nested
+	class NotOwner {
+		UserEntity notProductCreator = UserEntity.builder()
+			.email("anonymous@cocoa.com")
+			.username("alooaddod")
+			.password("1")
+			.nickName("sofattack")
+			.role(Role.OWNER)
+			.build();
+
+		@DisplayName("상품 수정시, 비즈니스 예외가 발생한다.")
+		@Test
+		void testUpdateFail() {
+			//given
+			UpdateProductRequestDto requestDto = new UpdateProductRequestDto("변경될 이름", 10L, 1000L,
+				category.getCode());
+
+			ProductEntity savedProduct = ProductEntity.builder()
+				.name("test 상품")
+				.quantity(10L)
+				.price(1000L)
+				.owner(user)
+				.isDisplay(true)
+				.category(category)
+				.build();
+
+			given(userRepository.findById(any())).willReturn(Optional.of(notProductCreator));
+			given(productRepository.findById(any())).willReturn(Optional.of(savedProduct));
+
+			//when
+			//then
+			assertThatThrownBy(() -> {
+				productService.update(2L, any(), requestDto);
+			}).isInstanceOf(BusinessException.class);
+		}
+
+		@DisplayName("상품 삭제시, 비즈니스 예외가 발행한다.")
+		@Test
+		void testDeleteFail() {
+			//given
+			Long productId = 1L;
+			ProductEntity savedProduct = ProductEntity.builder()
+				.name("test 상품")
+				.quantity(10L)
+				.price(1000L)
+				.owner(user)
+				.isDisplay(true)
+				.category(category)
+				.build();
+
+			given(userRepository.findById(2L)).willReturn(Optional.of(notProductCreator));
+			given(productRepository.findByIdWithCategory(any())).willReturn(Optional.of(savedProduct));
+			//when
+			//then
+			assertThatThrownBy(() -> {
+				productService.delete(productId, 2L);
+			}).isInstanceOf(BusinessException.class);
+		}
+	}
 }

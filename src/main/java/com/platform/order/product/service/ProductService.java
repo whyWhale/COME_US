@@ -26,6 +26,7 @@ import com.platform.order.product.web.dto.request.CreateProductRequestDto;
 import com.platform.order.product.web.dto.request.UpdateProductRequestDto;
 import com.platform.order.product.web.dto.response.CreateProductFileResponseDto;
 import com.platform.order.product.web.dto.response.CreateProductResponseDto;
+import com.platform.order.product.web.dto.response.DeleteProductResponseDto;
 import com.platform.order.product.web.dto.response.UpdateProductFileResponseDto;
 import com.platform.order.product.web.dto.response.UpdateProductResponseDto;
 import com.platform.order.user.domain.entity.UserEntity;
@@ -220,6 +221,27 @@ public class ProductService {
 		imageRepository.saveAllInBulk(productImages);
 
 		return productMapper.toUpdateProductFileResponseDto(newThunmbnail, productImages);
+	}
+
+	public DeleteProductResponseDto delete(Long productId, Long authId) {
+		ProductEntity foundProduct = productRepository.findByIdWithCategory(productId).orElseThrow(() -> new NotFoundResource(
+			MessageFormat.format("product id :{0} is not found.", productId),
+			ErrorCode.NOT_FOUND_RESOURCES));
+		UserEntity auth = userRepository.findById(authId).orElseThrow(() -> new NotFoundResource(
+			MessageFormat.format("user id :{0} is not found.", authId),
+			ErrorCode.NOT_FOUND_RESOURCES)
+		);
+
+		if (!foundProduct.isOwner(auth)) {
+			throw new BusinessException(
+				MessageFormat.format("product owner is not match. auth id : {0}", authId),
+				ErrorCode.NOT_OWNER
+			);
+		}
+
+		foundProduct.delete();
+
+		return productMapper.toDeleteProductResponseDto(foundProduct);
 	}
 
 }

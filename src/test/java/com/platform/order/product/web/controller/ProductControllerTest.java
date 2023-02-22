@@ -3,8 +3,7 @@ package com.platform.order.product.web.controller;
 import static org.mockito.BDDMockito.verify;
 import static org.mockito.Mockito.times;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.DisplayName;
@@ -246,10 +245,23 @@ class ProductControllerTest {
 
 		ResultActions getPerform(UpdateProductRequestDto requestDto) throws Exception {
 			return mockMvc.perform(
-				patch(URI_PREFIX+"/"+productId)
+				patch(URI_PREFIX + "/" + productId)
 					.content(objectMapper.writeValueAsString(requestDto))
 					.contentType(APPLICATION_JSON)
 			);
 		}
+	}
+
+	@Test
+	@DisplayName("상품을 삭제한다.")
+	void testDelete() throws Exception {
+		//given
+		Long productId = 1L;
+		//when
+		ResultActions perform = mockMvc.perform(delete(URI_PREFIX + "/" + productId)
+			.contentType(APPLICATION_JSON));
+		//then
+		perform.andExpect(status().isOk());
+		verify(productService,times(1)).delete(productId,1L);
 	}
 }

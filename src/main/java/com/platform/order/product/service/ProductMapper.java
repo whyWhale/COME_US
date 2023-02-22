@@ -9,6 +9,7 @@ import com.platform.order.product.domain.entity.ProductImageEntity;
 import com.platform.order.product.domain.entity.ProductThumbnailEntity;
 import com.platform.order.product.web.dto.response.CreateProductFileResponseDto;
 import com.platform.order.product.web.dto.response.CreateProductResponseDto;
+import com.platform.order.product.web.dto.response.DeleteProductResponseDto;
 import com.platform.order.product.web.dto.response.UpdateProductFileResponseDto;
 import com.platform.order.product.web.dto.response.UpdateProductResponseDto;
 
@@ -65,5 +66,16 @@ public class ProductMapper {
 			.toList();
 
 		return new UpdateProductFileResponseDto(thumbnailResponseDto, imageResponseDtos);
+	}
+
+	public DeleteProductResponseDto toDeleteProductResponseDto(ProductEntity foundProduct) {
+		return new DeleteProductResponseDto(
+			foundProduct.getName(),
+			foundProduct.getQuantity(),
+			foundProduct.getPrice(),
+			foundProduct.isDisplay(),
+			foundProduct.getCategory().getName(),
+			foundProduct.getCategory().getCode()
+		);
 	}
 }
