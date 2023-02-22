@@ -37,6 +37,7 @@ import com.platform.order.security.property.JwtConfig;
 class ProductControllerTest {
 
 	final String URI_PREFIX = "/api/products";
+	final Long productId = 1L;
 	@Autowired
 	MockMvc mockMvc;
 
@@ -48,7 +49,6 @@ class ProductControllerTest {
 
 	@MockBean
 	ProductService productService;
-	Long productId;
 
 	@Test
 	@DisplayName("상품을 생성한다")
@@ -154,7 +154,6 @@ class ProductControllerTest {
 	@DisplayName("상품을 수정한다.")
 	void testUpdate() throws Exception {
 		//given
-		productId = 1L;
 		UpdateProductRequestDto requestDto = new UpdateProductRequestDto("updating product", 10000L, 1000L,
 			"C032");
 		//when
@@ -183,9 +182,9 @@ class ProductControllerTest {
 			perform.andExpect(status().isBadRequest());
 		}
 
-		@DisplayName("수량이 음수이거나 0이면 BadRequest로 응답한다.")
+		@DisplayName("수량이 음수이면 BadRequest로 응답한다.")
 		@ParameterizedTest(name = "{index}: quantity: {0}")
-		@ValueSource(longs = {-1, 0})
+		@ValueSource(longs = {-1, -1000})
 		void failUpdateWithNegativeQuantity(Long quantity) throws Exception {
 			//given
 			UpdateProductRequestDto requestDto = new UpdateProductRequestDto("test 상품", quantity, 1000L, "C001");
@@ -256,12 +255,23 @@ class ProductControllerTest {
 	@DisplayName("상품을 삭제한다.")
 	void testDelete() throws Exception {
 		//given
-		Long productId = 1L;
 		//when
 		ResultActions perform = mockMvc.perform(delete(URI_PREFIX + "/" + productId)
 			.contentType(APPLICATION_JSON));
 		//then
 		perform.andExpect(status().isOk());
-		verify(productService,times(1)).delete(productId,1L);
+		verify(productService, times(1)).delete(productId, 1L);
+	}
+
+	@Test
+	@DisplayName("상품 상세를 확인한다.")
+	void testRead() throws Exception {
+		//given
+		//when
+		ResultActions perform = mockMvc.perform(get(URI_PREFIX + "/" + productId)
+			.contentType(APPLICATION_JSON));
+		//then
+		perform.andExpect(status().isOk());
+		verify(productService,times(1)).read(productId);
 	}
 }

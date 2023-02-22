@@ -47,6 +47,7 @@ class ProductServiceTest {
 	StorageService storageService;
 
 	final Long userId = 1L;
+	final Long productId = 1L;
 	UserEntity user;
 	CategoryEntity category;
 
@@ -118,7 +119,6 @@ class ProductServiceTest {
 	@DisplayName("상품을 삭제한다.")
 	void testDelete() {
 		//given
-		Long productId = 1L;
 		ProductEntity savedProduct = ProductEntity.builder()
 			.name("test 상품")
 			.quantity(10L)
@@ -178,7 +178,6 @@ class ProductServiceTest {
 		@Test
 		void testDeleteFail() {
 			//given
-			Long productId = 1L;
 			ProductEntity savedProduct = ProductEntity.builder()
 				.name("test 상품")
 				.quantity(10L)
@@ -196,5 +195,26 @@ class ProductServiceTest {
 				productService.delete(productId, 2L);
 			}).isInstanceOf(BusinessException.class);
 		}
+	}
+
+	@Test
+	@DisplayName("상품 상세를 확인한다.")
+	void testRead() {
+		//given
+		ProductEntity savedProduct = ProductEntity.builder()
+			.name("test 상품")
+			.quantity(10L)
+			.price(1000L)
+			.owner(user)
+			.isDisplay(true)
+			.category(category)
+			.build();
+
+		given(productRepository.findByIdWithCategoryAndThumbnail(productId)).willReturn(Optional.of(savedProduct));
+		//when
+		productService.read(productId);
+		//then
+		verify(productRepository,times(1)).findByIdWithCategoryAndThumbnail(productId);
+		verify(imageRepository,times(1)).findByProduct(any());
 	}
 }
