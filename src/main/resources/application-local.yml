@@ -33,6 +33,8 @@ security:
         - /swagger-ui/**
         - /swagger-ui.html/**
         - /health
+        - /api/products/*
+        - /api/products
       POST:
         - /api/auth/login
         - /api/users

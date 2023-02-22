@@ -1,6 +1,9 @@
 package com.platform.order.product.domain.entity;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Where;
@@ -16,10 +19,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Where(clause = "deleted=false")
 @Table(name = "product_thunmnail_image")
 @Entity
-public class ProductThumbnailEntity extends BaseEntity {
+public class ProductThumbnailEntity{
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 	private String originName;
 	private String name;
 	private String path;

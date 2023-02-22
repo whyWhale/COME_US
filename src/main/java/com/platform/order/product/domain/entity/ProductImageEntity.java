@@ -25,7 +25,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Where(clause = "deleted=false")
 @Table(name = "product_image")
 @Entity
 public class ProductImageEntity {

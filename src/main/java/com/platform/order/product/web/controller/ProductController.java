@@ -7,6 +7,7 @@ import javax.validation.constraints.Size;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +23,7 @@ import com.platform.order.product.web.dto.request.UpdateProductRequestDto;
 import com.platform.order.product.web.dto.response.CreateProductFileResponseDto;
 import com.platform.order.product.web.dto.response.CreateProductResponseDto;
 import com.platform.order.product.web.dto.response.DeleteProductResponseDto;
+import com.platform.order.product.web.dto.response.ReadProductResponseDto;
 import com.platform.order.product.web.dto.response.UpdateProductFileResponseDto;
 import com.platform.order.product.web.dto.response.UpdateProductResponseDto;
 import com.platform.order.security.JwtAuthentication;
@@ -72,4 +74,11 @@ public class ProductController {
 
 		return productService.delete(productId, principal.id());
 	}
+
+	@GetMapping("/{productId}")
+	public ReadProductResponseDto read(@PathVariable Long productId) {
+
+		return productService.read(productId);
+	}
+
 }

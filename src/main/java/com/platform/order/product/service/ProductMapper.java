@@ -10,6 +10,7 @@ import com.platform.order.product.domain.entity.ProductThumbnailEntity;
 import com.platform.order.product.web.dto.response.CreateProductFileResponseDto;
 import com.platform.order.product.web.dto.response.CreateProductResponseDto;
 import com.platform.order.product.web.dto.response.DeleteProductResponseDto;
+import com.platform.order.product.web.dto.response.ReadProductResponseDto;
 import com.platform.order.product.web.dto.response.UpdateProductFileResponseDto;
 import com.platform.order.product.web.dto.response.UpdateProductResponseDto;
 
@@ -70,12 +71,28 @@ public class ProductMapper {
 
 	public DeleteProductResponseDto toDeleteProductResponseDto(ProductEntity foundProduct) {
 		return new DeleteProductResponseDto(
+			foundProduct.getId(),
 			foundProduct.getName(),
 			foundProduct.getQuantity(),
 			foundProduct.getPrice(),
 			foundProduct.isDisplay(),
 			foundProduct.getCategory().getName(),
 			foundProduct.getCategory().getCode()
+		);
+	}
+
+	public ReadProductResponseDto toReadProductResponseDto(ProductEntity foundProduct, List<ProductImageEntity> images) {
+		List<String> imagePaths = images.stream()
+			.map(ProductImageEntity::getPath)
+			.toList();
+
+		return new ReadProductResponseDto(
+			foundProduct.getName(),
+			foundProduct.getQuantity(),
+			foundProduct.getPrice(),
+			foundProduct.getProductThumbnail().getPath(),
+			foundProduct.getCategory().getName(),
+			imagePaths
 		);
 	}
 }

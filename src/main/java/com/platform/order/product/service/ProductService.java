@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,10 +25,12 @@ import com.platform.order.product.domain.respository.CategoryRepository;
 import com.platform.order.product.domain.respository.ProductImageRepository;
 import com.platform.order.product.domain.respository.ProductRepository;
 import com.platform.order.product.web.dto.request.CreateProductRequestDto;
+import com.platform.order.product.web.dto.request.PageRequestDto;
 import com.platform.order.product.web.dto.request.UpdateProductRequestDto;
 import com.platform.order.product.web.dto.response.CreateProductFileResponseDto;
 import com.platform.order.product.web.dto.response.CreateProductResponseDto;
 import com.platform.order.product.web.dto.response.DeleteProductResponseDto;
+import com.platform.order.product.web.dto.response.ReadProductResponseDto;
 import com.platform.order.product.web.dto.response.UpdateProductFileResponseDto;
 import com.platform.order.product.web.dto.response.UpdateProductResponseDto;
 import com.platform.order.user.domain.entity.UserEntity;
@@ -130,6 +134,7 @@ public class ProductService {
 		return productMapper.productFileResponseDto(productThumbnail, productImageEntities);
 	}
 
+	@Transactional
 	public UpdateProductResponseDto update(Long authId, Long productId, UpdateProductRequestDto updateProductRequest) {
 		UserEntity auth = userRepository.findById(authId).orElseThrow(() -> new NotFoundResource(
 			MessageFormat.format("user id :{0} is not found.", authId),
@@ -160,6 +165,7 @@ public class ProductService {
 		return productMapper.toUpdateProductResponseDto(updatedProduct);
 	}
 
+	@Transactional
 	public UpdateProductFileResponseDto updateFile(Long productId, Long authId, MultipartFile thumbnail,
 		List<MultipartFile> images) {
 		UserEntity auth = userRepository.findById(authId).orElseThrow(() -> new NotFoundResource(
@@ -223,10 +229,12 @@ public class ProductService {
 		return productMapper.toUpdateProductFileResponseDto(newThunmbnail, productImages);
 	}
 
+	@Transactional
 	public DeleteProductResponseDto delete(Long productId, Long authId) {
-		ProductEntity foundProduct = productRepository.findByIdWithCategory(productId).orElseThrow(() -> new NotFoundResource(
-			MessageFormat.format("product id :{0} is not found.", productId),
-			ErrorCode.NOT_FOUND_RESOURCES));
+		ProductEntity foundProduct = productRepository.findByIdWithCategory(productId)
+			.orElseThrow(() -> new NotFoundResource(
+				MessageFormat.format("product id :{0} is not found.", productId),
+				ErrorCode.NOT_FOUND_RESOURCES));
 		UserEntity auth = userRepository.findById(authId).orElseThrow(() -> new NotFoundResource(
 			MessageFormat.format("user id :{0} is not found.", authId),
 			ErrorCode.NOT_FOUND_RESOURCES)
@@ -242,6 +250,16 @@ public class ProductService {
 		foundProduct.delete();
 
 		return productMapper.toDeleteProductResponseDto(foundProduct);
+	}
+
+	public ReadProductResponseDto read(Long productId) {
+		ProductEntity foundProduct = productRepository.findByIdWithCategoryAndThumbnail(productId)
+			.orElseThrow(() -> new NotFoundResource(
+				MessageFormat.format("product id :{0} is not found.", productId),
+				ErrorCode.NOT_FOUND_RESOURCES));
+		List<ProductImageEntity> images = imageRepository.findByProduct(foundProduct);
+
+		return productMapper.toReadProductResponseDto(foundProduct, images);
 	}
 
 }
