@@ -8,20 +8,16 @@ import org.springframework.stereotype.Component;
 
 import com.platform.order.auth.controller.dto.response.LoginAuthResponseDto;
 import com.platform.order.auth.controller.dto.response.TokenResponseDto;
-import com.platform.order.security.property.CookieProperty;
+import com.platform.order.common.security.constant.CookieProperty;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Component
 public class LoginSuccessHandler {
-
 	private final CookieProperty cookieProperty;
-	public LoginSuccessHandler(CookieProperty cookieProperty) {
-		this.cookieProperty = cookieProperty;
-	}
 
-	public void onAuthenticationSuccess(
-		HttpServletResponse response,
-		LoginAuthResponseDto loginResponse
-	) {
+	public void onAuthenticationSuccess(HttpServletResponse response, LoginAuthResponseDto loginResponse) {
 		ResponseCookie accessCookie = createCookie(loginResponse.accessToken());
 		ResponseCookie refreshCookie = createCookie(loginResponse.refreshToken());
 

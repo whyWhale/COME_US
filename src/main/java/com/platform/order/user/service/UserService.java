@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
-	private final UserConverter userConverter;
+	private final UserMapper userMapper;
 
 	@Transactional
 	public SignUpUserResponseDto register(SignUpUserRequestDto signUpRequestDto) {
@@ -31,7 +31,7 @@ public class UserService {
 
 		UserEntity registeredUser = userRepository.save(user);
 
-		return userConverter.toSignUpUserResponseDto(registeredUser);
+		return userMapper.toSignUpUserResponseDto(registeredUser);
 	}
 
 }

@@ -13,7 +13,7 @@ import org.hibernate.annotations.Where;
 
 import com.platform.order.common.BaseEntity;
 import com.platform.order.common.exception.custom.BusinessException;
-import com.platform.order.common.exception.custom.ErrorCode;
+import com.platform.order.common.exception.model.ErrorCode;
 import com.platform.order.user.domain.entity.UserEntity;
 
 import lombok.AllArgsConstructor;

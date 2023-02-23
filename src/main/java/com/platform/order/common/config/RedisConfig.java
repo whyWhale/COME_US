@@ -3,16 +3,14 @@ package com.platform.order.common.config;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import com.platform.order.common.config.property.RedisProperty;
+import com.platform.order.common.config.constant.RedisProperty;
 
-@Profile({"local"})
 @Configuration
 @EnableRedisRepositories
 @EnableConfigurationProperties(RedisProperty.class)

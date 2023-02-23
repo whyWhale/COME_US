@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.platform.order.order.domain.entity.OrderEntity;
 import com.platform.order.order.domain.entity.OrderProductEntity;
-import com.platform.order.order.web.dto.response.CreateOrderResponseDto;
+import com.platform.order.order.controller.dto.response.CreateOrderResponseDto;
 
 import com.platform.order.product.domain.entity.ProductEntity;
 

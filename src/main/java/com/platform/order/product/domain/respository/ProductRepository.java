@@ -4,15 +4,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.platform.order.product.domain.entity.ProductEntity;
+import com.platform.order.product.domain.respository.custom.CustomProductRepository;
 
-public interface ProductRepository extends JpaRepository<ProductEntity, Long>, CustomProductRepository{
+public interface ProductRepository extends JpaRepository<ProductEntity, Long>, CustomProductRepository {
 
 	@Modifying(clearAutomatically = true)
 	@Query(value = "update product p set p.quantity=p.quantity-:orderQuantity where p.id =:productId and p.quantity >=:orderQuantity", nativeQuery = true)
