@@ -5,8 +5,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.platform.order.common.exception.custom.BusinessException;
 import com.platform.order.common.exception.custom.ErrorCode;
 import com.platform.order.common.exception.custom.NotFoundResource;
+import com.platform.order.common.protocal.PageResponseDto;
 import com.platform.order.common.storage.FileSuffixPath;
 import com.platform.order.common.storage.StorageService;
 import com.platform.order.common.utils.FileUtils;
@@ -25,11 +25,12 @@ import com.platform.order.product.domain.respository.CategoryRepository;
 import com.platform.order.product.domain.respository.ProductImageRepository;
 import com.platform.order.product.domain.respository.ProductRepository;
 import com.platform.order.product.web.dto.request.CreateProductRequestDto;
-import com.platform.order.product.web.dto.request.PageRequestDto;
+import com.platform.order.product.web.dto.request.ProductPageRequestRequestDto;
 import com.platform.order.product.web.dto.request.UpdateProductRequestDto;
 import com.platform.order.product.web.dto.response.CreateProductFileResponseDto;
 import com.platform.order.product.web.dto.response.CreateProductResponseDto;
 import com.platform.order.product.web.dto.response.DeleteProductResponseDto;
+import com.platform.order.product.web.dto.response.ReadAllProductResponseDto;
 import com.platform.order.product.web.dto.response.ReadProductResponseDto;
 import com.platform.order.product.web.dto.response.UpdateProductFileResponseDto;
 import com.platform.order.product.web.dto.response.UpdateProductResponseDto;
@@ -260,6 +261,12 @@ public class ProductService {
 		List<ProductImageEntity> images = imageRepository.findByProduct(foundProduct);
 
 		return productMapper.toReadProductResponseDto(foundProduct, images);
+	}
+
+	public PageResponseDto<ReadAllProductResponseDto> readAll(ProductPageRequestRequestDto pageRequest) {
+		Page<ProductEntity> productsPage = productRepository.findAllWithConditions(pageRequest);
+
+		return productMapper.toPageResponseDto(productsPage);
 	}
 
 }

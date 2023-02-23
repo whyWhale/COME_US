@@ -17,12 +17,15 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.platform.order.common.protocal.PageResponseDto;
 import com.platform.order.product.service.ProductService;
 import com.platform.order.product.web.dto.request.CreateProductRequestDto;
+import com.platform.order.product.web.dto.request.ProductPageRequestRequestDto;
 import com.platform.order.product.web.dto.request.UpdateProductRequestDto;
 import com.platform.order.product.web.dto.response.CreateProductFileResponseDto;
 import com.platform.order.product.web.dto.response.CreateProductResponseDto;
 import com.platform.order.product.web.dto.response.DeleteProductResponseDto;
+import com.platform.order.product.web.dto.response.ReadAllProductResponseDto;
 import com.platform.order.product.web.dto.response.ReadProductResponseDto;
 import com.platform.order.product.web.dto.response.UpdateProductFileResponseDto;
 import com.platform.order.product.web.dto.response.UpdateProductResponseDto;
@@ -49,7 +52,6 @@ public class ProductController {
 		@AuthenticationPrincipal JwtAuthentication principal, @RequestPart MultipartFile thumbnail,
 		@Valid @Size(min = 1, max = 10) @RequestPart List<MultipartFile> images
 	) {
-
 		return productService.createFile(productId, principal.id(), thumbnail, images);
 	}
 
@@ -79,6 +81,12 @@ public class ProductController {
 	public ReadProductResponseDto read(@PathVariable Long productId) {
 
 		return productService.read(productId);
+	}
+
+	@GetMapping
+	public PageResponseDto<ReadAllProductResponseDto> readAll(@Valid ProductPageRequestRequestDto pageRequest) {
+
+		return productService.readAll(pageRequest);
 	}
 
 }
