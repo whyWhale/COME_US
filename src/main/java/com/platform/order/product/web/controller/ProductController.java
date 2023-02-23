@@ -79,13 +79,11 @@ public class ProductController {
 
 	@GetMapping("/{productId}")
 	public ReadProductResponseDto read(@PathVariable Long productId) {
-
 		return productService.read(productId);
 	}
 
 	@GetMapping
 	public PageResponseDto<ReadAllProductResponseDto> readAll(@Valid ProductPageRequestRequestDto pageRequest) {
-
 		return productService.readAll(pageRequest);
 	}
 

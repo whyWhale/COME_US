@@ -37,6 +37,10 @@ public final class ProductPageRequestRequestDto extends PageRequestDto {
 	}
 
 	public Pageable toPageable() {
+		if (sorts == null) {
+			return PageRequest.of(super.page, super.size);
+		}
+
 		List<Sort.Order> orders = sorts.stream()
 			.distinct()
 			.map(ProductCondition::getPageableOrder)

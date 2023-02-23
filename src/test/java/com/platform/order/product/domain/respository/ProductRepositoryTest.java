@@ -9,9 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
+import com.platform.order.common.config.QueryDslConfig;
 import com.platform.order.config.TestJpaAuditConfig;
 import com.platform.order.product.domain.entity.ProductEntity;
-@Import(TestJpaAuditConfig.class)
+@Import({TestJpaAuditConfig.class, QueryDslConfig.class})
 @DataJpaTest
 class ProductRepositoryTest {
 

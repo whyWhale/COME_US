@@ -1,15 +1,20 @@
 package com.platform.order.product.web.controller;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.verify;
 import static org.mockito.Mockito.times;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,16 +23,20 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.util.MultiValueMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.platform.order.product.service.ProductService;
 import com.platform.order.product.web.dto.request.CreateProductRequestDto;
+import com.platform.order.product.web.dto.request.ProductPageRequestRequestDto;
+import com.platform.order.product.web.dto.request.ProductPageRequestRequestDto.ProductCondition;
 import com.platform.order.product.web.dto.request.UpdateProductRequestDto;
 import com.platform.order.security.JwtProviderManager;
 import com.platform.order.security.TokenService;
 import com.platform.order.security.WebSecurityConfig;
 import com.platform.order.security.WithJwtMockUser;
 import com.platform.order.security.property.JwtConfig;
+import com.platform.order.utils.ParameterUtils;
 
 @WithJwtMockUser
 @WebMvcTest({ProductController.class,
@@ -65,7 +74,7 @@ class ProductControllerTest {
 		verify(productService, times(1)).create(1L, requestDto);
 	}
 
-	@DisplayName("상품 생성시 ")
+	@DisplayName("상품을 생성할 때")
 	@Nested
 	class CreateProductValidation {
 
@@ -166,7 +175,7 @@ class ProductControllerTest {
 		verify(productService, times(1)).update(1L, productId, requestDto);
 	}
 
-	@DisplayName("상품 수정시 ")
+	@DisplayName("상품을 수정할 때 ")
 	@Nested
 	class UpdateProductValidation {
 
@@ -272,6 +281,91 @@ class ProductControllerTest {
 			.contentType(APPLICATION_JSON));
 		//then
 		perform.andExpect(status().isOk());
-		verify(productService,times(1)).read(productId);
+		verify(productService, times(1)).read(productId);
+	}
+
+	@Test
+	@DisplayName("전체 상품들을 조회한다.")
+	void testReadAll() throws Exception {
+		//given
+		ProductPageRequestRequestDto productPageRequest = new ProductPageRequestRequestDto(1, 10, null, null, null,
+			null);
+		MultiValueMap<String, String> params = new ParameterUtils<ProductPageRequestRequestDto>().toMultiValueParams(
+			objectMapper, productPageRequest);
+
+		//when
+		ResultActions perform = mockMvc.perform(get(URI_PREFIX).params(params)
+			.contentType(APPLICATION_JSON));
+		//then
+		perform.andExpect(status().isOk());
+		verify(productService, times(1)).readAll(any());
+	}
+
+	@Nested
+	@DisplayName("전체 상품을 조회할 때")
+	class ReadAllProductValidation {
+		static Stream<Arguments> getMinAndMaxPrice() {
+			return Stream.of(
+				Arguments.arguments(-1L, 10L),
+				Arguments.arguments(10L, -1L),
+				Arguments.arguments(-1L, -1L)
+			);
+		}
+
+		@Test
+		@DisplayName("이름 검색이 1자이면 BadRequest로 응답한다")
+		void failReadAllWithInvalidName() throws Exception {
+			//given
+			ProductPageRequestRequestDto productPageRequest = new ProductPageRequestRequestDto(1, 10, "아", null, null,
+				null);
+			MultiValueMap<String, String> params = new ParameterUtils<ProductPageRequestRequestDto>().toMultiValueParams(
+				objectMapper, productPageRequest);
+			//when
+			ResultActions perform = getPerform(productPageRequest, params);
+			//then
+			perform.andExpect(status().isBadRequest());
+		}
+
+		@DisplayName("하한 금액 또는 상한 금액이 음수이면 BadRequest로 응답한다.")
+		@ParameterizedTest(name = "{index}: min : {0}, max : {1}")
+		@MethodSource("getMinAndMaxPrice")
+		void failReadAllWithInvalidPrice(Long minPrice, Long maxPrice) throws Exception {
+			//given
+			ProductPageRequestRequestDto productPageRequest = new ProductPageRequestRequestDto(1, 10, null, maxPrice,
+				minPrice,
+				null);
+			MultiValueMap<String, String> params = new ParameterUtils<ProductPageRequestRequestDto>().toMultiValueParams(
+				objectMapper, productPageRequest);
+			//when
+			ResultActions perform = getPerform(productPageRequest, params);
+			//then
+			perform.andExpect(status().isBadRequest());
+		}
+
+		@Test
+		@DisplayName("정렬 조건이 2개가 넘어가면 BadRequest로 응답한다.")
+		void failReadAllWithInvalidOrdering() throws Exception {
+			//given
+			ProductPageRequestRequestDto productPageRequest = new ProductPageRequestRequestDto(1, 10, null, null, null,
+				null);
+			MultiValueMap<String, String> params = new ParameterUtils<ProductPageRequestRequestDto>().toMultiValueParams(
+				objectMapper, productPageRequest);
+			//when
+			ResultActions perform = mockMvc.perform(
+				get(URI_PREFIX).params(params)
+					.param("sorts", ProductCondition.PRICE_ASC.name())
+					.param("sorts", ProductCondition.CREATED_ASC.name())
+					.param("sorts", ProductCondition.PRICE_DESC.name())
+					.contentType(APPLICATION_JSON));
+			//then
+			perform.andExpect(status().isBadRequest());
+		}
+
+		ResultActions getPerform(ProductPageRequestRequestDto requestDto, MultiValueMap<String, String> params) throws
+			Exception {
+			return mockMvc.perform(
+				get(URI_PREFIX).params(params)
+					.contentType(APPLICATION_JSON));
+		}
 	}
 }

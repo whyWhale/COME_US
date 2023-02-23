@@ -211,10 +211,20 @@ class ProductServiceTest {
 			.build();
 
 		given(productRepository.findByIdWithCategoryAndThumbnail(productId)).willReturn(Optional.of(savedProduct));
-		//when
+		//whenΩ
 		productService.read(productId);
 		//then
 		verify(productRepository,times(1)).findByIdWithCategoryAndThumbnail(productId);
 		verify(imageRepository,times(1)).findByProduct(any());
+	}
+
+	@Test
+	@DisplayName("상품목록을 조회한다.")
+	void testReadAll(){
+	    //given
+	    //when
+	    productService.readAll(any());
+	    //then
+		verify(productRepository,times(1)).findAllWithConditions(any());
 	}
 }

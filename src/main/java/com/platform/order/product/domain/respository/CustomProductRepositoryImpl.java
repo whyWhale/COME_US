@@ -66,7 +66,7 @@ public class CustomProductRepositoryImpl implements CustomProductRepository {
 	}
 
 	private BooleanExpression likeProductName(String productName) {
-		return StringUtils.hasText(productName) ? productEntity.name.like(productName + "%/") : null;
+		return StringUtils.hasText(productName) ? productEntity.name.like(productName + "%") : null;
 	}
 
 	private List<OrderSpecifier> getAllOrderSpecifiers(Pageable pageable) {
