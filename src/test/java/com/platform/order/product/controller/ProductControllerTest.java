@@ -1,4 +1,4 @@
-package com.platform.order.product.web.controller;
+package com.platform.order.product.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.verify;
@@ -26,16 +26,16 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.util.MultiValueMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.platform.order.common.config.WebSecurityConfig;
+import com.platform.order.common.security.JwtProviderManager;
+import com.platform.order.common.security.constant.JwtConfig;
+import com.platform.order.common.security.service.TokenService;
+import com.platform.order.product.controller.dto.request.CreateProductRequestDto;
+import com.platform.order.product.controller.dto.request.ProductPageRequestDto;
+import com.platform.order.product.controller.dto.request.ProductPageRequestDto.ProductCondition;
+import com.platform.order.product.controller.dto.request.UpdateProductRequestDto;
 import com.platform.order.product.service.ProductService;
-import com.platform.order.product.web.dto.request.CreateProductRequestDto;
-import com.platform.order.product.web.dto.request.ProductPageRequestRequestDto;
-import com.platform.order.product.web.dto.request.ProductPageRequestRequestDto.ProductCondition;
-import com.platform.order.product.web.dto.request.UpdateProductRequestDto;
-import com.platform.order.security.JwtProviderManager;
-import com.platform.order.security.TokenService;
-import com.platform.order.security.WebSecurityConfig;
 import com.platform.order.security.WithJwtMockUser;
-import com.platform.order.security.property.JwtConfig;
 import com.platform.order.utils.ParameterUtils;
 
 @WithJwtMockUser
@@ -288,9 +288,9 @@ class ProductControllerTest {
 	@DisplayName("전체 상품들을 조회한다.")
 	void testReadAll() throws Exception {
 		//given
-		ProductPageRequestRequestDto productPageRequest = new ProductPageRequestRequestDto(1, 10, null, null, null,
+		ProductPageRequestDto productPageRequest = new ProductPageRequestDto(1, 10, null, null, null,
 			null);
-		MultiValueMap<String, String> params = new ParameterUtils<ProductPageRequestRequestDto>().toMultiValueParams(
+		MultiValueMap<String, String> params = new ParameterUtils<ProductPageRequestDto>().toMultiValueParams(
 			objectMapper, productPageRequest);
 
 		//when
@@ -316,9 +316,9 @@ class ProductControllerTest {
 		@DisplayName("이름 검색이 1자이면 BadRequest로 응답한다")
 		void failReadAllWithInvalidName() throws Exception {
 			//given
-			ProductPageRequestRequestDto productPageRequest = new ProductPageRequestRequestDto(1, 10, "아", null, null,
+			ProductPageRequestDto productPageRequest = new ProductPageRequestDto(1, 10, "아", null, null,
 				null);
-			MultiValueMap<String, String> params = new ParameterUtils<ProductPageRequestRequestDto>().toMultiValueParams(
+			MultiValueMap<String, String> params = new ParameterUtils<ProductPageRequestDto>().toMultiValueParams(
 				objectMapper, productPageRequest);
 			//when
 			ResultActions perform = getPerform(productPageRequest, params);
@@ -331,10 +331,10 @@ class ProductControllerTest {
 		@MethodSource("getMinAndMaxPrice")
 		void failReadAllWithInvalidPrice(Long minPrice, Long maxPrice) throws Exception {
 			//given
-			ProductPageRequestRequestDto productPageRequest = new ProductPageRequestRequestDto(1, 10, null, maxPrice,
+			ProductPageRequestDto productPageRequest = new ProductPageRequestDto(1, 10, null, maxPrice,
 				minPrice,
 				null);
-			MultiValueMap<String, String> params = new ParameterUtils<ProductPageRequestRequestDto>().toMultiValueParams(
+			MultiValueMap<String, String> params = new ParameterUtils<ProductPageRequestDto>().toMultiValueParams(
 				objectMapper, productPageRequest);
 			//when
 			ResultActions perform = getPerform(productPageRequest, params);
@@ -346,9 +346,9 @@ class ProductControllerTest {
 		@DisplayName("정렬 조건이 2개가 넘어가면 BadRequest로 응답한다.")
 		void failReadAllWithInvalidOrdering() throws Exception {
 			//given
-			ProductPageRequestRequestDto productPageRequest = new ProductPageRequestRequestDto(1, 10, null, null, null,
+			ProductPageRequestDto productPageRequest = new ProductPageRequestDto(1, 10, null, null, null,
 				null);
-			MultiValueMap<String, String> params = new ParameterUtils<ProductPageRequestRequestDto>().toMultiValueParams(
+			MultiValueMap<String, String> params = new ParameterUtils<ProductPageRequestDto>().toMultiValueParams(
 				objectMapper, productPageRequest);
 			//when
 			ResultActions perform = mockMvc.perform(
@@ -361,7 +361,7 @@ class ProductControllerTest {
 			perform.andExpect(status().isBadRequest());
 		}
 
-		ResultActions getPerform(ProductPageRequestRequestDto requestDto, MultiValueMap<String, String> params) throws
+		ResultActions getPerform(ProductPageRequestDto requestDto, MultiValueMap<String, String> params) throws
 			Exception {
 			return mockMvc.perform(
 				get(URI_PREFIX).params(params)

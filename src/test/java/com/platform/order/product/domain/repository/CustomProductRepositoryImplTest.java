@@ -1,4 +1,4 @@
-package com.platform.order.product.domain.respository;
+package com.platform.order.product.domain.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -11,21 +11,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.platform.order.config.TestJpaAuditConfig;
-import com.platform.order.config.TestQueryDslConfig;
+import com.platform.order.env.RepositoryTest;
+import com.platform.order.product.controller.dto.request.ProductPageRequestDto;
 import com.platform.order.product.domain.entity.CategoryEntity;
 import com.platform.order.product.domain.entity.ProductEntity;
 import com.platform.order.product.domain.entity.ProductThumbnailEntity;
-import com.platform.order.product.web.dto.request.ProductPageRequestRequestDto;
 
-@Import({TestQueryDslConfig.class, TestJpaAuditConfig.class})
-@DataJpaTest(showSql = false)
-class CustomProductRepositoryImplTest {
+class CustomProductRepositoryImplTest extends RepositoryTest {
 
 	@Autowired
 	ProductRepository productRepository;
@@ -79,9 +74,9 @@ class CustomProductRepositoryImplTest {
 		int page = 1;
 		int pageSize = 20;
 		int expectedTotalPage = (int)Math.ceil((double)products.size() / pageSize);
-		var productPageRequestDto = new ProductPageRequestRequestDto(page, pageSize, null, null, null,
-			List.of(ProductPageRequestRequestDto.ProductCondition.CREATED_DESC,
-				ProductPageRequestRequestDto.ProductCondition.CREATED_ASC));
+		var productPageRequestDto = new ProductPageRequestDto(page, pageSize, null, null, null,
+			List.of(ProductPageRequestDto.ProductCondition.CREATED_DESC,
+				ProductPageRequestDto.ProductCondition.CREATED_ASC));
 		// when
 		Page<ProductEntity> productPage = productRepository.findAllWithConditions(productPageRequestDto);
 		Pageable pageable = productPage.getPageable();
@@ -97,7 +92,7 @@ class CustomProductRepositoryImplTest {
 		// given
 		int page = 1;
 		int pageSize = 10;
-		var productPageRequestDto = new ProductPageRequestRequestDto(page, pageSize, "가리온", null, null, null);
+		var productPageRequestDto = new ProductPageRequestDto(page, pageSize, "가리온", null, null, null);
 		List<ProductEntity> plusProducts = LongStream.rangeClosed(1, 30).mapToObj(value -> {
 			ProductEntity product = ProductEntity.builder()
 				.name("가리온상품" + value)
@@ -139,7 +134,7 @@ class CustomProductRepositoryImplTest {
 		long minimumPrice = 100L;
 		long maximumPrice = 130L;
 		long expectedProductSize = maximumPrice - minimumPrice + 1;
-		var productPageRequestDto = new ProductPageRequestRequestDto(page, pageSize, null, maximumPrice, minimumPrice,
+		var productPageRequestDto = new ProductPageRequestDto(page, pageSize, null, maximumPrice, minimumPrice,
 			null);
 		int expectedTotalPage = (int)Math.ceil(expectedProductSize / (double)pageSize);
 		//when

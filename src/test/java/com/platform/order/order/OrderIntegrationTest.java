@@ -3,32 +3,36 @@ package com.platform.order.order;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import java.util.Set;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
-import com.platform.order.BaseSpringBootTest;
+import com.platform.order.env.IntegrationTest;
+import com.platform.order.order.controller.dto.request.CreateOrderRequestDto;
+import com.platform.order.order.controller.dto.response.CreateOrderResponseDto;
+import com.platform.order.order.domain.repository.OrderProductRepository;
+import com.platform.order.order.domain.repository.OrderRepository;
 import com.platform.order.order.service.OrderService;
-import com.platform.order.order.web.dto.request.CreateOrderRequestDto;
-import com.platform.order.order.web.dto.response.CreateOrderResponseDto;
 import com.platform.order.product.domain.entity.ProductEntity;
-import com.platform.order.product.domain.respository.ProductRepository;
+import com.platform.order.product.domain.repository.ProductRepository;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
 
-@SpringBootTest
-public class OrderIntegrationTest extends BaseSpringBootTest {
+public class OrderIntegrationTest extends IntegrationTest {
 	@Autowired
 	OrderService orderService;
 	@Autowired
 	UserRepository userRepository;
 	@Autowired
 	ProductRepository productRepository;
+	@Autowired
+	OrderProductRepository orderProductRepository;
+	@Autowired
+	OrderRepository orderRepository;
 	ProductEntity product;
 	UserEntity user;
 	String address = "서울특별시 강남구 강남동";
@@ -51,6 +55,14 @@ public class OrderIntegrationTest extends BaseSpringBootTest {
 			.price(4500L)
 			.isDisplay(true)
 			.build());
+	}
+
+	@AfterEach
+	public void setDown() {
+		orderProductRepository.deleteAllInBatch();
+		productRepository.deleteAllInBatch();
+		orderRepository.deleteAllInBatch();
+		userRepository.deleteAllInBatch();
 	}
 
 	@Test

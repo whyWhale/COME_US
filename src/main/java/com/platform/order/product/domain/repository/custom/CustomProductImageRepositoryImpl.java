@@ -1,4 +1,4 @@
-package com.platform.order.product.domain.respository.custom;
+package com.platform.order.product.domain.repository.custom;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

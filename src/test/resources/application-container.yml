@@ -11,5 +11,6 @@ spring:
 
 logging:
   level:
-    com.zaxxer.hikari.HikariConfig: DEBUG
+    org.testcontainers: info
+    com.zaxxer.hikari.HikariConfig: INFO
     com.zaxxer.hikari: TRACE

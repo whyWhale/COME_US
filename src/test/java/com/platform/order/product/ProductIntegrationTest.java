@@ -9,27 +9,25 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
-import com.platform.order.BaseSpringBootTest;
+import com.platform.order.env.IntegrationTest;
+import com.platform.order.product.controller.dto.request.CreateProductRequestDto;
+import com.platform.order.product.controller.dto.request.UpdateProductRequestDto;
+import com.platform.order.product.controller.dto.response.CreateProductResponseDto;
+import com.platform.order.product.controller.dto.response.DeleteProductResponseDto;
+import com.platform.order.product.controller.dto.response.ReadProductResponseDto;
+import com.platform.order.product.controller.dto.response.UpdateProductResponseDto;
 import com.platform.order.product.domain.entity.CategoryEntity;
 import com.platform.order.product.domain.entity.ProductEntity;
 import com.platform.order.product.domain.entity.ProductThumbnailEntity;
-import com.platform.order.product.domain.respository.CategoryRepository;
-import com.platform.order.product.domain.respository.ProductRepository;
+import com.platform.order.product.domain.repository.CategoryRepository;
+import com.platform.order.product.domain.repository.ProductRepository;
 import com.platform.order.product.service.ProductService;
-import com.platform.order.product.web.dto.request.CreateProductRequestDto;
-import com.platform.order.product.web.dto.request.UpdateProductRequestDto;
-import com.platform.order.product.web.dto.response.CreateProductResponseDto;
-import com.platform.order.product.web.dto.response.DeleteProductResponseDto;
-import com.platform.order.product.web.dto.response.ReadProductResponseDto;
-import com.platform.order.product.web.dto.response.UpdateProductResponseDto;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
 
-@SpringBootTest
-public class ProductIntegrationTest extends BaseSpringBootTest {
+public class ProductIntegrationTest extends IntegrationTest {
 
 	@Autowired
 	ProductService productService;
@@ -80,8 +78,6 @@ public class ProductIntegrationTest extends BaseSpringBootTest {
 			.build());
 
 		product = productRepository.save(productEntity);
-
-
 	}
 
 	@AfterEach

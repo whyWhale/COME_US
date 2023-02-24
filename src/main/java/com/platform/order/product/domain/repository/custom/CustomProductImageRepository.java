@@ -1,4 +1,4 @@
-package com.platform.order.product.domain.respository.custom;
+package com.platform.order.product.domain.repository.custom;
 
 import java.util.List;
 

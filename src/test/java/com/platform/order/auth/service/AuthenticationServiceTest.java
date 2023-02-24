@@ -19,15 +19,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.platform.order.auth.controller.dto.request.LoginAuthRequestDto;
 import com.platform.order.auth.controller.dto.response.LoginAuthResponseDto;
 import com.platform.order.auth.controller.dto.response.TokenResponseDto;
-import com.platform.order.auth.controller.dto.request.LoginAuthRequestDto;
-import com.platform.order.auth.service.converter.AuthConverter;
 import com.platform.order.common.exception.custom.BusinessException;
 import com.platform.order.common.exception.custom.NotFoundResource;
-import com.platform.order.security.JwtProviderManager;
-import com.platform.order.security.Token;
-import com.platform.order.security.property.JwtConfig;
+import com.platform.order.common.security.JwtProviderManager;
+import com.platform.order.common.security.constant.JwtConfig;
+import com.platform.order.common.security.model.Token;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
@@ -45,7 +44,7 @@ class AuthenticationServiceTest {
 	@Mock
 	PasswordEncoder passwordEncoder;
 	@Mock
-	AuthConverter authConverter;
+	AuthMapper authMapper;
 
 	JwtConfig concreteJwtConfig;
 
@@ -102,7 +101,7 @@ class AuthenticationServiceTest {
 		given(jwtProviderManager.generateAccessToken(claim)).willReturn(expectedToken);
 		given(jwtProviderManager.generateRefreshToken(savedUserEntity.getId())).willReturn(expectedToken);
 		given(
-			authConverter.toLoginResponse(expectedToken, expectedToken, concreteJwtConfig)
+			authMapper.toLoginResponse(expectedToken, expectedToken, concreteJwtConfig)
 		).willReturn(expectedResponse);
 
 		//when

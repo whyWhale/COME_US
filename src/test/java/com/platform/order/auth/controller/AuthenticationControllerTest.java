@@ -9,7 +9,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,30 +22,29 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.platform.order.auth.controller.dto.request.LoginAuthRequestDto;
 import com.platform.order.auth.controller.dto.response.LoginAuthResponseDto;
 import com.platform.order.auth.controller.dto.response.LogoutAuthResponseDto;
 import com.platform.order.auth.controller.dto.response.TokenResponseDto;
-import com.platform.order.auth.controller.dto.request.LoginAuthRequestDto;
 import com.platform.order.auth.controller.handler.LoginSuccessHandler;
-import com.platform.order.auth.controller.handler.LogoutHandler;
+import com.platform.order.auth.controller.handler.LogoutSuccessHandler;
+import com.platform.order.auth.service.AuthService;
+import com.platform.order.common.config.WebSecurityConfig;
+import com.platform.order.common.security.JwtProviderManager;
+import com.platform.order.common.security.constant.JwtConfig;
+import com.platform.order.common.security.service.TokenService;
+import com.platform.order.security.WithJwtMockUser;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
-import com.platform.order.auth.service.AuthService;
-import com.platform.order.common.protocal.ApiResponse;
-import com.platform.order.security.JwtProviderManager;
-import com.platform.order.security.TokenService;
-import com.platform.order.security.WebSecurityConfig;
-import com.platform.order.security.WithJwtMockUser;
-import com.platform.order.security.property.JwtConfig;
 
-@WebMvcTest({AuthenticationRestController.class,
+@WebMvcTest({AuthenticationController.class,
 	WebSecurityConfig.class,
 	JwtProviderManager.class,
 	LoginSuccessHandler.class,
-	LogoutHandler.class,
-	LogoutHandler.class,
+	LogoutSuccessHandler.class,
+	LogoutSuccessHandler.class,
 	JwtConfig.class})
-class AuthenticationRestControllerTest {
+class AuthenticationControllerTest {
 
 	static final String URI_PREFIX = "/api/auth";
 	@Autowired
@@ -61,7 +59,7 @@ class AuthenticationRestControllerTest {
 	LoginSuccessHandler loginSuccessHandler;
 
 	@Autowired
-	LogoutHandler logoutHandler;
+	LogoutSuccessHandler logoutSuccessHandler;
 
 	@MockBean
 	AuthService authService;
@@ -84,8 +82,8 @@ class AuthenticationRestControllerTest {
 		);
 		String requestBody = objectMapper.writeValueAsString(requestDto);
 
-		String expectedResponse = objectMapper.writeValueAsString(new ApiResponse<>("success-login"));
-		LoginAuthRequestDto loginDto = new LoginAuthRequestDto(loginUserEntity.getUsername(), loginUserEntity.getPassword());
+		LoginAuthRequestDto loginDto = new LoginAuthRequestDto(loginUserEntity.getUsername(),
+			loginUserEntity.getPassword());
 		TokenResponseDto accessTokenResponse = new TokenResponseDto("access-token", "access-token", 1000);
 		TokenResponseDto refreshTokenResponse = new TokenResponseDto("refresh-token", "refresh-token", 60000);
 		LoginAuthResponseDto loginResponse = new LoginAuthResponseDto(accessTokenResponse, refreshTokenResponse);
@@ -116,10 +114,6 @@ class AuthenticationRestControllerTest {
 				)
 			)
 			.andReturn();
-
-		String response = result.getResponse().getContentAsString();
-
-		Assertions.assertThat(response).isEqualTo(expectedResponse);
 	}
 
 	@Test

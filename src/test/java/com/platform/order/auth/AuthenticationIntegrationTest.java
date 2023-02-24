@@ -14,31 +14,25 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.utility.DockerImageName;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.platform.order.BaseSpringBootTest;
 import com.platform.order.auth.controller.dto.request.LoginAuthRequestDto;
-import com.platform.order.security.JwtProviderManager;
+import com.platform.order.common.security.JwtProviderManager;
+import com.platform.order.common.security.constant.JwtConfig;
+import com.platform.order.env.IntegrationTest;
 import com.platform.order.security.WithJwtMockUser;
-import com.platform.order.security.property.JwtConfig;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
 
-@SpringBootTest
 @AutoConfigureMockMvc
-class AuthenticationRestControllerIntegrationTest extends BaseSpringBootTest {
+class AuthenticationIntegrationTest extends IntegrationTest {
 
 	static final String URI_PREFIX = "/api/auth";
 

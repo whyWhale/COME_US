@@ -1,4 +1,4 @@
-package com.platform.order.order.web.controller;
+package com.platform.order.order.controller;
 
 import static org.mockito.BDDMockito.verify;
 import static org.mockito.Mockito.times;
@@ -26,23 +26,22 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.platform.order.auth.controller.handler.LoginSuccessHandler;
-import com.platform.order.auth.controller.handler.LogoutHandler;
+import com.platform.order.auth.controller.handler.LogoutSuccessHandler;
+import com.platform.order.common.config.WebSecurityConfig;
+import com.platform.order.common.security.JwtProviderManager;
+import com.platform.order.common.security.constant.JwtConfig;
+import com.platform.order.common.security.service.TokenService;
+import com.platform.order.order.controller.dto.request.CreateOrderRequestDto;
 import com.platform.order.order.service.OrderService;
-import com.platform.order.order.web.OrderController;
-import com.platform.order.order.web.dto.request.CreateOrderRequestDto;
-import com.platform.order.security.JwtProviderManager;
-import com.platform.order.security.TokenService;
-import com.platform.order.security.WebSecurityConfig;
 import com.platform.order.security.WithJwtMockUser;
-import com.platform.order.security.property.JwtConfig;
 
 @WithJwtMockUser
 @WebMvcTest({OrderController.class,
 	WebSecurityConfig.class,
 	JwtProviderManager.class,
 	LoginSuccessHandler.class,
-	LogoutHandler.class,
-	LogoutHandler.class,
+	LogoutSuccessHandler.class,
+	LogoutSuccessHandler.class,
 	JwtConfig.class})
 class OrderControllerTest {
 	final String URI_PREFIX = "/api/orders";

@@ -1,10 +1,10 @@
 package com.platform.order;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class OderRenewalApplicationTests extends BaseSpringBootTest {
+import com.platform.order.env.IntegrationTest;
+
+class OderRenewalApplicationTests extends IntegrationTest {
 
 	@Test
 	void contextLoads() {

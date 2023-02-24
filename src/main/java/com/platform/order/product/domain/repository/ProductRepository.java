@@ -1,4 +1,4 @@
-package com.platform.order.product.domain.respository;
+package com.platform.order.product.domain.repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.platform.order.product.domain.entity.ProductEntity;
-import com.platform.order.product.domain.respository.custom.CustomProductRepository;
+import com.platform.order.product.domain.repository.custom.CustomProductRepository;
 
 public interface ProductRepository extends JpaRepository<ProductEntity, Long>, CustomProductRepository {
 

@@ -1,4 +1,4 @@
-package com.platform.order.product.domain.respository;
+package com.platform.order.product.domain.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -6,15 +6,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
 
-import com.platform.order.common.config.QueryDslConfig;
-import com.platform.order.config.TestJpaAuditConfig;
+import com.platform.order.env.RepositoryTest;
 import com.platform.order.product.domain.entity.ProductEntity;
-@Import({TestJpaAuditConfig.class, QueryDslConfig.class})
-@DataJpaTest
-class ProductRepositoryTest {
+
+class ProductRepositoryTest extends RepositoryTest {
 
 	@Autowired
 	ProductRepository productRepository;
@@ -48,7 +44,7 @@ class ProductRepositoryTest {
 
 		//given
 		//when
-		boolean isPossibleOrder = productRepository.updateQuantity(product.getId(), product.getQuantity()+1) == 1;
+		boolean isPossibleOrder = productRepository.updateQuantity(product.getId(), product.getQuantity() + 1) == 1;
 
 		//then
 		assertThat(isPossibleOrder).isFalse();

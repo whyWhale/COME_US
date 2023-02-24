@@ -1,4 +1,4 @@
-package com.platform.order.product.domain.respository;
+package com.platform.order.product.domain.repository;
 
 import java.util.Optional;
 

@@ -18,13 +18,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.platform.order.common.exception.custom.BusinessException;
 import com.platform.order.common.storage.StorageService;
+import com.platform.order.product.controller.dto.request.CreateProductRequestDto;
+import com.platform.order.product.controller.dto.request.UpdateProductRequestDto;
 import com.platform.order.product.domain.entity.CategoryEntity;
 import com.platform.order.product.domain.entity.ProductEntity;
-import com.platform.order.product.domain.respository.CategoryRepository;
-import com.platform.order.product.domain.respository.ProductImageRepository;
-import com.platform.order.product.domain.respository.ProductRepository;
-import com.platform.order.product.web.dto.request.CreateProductRequestDto;
-import com.platform.order.product.web.dto.request.UpdateProductRequestDto;
+import com.platform.order.product.domain.repository.CategoryRepository;
+import com.platform.order.product.domain.repository.ProductImageRepository;
+import com.platform.order.product.domain.repository.ProductRepository;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
@@ -214,17 +214,17 @@ class ProductServiceTest {
 		//whenΩ
 		productService.read(productId);
 		//then
-		verify(productRepository,times(1)).findByIdWithCategoryAndThumbnail(productId);
-		verify(imageRepository,times(1)).findByProduct(any());
+		verify(productRepository, times(1)).findByIdWithCategoryAndThumbnail(productId);
+		verify(imageRepository, times(1)).findByProduct(any());
 	}
 
 	@Test
 	@DisplayName("상품목록을 조회한다.")
-	void testReadAll(){
-	    //given
-	    //when
-	    productService.readAll(any());
-	    //then
-		verify(productRepository,times(1)).findAllWithConditions(any());
+	void testReadAll() {
+		//given
+		//when
+		productService.readAll(any());
+		//then
+		verify(productRepository, times(1)).findAllWithConditions(any());
 	}
 }

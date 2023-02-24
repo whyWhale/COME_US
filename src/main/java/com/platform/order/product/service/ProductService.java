@@ -31,9 +31,9 @@ import com.platform.order.product.domain.entity.CategoryEntity;
 import com.platform.order.product.domain.entity.ProductEntity;
 import com.platform.order.product.domain.entity.ProductImageEntity;
 import com.platform.order.product.domain.entity.ProductThumbnailEntity;
-import com.platform.order.product.domain.respository.CategoryRepository;
-import com.platform.order.product.domain.respository.ProductImageRepository;
-import com.platform.order.product.domain.respository.ProductRepository;
+import com.platform.order.product.domain.repository.CategoryRepository;
+import com.platform.order.product.domain.repository.ProductImageRepository;
+import com.platform.order.product.domain.repository.ProductRepository;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
 

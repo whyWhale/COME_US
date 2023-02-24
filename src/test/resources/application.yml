@@ -24,6 +24,8 @@ security:
     ignoring:
       GET:
         - /health
+        - /api/products/*
+        - /api/products
       POST:
         - /api/auth/login
         - /api/users

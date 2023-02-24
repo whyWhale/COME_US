@@ -18,7 +18,7 @@ import com.platform.order.order.domain.repository.OrderRepository;
 import com.platform.order.order.controller.dto.request.CreateOrderRequestDto;
 import com.platform.order.order.controller.dto.response.CreateOrderResponseDto;
 import com.platform.order.product.domain.entity.ProductEntity;
-import com.platform.order.product.domain.respository.ProductRepository;
+import com.platform.order.product.domain.repository.ProductRepository;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
 
