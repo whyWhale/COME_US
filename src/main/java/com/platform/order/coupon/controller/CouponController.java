@@ -1,4 +1,4 @@
-package com.platform.order.coupon.controller.dto;
+package com.platform.order.coupon.controller;
 
 import javax.validation.Valid;
 
