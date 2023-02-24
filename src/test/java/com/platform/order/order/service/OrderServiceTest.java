@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.platform.order.common.exception.custom.BusinessException;
+import com.platform.order.env.ServiceTest;
 import com.platform.order.order.controller.dto.request.CreateOrderRequestDto;
 import com.platform.order.order.controller.dto.response.CreateOrderResponseDto;
 import com.platform.order.order.domain.entity.OrderEntity;
@@ -30,8 +31,7 @@ import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
 
-@ExtendWith(MockitoExtension.class)
-class OrderServiceTest {
+class OrderServiceTest extends ServiceTest {
 
 	@InjectMocks
 	OrderService orderService;
