@@ -3,15 +3,13 @@ package com.platform.order.coupon.domain.entity;
 import java.time.LocalDate;
 
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Where;
-
-import com.platform.order.common.BaseEntity;
 import com.platform.order.user.domain.entity.UserEntity;
 
 import lombok.AllArgsConstructor;
@@ -23,20 +21,19 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Where(clause = "deleted=false")
-@Table(name = "coupon")
+@Table(name = "user_coupon")
 @Entity
-public class CouponEntity extends BaseEntity {
-	@Enumerated(EnumType.STRING)
-	private CouponType type;
+public class UserCouponEntity{
 
-	private Long amount;
-
-	private Long quantity;
-
-	private LocalDate expiredAt;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	private UserEntity user;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	private CouponEntity coupon;
+
+	LocalDate issuedAt;
 }
