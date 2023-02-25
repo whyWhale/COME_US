@@ -1,5 +1,7 @@
 package com.platform.order.product.domain.repository;
 
+import static com.platform.order.product.controller.dto.request.ProductPageRequestDto.ProductCondition.CREATED_ASC;
+import static com.platform.order.product.controller.dto.request.ProductPageRequestDto.ProductCondition.CREATED_DESC;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
@@ -24,11 +26,11 @@ class CustomProductRepositoryImplTest extends RepositoryTest {
 
 	@Autowired
 	ProductRepository productRepository;
+
 	@Autowired
 	CategoryRepository categoryRepository;
 
 	List<ProductEntity> products;
-
 	CategoryEntity category;
 
 	@BeforeEach
@@ -37,7 +39,6 @@ class CustomProductRepositoryImplTest extends RepositoryTest {
 			.code("C0323")
 			.name("testCategory")
 			.build());
-
 		products = LongStream.rangeClosed(1, 130).mapToObj(value -> {
 				ProductEntity product = ProductEntity.builder()
 					.name("test상품" + value)
@@ -65,6 +66,7 @@ class CustomProductRepositoryImplTest extends RepositoryTest {
 	@AfterEach
 	public void setDown() {
 		productRepository.deleteAllInBatch();
+		categoryRepository.deleteAllInBatch();
 	}
 
 	@Test
@@ -75,8 +77,7 @@ class CustomProductRepositoryImplTest extends RepositoryTest {
 		int pageSize = 20;
 		int expectedTotalPage = (int)Math.ceil((double)products.size() / pageSize);
 		var productPageRequestDto = new ProductPageRequestDto(page, pageSize, null, null, null,
-			List.of(ProductPageRequestDto.ProductCondition.CREATED_DESC,
-				ProductPageRequestDto.ProductCondition.CREATED_ASC));
+			List.of(CREATED_DESC, CREATED_ASC));
 		// when
 		Page<ProductEntity> productPage = productRepository.findAllWithConditions(productPageRequestDto);
 		Pageable pageable = productPage.getPageable();
@@ -115,7 +116,6 @@ class CustomProductRepositoryImplTest extends RepositoryTest {
 		int expectedTotalPage = (int)Math.ceil((double)plusProducts.size() / pageSize);
 
 		productRepository.saveAll(plusProducts);
-
 		// when
 		Page<ProductEntity> productPage = productRepository.findAllWithConditions(productPageRequestDto);
 		Pageable pageable = productPage.getPageable();
@@ -134,8 +134,7 @@ class CustomProductRepositoryImplTest extends RepositoryTest {
 		long minimumPrice = 100L;
 		long maximumPrice = 130L;
 		long expectedProductSize = maximumPrice - minimumPrice + 1;
-		var productPageRequestDto = new ProductPageRequestDto(page, pageSize, null, maximumPrice, minimumPrice,
-			null);
+		var productPageRequestDto = new ProductPageRequestDto(page, pageSize, null, maximumPrice, minimumPrice, null);
 		int expectedTotalPage = (int)Math.ceil(expectedProductSize / (double)pageSize);
 		//when
 		Page<ProductEntity> productPage = productRepository.findAllWithConditions(productPageRequestDto);

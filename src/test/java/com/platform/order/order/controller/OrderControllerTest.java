@@ -45,10 +45,13 @@ import com.platform.order.security.WithJwtMockUser;
 	JwtConfig.class})
 class OrderControllerTest {
 	final String URI_PREFIX = "/api/orders";
+
 	@Autowired
 	MockMvc mockMvc;
+
 	@Autowired
 	ObjectMapper objectMapper;
+
 	@MockBean
 	OrderService orderService;
 
@@ -65,8 +68,7 @@ class OrderControllerTest {
 		//given
 		Long orderQuantity = 1L;
 		var orderProductsRequest = List.of(
-			new CreateOrderRequestDto.OrderProductRequestDto(buyingProductId, orderQuantity)
-		);
+			new CreateOrderRequestDto.OrderProductRequestDto(buyingProductId, orderQuantity));
 		CreateOrderRequestDto requestDto = new CreateOrderRequestDto(orderProductsRequest, address, zipCode);
 		//when
 		ResultActions perform = mockMvc.perform(
@@ -82,12 +84,11 @@ class OrderControllerTest {
 	@DisplayName("상품 주문시 ")
 	@Nested
 	class CreateOrderValidation {
-		static Stream<Arguments> provideNullWithProductIdOrOrderQuantity() { // argument source method
+		static Stream<Arguments> provideNullWithProductIdOrOrderQuantity() {
 			return Stream.of(
 				Arguments.of(null, 1L),
 				Arguments.of(1L, null),
-				Arguments.of(null, null)
-			);
+				Arguments.of(null, null));
 		}
 
 		@Test
@@ -109,9 +110,8 @@ class OrderControllerTest {
 		void failOrderWithInvalidAddress(String invalidAddress) throws Exception {
 			//given
 			var orderProductsRequest = List.of(
-				new CreateOrderRequestDto.OrderProductRequestDto(buyingProductId, 1L)
-			);
-			CreateOrderRequestDto requestDto = new CreateOrderRequestDto(orderProductsRequest, invalidAddress, zipCode);
+				new CreateOrderRequestDto.OrderProductRequestDto(buyingProductId, 1L));
+			var requestDto = new CreateOrderRequestDto(orderProductsRequest, invalidAddress, zipCode);
 			//when
 			ResultActions perform = getPerform(requestDto);
 			//then
@@ -125,9 +125,8 @@ class OrderControllerTest {
 		void failOrderWithInvalidZipCode(String invalidZipCode) throws Exception {
 			//given
 			var orderProductsRequest = List.of(
-				new CreateOrderRequestDto.OrderProductRequestDto(buyingProductId, 1L)
-			);
-			CreateOrderRequestDto requestDto = new CreateOrderRequestDto(orderProductsRequest, address, invalidZipCode);
+				new CreateOrderRequestDto.OrderProductRequestDto(buyingProductId, 1L));
+			var requestDto = new CreateOrderRequestDto(orderProductsRequest, address, invalidZipCode);
 			//when
 			ResultActions perform = getPerform(requestDto);
 			//then
@@ -140,9 +139,8 @@ class OrderControllerTest {
 		void failOrderWithInvalidOrderProductDto(Long productId, Long orderQuantity) throws Exception {
 			//given
 			var orderProductsRequest = List.of(
-				new CreateOrderRequestDto.OrderProductRequestDto(productId, orderQuantity)
-			);
-			CreateOrderRequestDto requestDto = new CreateOrderRequestDto(orderProductsRequest, address, zipCode);
+				new CreateOrderRequestDto.OrderProductRequestDto(productId, orderQuantity));
+			var requestDto = new CreateOrderRequestDto(orderProductsRequest, address, zipCode);
 			//when
 			ResultActions perform = getPerform(requestDto);
 			//then

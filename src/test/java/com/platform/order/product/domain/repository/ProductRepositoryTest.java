@@ -14,6 +14,7 @@ class ProductRepositoryTest extends RepositoryTest {
 
 	@Autowired
 	ProductRepository productRepository;
+
 	ProductEntity product;
 
 	@BeforeEach
@@ -29,23 +30,20 @@ class ProductRepositoryTest extends RepositoryTest {
 
 	@Test
 	@DisplayName("재고량 보다 적은 개수를 주문하면 1을 반환한다.")
-	void testDecreateQuantity() {
+	void testDecreaseQuantity() {
 		//given
 		//when
 		boolean isPossibleOrder = productRepository.updateQuantity(product.getId(), product.getQuantity()) == 1;
-
 		//then
 		assertThat(isPossibleOrder).isTrue();
 	}
 
 	@Test
 	@DisplayName("재고량 보다 더 많은 개수를 주문한다면 0을 반환한다.")
-	void testFailDecreateQuantity() {
-
+	void testFailDecreaseQuantity() {
 		//given
 		//when
 		boolean isPossibleOrder = productRepository.updateQuantity(product.getId(), product.getQuantity() + 1) == 1;
-
 		//then
 		assertThat(isPossibleOrder).isFalse();
 	}

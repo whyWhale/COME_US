@@ -13,10 +13,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.platform.order.common.exception.custom.BusinessException;
 import com.platform.order.env.ServiceTest;
@@ -35,14 +33,19 @@ class OrderServiceTest extends ServiceTest {
 
 	@InjectMocks
 	OrderService orderService;
+
 	@Mock
 	UserRepository userRepository;
+
 	@Mock
 	OrderRepository orderRepository;
+
 	@Mock
 	OrderProductRepository orderProductRepository;
+
 	@Mock
 	ProductRepository productRepository;
+
 	@Mock
 	OrderMapper orderMapper;
 
@@ -54,7 +57,6 @@ class OrderServiceTest extends ServiceTest {
 
 	@BeforeEach
 	public void setUp() {
-		String username = "whyWhale";
 		user = UserEntity.builder()
 			.email("whywhale@cocoa.com")
 			.username("whyWhale")
@@ -77,8 +79,7 @@ class OrderServiceTest extends ServiceTest {
 		Long orderQuantity = 1L;
 		int orderPossibility = 1;
 		var orderProductsRequest = List.of(
-			new CreateOrderRequestDto.OrderProductRequestDto(buyingProductId, orderQuantity)
-		);
+			new CreateOrderRequestDto.OrderProductRequestDto(buyingProductId, orderQuantity));
 		OrderEntity order = OrderEntity.create(user, address, zipCode);
 		CreateOrderRequestDto createOrderRequest = new CreateOrderRequestDto(orderProductsRequest, address, zipCode);
 
@@ -86,10 +87,8 @@ class OrderServiceTest extends ServiceTest {
 		given(productRepository.updateQuantity(buyingProductId, orderQuantity)).willReturn(orderPossibility);
 		given(orderRepository.save(any())).willReturn(order);
 		given(productRepository.findByIdIn(Set.of(buyingProductId))).willReturn(List.of(product));
-
 		//when
 		CreateOrderResponseDto createOrderResponseDto = orderService.placeOrder(any(), createOrderRequest);
-
 		//then
 		verify(userRepository, times(1)).findById(any());
 		verify(productRepository, times(1)).updateQuantity(buyingProductId, orderQuantity);

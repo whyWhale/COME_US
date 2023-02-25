@@ -1,5 +1,6 @@
 package com.platform.order.coupon.controller;
 
+import static com.platform.order.coupon.domain.entity.CouponType.FIXED;
 import static org.mockito.BDDMockito.verify;
 import static org.mockito.Mockito.times;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -29,7 +30,6 @@ import com.platform.order.common.security.JwtProviderManager;
 import com.platform.order.common.security.constant.JwtConfig;
 import com.platform.order.common.security.service.TokenService;
 import com.platform.order.coupon.controller.dto.request.CreateCouponRequestDto;
-import com.platform.order.coupon.domain.entity.CouponType;
 import com.platform.order.coupon.service.CouponService;
 import com.platform.order.security.WithJwtMockUser;
 
@@ -56,8 +56,7 @@ class CouponControllerTest {
 	@DisplayName("쿠폰을 생성한다.")
 	void testCreate() throws Exception {
 		// given
-		CreateCouponRequestDto createCouponRequest = new CreateCouponRequestDto(CouponType.FIXED, 10000L, 1000L,
-			LocalDate.now().plusDays(60));
+		var createCouponRequest = new CreateCouponRequestDto(FIXED, 10000L, 1000L, LocalDate.now().plusDays(60));
 		// when
 		ResultActions perform = mockMvc.perform(
 			post(URI_PREFIX)
@@ -76,16 +75,14 @@ class CouponControllerTest {
 			return Stream.of(
 				Arguments.arguments(LocalDate.now().minusDays(1)),
 				Arguments.arguments(LocalDate.now().minusDays(2)),
-				Arguments.arguments(LocalDate.now().minusDays(3))
-			);
+				Arguments.arguments(LocalDate.now().minusDays(3)));
 		}
 
 		@Test
 		@DisplayName("쿠폰 형식이 없으면 BadRequest로 응답한다.")
 		void failCreateWithNullCouponType() throws Exception {
 			//given
-			CreateCouponRequestDto createCouponRequest = new CreateCouponRequestDto(null, 10000L, 1000L,
-				LocalDate.now().plusDays(60));
+			var createCouponRequest = new CreateCouponRequestDto(null, 10000L, 1000L, LocalDate.now().plusDays(60));
 			//when
 			ResultActions perform = getPerform(createCouponRequest);
 			//then
@@ -97,8 +94,7 @@ class CouponControllerTest {
 		@ValueSource(longs = {-1, -2, -3})
 		void failCreateWithNegativeAmount(Long amount) throws Exception {
 			//given
-			CreateCouponRequestDto createCouponRequest = new CreateCouponRequestDto(CouponType.FIXED, amount, 1000L,
-				LocalDate.now().plusDays(60));
+			var createCouponRequest = new CreateCouponRequestDto(FIXED, amount, 1000L, LocalDate.now().plusDays(60));
 			//when
 			ResultActions perform = getPerform(createCouponRequest);
 			//then
@@ -110,7 +106,7 @@ class CouponControllerTest {
 		@ValueSource(longs = {-1, -2, -3})
 		void failCreateWithNegativeQuantity(Long quantity) throws Exception {
 			//given
-			CreateCouponRequestDto createCouponRequest = new CreateCouponRequestDto(CouponType.FIXED, 1000L, quantity,
+			var createCouponRequest = new CreateCouponRequestDto(FIXED, 1000L, quantity,
 				LocalDate.now().plusDays(60));
 			//when
 			ResultActions perform = getPerform(createCouponRequest);
@@ -123,8 +119,7 @@ class CouponControllerTest {
 		@MethodSource("getPastDate")
 		void failCreateWithNegativeQuantity(LocalDate pastDate) throws Exception {
 			//given
-			CreateCouponRequestDto createCouponRequest = new CreateCouponRequestDto(CouponType.FIXED, 1000L, 200L,
-				pastDate);
+			var createCouponRequest = new CreateCouponRequestDto(FIXED, 1000L, 200L, pastDate);
 			//when
 			ResultActions perform = getPerform(createCouponRequest);
 			//then
@@ -136,8 +131,7 @@ class CouponControllerTest {
 			return mockMvc.perform(
 				post(URI_PREFIX)
 					.content(objectMapper.writeValueAsString(createCouponRequest))
-					.contentType(APPLICATION_JSON)
-			);
+					.contentType(APPLICATION_JSON));
 		}
 	}
 
@@ -150,8 +144,7 @@ class CouponControllerTest {
 		ResultActions perform = mockMvc.perform(
 			post(URI_PREFIX + "/issue")
 				.content(objectMapper.writeValueAsString(couponId))
-				.contentType(APPLICATION_JSON)
-		);
+				.contentType(APPLICATION_JSON));
 		//then
 		perform.andExpect(status().isOk());
 		verify(couponService, times(1)).issue(1L, couponId);
@@ -160,15 +153,14 @@ class CouponControllerTest {
 	@Test
 	@DisplayName("쿠폰을 발급받을 때 쿠폰 아이디를 전달하지 않으면 BadRequest로 응답한다.")
 	void failIssue() throws Exception {
-	    //given
-		Long couponId=null;
-	    //when
+		//given
+		Long couponId = null;
+		//when
 		ResultActions perform = mockMvc.perform(
 			post(URI_PREFIX + "/issue")
 				.content(objectMapper.writeValueAsString(couponId))
-				.contentType(APPLICATION_JSON)
-		);
-	    //then
+				.contentType(APPLICATION_JSON));
+		//then
 		perform.andExpect(status().isBadRequest());
 	}
 }

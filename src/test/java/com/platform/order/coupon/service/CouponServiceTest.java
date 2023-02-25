@@ -53,7 +53,6 @@ class CouponServiceTest extends ServiceTest {
 			.role(Role.OWNER)
 			.password("1")
 			.build();
-
 	}
 
 	@Test

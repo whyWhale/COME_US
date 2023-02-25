@@ -1,6 +1,7 @@
 package com.platform.order.auth.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -13,12 +14,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -47,8 +46,10 @@ import com.platform.order.user.domain.entity.UserEntity;
 class AuthenticationControllerTest {
 
 	static final String URI_PREFIX = "/api/auth";
+
 	@Autowired
 	MockMvc mockMvc;
+
 	@Autowired
 	ObjectMapper objectMapper;
 
@@ -74,46 +75,32 @@ class AuthenticationControllerTest {
 		UserEntity loginUserEntity = UserEntity.builder()
 			.username("whyWhale")
 			.password("wls23333")
-			.role(Role.OWNER)
+			.role(Role.USER)
 			.build();
+		var requestDto = new LoginAuthRequestDto(loginUserEntity.getUsername(), loginUserEntity.getPassword());
+		var loginDto = new LoginAuthRequestDto(loginUserEntity.getUsername(), loginUserEntity.getPassword());
+		var accessTokenResponse = new TokenResponseDto("access-token", "access-token", 1000);
+		var refreshTokenResponse = new TokenResponseDto("refresh-token", "refresh-token", 60000);
+		var loginResponse = new LoginAuthResponseDto(accessTokenResponse, refreshTokenResponse);
 
-		LoginAuthRequestDto requestDto = new LoginAuthRequestDto(
-			loginUserEntity.getUsername(), loginUserEntity.getPassword()
-		);
-		String requestBody = objectMapper.writeValueAsString(requestDto);
-
-		LoginAuthRequestDto loginDto = new LoginAuthRequestDto(loginUserEntity.getUsername(),
-			loginUserEntity.getPassword());
-		TokenResponseDto accessTokenResponse = new TokenResponseDto("access-token", "access-token", 1000);
-		TokenResponseDto refreshTokenResponse = new TokenResponseDto("refresh-token", "refresh-token", 60000);
-		LoginAuthResponseDto loginResponse = new LoginAuthResponseDto(accessTokenResponse, refreshTokenResponse);
-
-		BDDMockito.given(authService.login(loginDto)).willReturn(loginResponse);
-
+		given(authService.login(loginDto)).willReturn(loginResponse);
 		//when
 		ResultActions perform = mockMvc.perform(
 			post(URI_PREFIX + "/login")
-				.content(requestBody)
+				.content(objectMapper.writeValueAsString(requestDto))
 				.contentType(APPLICATION_JSON)
 		);
 
 		//then
 		verify(authService, times(1)).login(requestDto);
-
-		MvcResult result = perform.andExpect(status().isOk())
+		perform.andExpect(status().isOk())
 			.andExpect(cookie().exists(loginResponse.accessToken().header()))
 			.andExpect(cookie()
-				.maxAge(
-					loginResponse.accessToken().header(), (int)accessTokenResponse.expirySeconds()
-				)
-			)
-			.andExpect(cookie().exists(loginResponse.refreshToken().header()))
+				.maxAge(loginResponse.accessToken().header(), (int)accessTokenResponse.expirySeconds())
+			).andExpect(cookie().exists(loginResponse.refreshToken().header()))
 			.andExpect(cookie()
-				.maxAge(
-					loginResponse.refreshToken().header(), (int)refreshTokenResponse.expirySeconds()
-				)
-			)
-			.andReturn();
+				.maxAge(loginResponse.refreshToken().header(), (int)refreshTokenResponse.expirySeconds())
+			).andReturn();
 	}
 
 	@Test
@@ -121,24 +108,22 @@ class AuthenticationControllerTest {
 	@DisplayName("인증된 사용자가 로그아웃 한다.")
 	void testLogout() throws Exception {
 		//given
-		LogoutAuthResponseDto logoutResponse = new LogoutAuthResponseDto(
+		var logoutResponse = new LogoutAuthResponseDto(
 			jwtConfig.accessToken().header(),
-			jwtConfig.refreshToken().header()
-		);
-		BDDMockito.given(authService.logout(any())).willReturn(logoutResponse);
+			jwtConfig.refreshToken().header());
+
+		given(authService.logout(any())).willReturn(logoutResponse);
 		//when
 		ResultActions perform = mockMvc.perform(
 			delete(URI_PREFIX + "/logout")
 		);
-
 		//then
 		perform.andExpect(status().isOk())
 			.andExpect(cookie().exists(jwtConfig.accessToken().header()))
 			.andExpect(cookie().maxAge(jwtConfig.accessToken().header(), 0))
 			.andExpect(cookie().exists(jwtConfig.refreshToken().header()))
 			.andExpect(cookie().maxAge(jwtConfig.refreshToken().header(), 0));
-
-		BDDMockito.verify(authService, times(1)).logout(any());
+		verify(authService, times(1)).logout(any());
 	}
 
 	@DisplayName("아이디 또는 비밀번호가 유효하지 않다면 실패한다.")
@@ -147,33 +132,26 @@ class AuthenticationControllerTest {
 		"'',paswword",
 		"'username',''",
 		"'username','      '",
-		"'       ','encodingPassword'"
-	})
-	void testFailNotProperArguments(String username, String password) throws Exception {
+		"'       ','encodingPassword'"})
+	void failNotProperArguments(String username, String password) throws Exception {
 		//given
 		LoginAuthRequestDto loginRequest = new LoginAuthRequestDto(username, password);
 		String requestBody = objectMapper.writeValueAsString(loginRequest);
-
 		//when
 		ResultActions perform = mockMvc.perform(
 			post(URI_PREFIX + "/login")
 				.content(requestBody)
-				.contentType(APPLICATION_JSON)
-		);
-
+				.contentType(APPLICATION_JSON));
 		//then
 		perform.andExpect(status().isBadRequest());
 	}
 
 	@Test
 	@DisplayName("인증되지 않는 사용자가 로그아웃을 하면 실패한다.")
-	void testLogoutWithNotAuthenticationUser() throws Exception {
+	void failLogoutWithNotAuthenticationUser() throws Exception {
 		//given
-
 		//when
-		ResultActions perform = mockMvc.perform(
-			delete(URI_PREFIX + "/logout")
-		);
+		ResultActions perform = mockMvc.perform(delete(URI_PREFIX + "/logout"));
 		//then
 		perform.andExpect(status().isUnauthorized());
 	}

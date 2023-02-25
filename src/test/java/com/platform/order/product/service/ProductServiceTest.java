@@ -11,10 +11,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.platform.order.common.exception.custom.BusinessException;
 import com.platform.order.common.storage.StorageService;
@@ -33,16 +31,22 @@ import com.platform.order.user.domain.repository.UserRepository;
 class ProductServiceTest extends ServiceTest {
 	@InjectMocks
 	ProductService productService;
+
 	@Mock
 	UserRepository userRepository;
+
 	@Mock
 	ProductRepository productRepository;
+
 	@Mock
 	CategoryRepository categoryRepository;
+
 	@Mock
 	ProductImageRepository imageRepository;
+
 	@Mock
 	ProductMapper productMapper;
+
 	@Mock
 	StorageService storageService;
 
@@ -50,6 +54,7 @@ class ProductServiceTest extends ServiceTest {
 	final Long productId = 1L;
 	UserEntity user;
 	CategoryEntity category;
+	ProductEntity product;
 
 	@BeforeEach
 	public void setUp() {
@@ -66,6 +71,14 @@ class ProductServiceTest extends ServiceTest {
 			.code("C032")
 			.build();
 
+		product = ProductEntity.builder()
+			.name("test 상품")
+			.quantity(10L)
+			.price(1000L)
+			.owner(user)
+			.isDisplay(true)
+			.category(category)
+			.build();
 	}
 
 	@Test
@@ -119,17 +132,8 @@ class ProductServiceTest extends ServiceTest {
 	@DisplayName("상품을 삭제한다.")
 	void testDelete() {
 		//given
-		ProductEntity savedProduct = ProductEntity.builder()
-			.name("test 상품")
-			.quantity(10L)
-			.price(1000L)
-			.owner(user)
-			.isDisplay(true)
-			.category(category)
-			.build();
-
 		given(userRepository.findById(any())).willReturn(Optional.of(user));
-		given(productRepository.findByIdWithCategory(any())).willReturn(Optional.of(savedProduct));
+		given(productRepository.findByIdWithCategory(any())).willReturn(Optional.of(product));
 		//when
 		productService.delete(productId, userId);
 		//then
@@ -140,6 +144,7 @@ class ProductServiceTest extends ServiceTest {
 	@DisplayName("상품 상태를 변경할 때, 상품을 만든 생산자가 아니면 비즈니스 예외가 발생한다. ")
 	@Nested
 	class NotOwner {
+		Long notAuthId = 2L;
 		UserEntity notProductCreator = UserEntity.builder()
 			.email("anonymous@cocoa.com")
 			.username("alooaddod")
@@ -152,25 +157,13 @@ class ProductServiceTest extends ServiceTest {
 		@Test
 		void testUpdateFail() {
 			//given
-			UpdateProductRequestDto requestDto = new UpdateProductRequestDto("변경될 이름", 10L, 1000L,
-				category.getCode());
-
-			ProductEntity savedProduct = ProductEntity.builder()
-				.name("test 상품")
-				.quantity(10L)
-				.price(1000L)
-				.owner(user)
-				.isDisplay(true)
-				.category(category)
-				.build();
-
+			UpdateProductRequestDto requestDto = new UpdateProductRequestDto("변경될 이름", 10L, 1000L, category.getCode());
 			given(userRepository.findById(any())).willReturn(Optional.of(notProductCreator));
-			given(productRepository.findById(any())).willReturn(Optional.of(savedProduct));
-
+			given(productRepository.findById(any())).willReturn(Optional.of(product));
 			//when
 			//then
 			assertThatThrownBy(() -> {
-				productService.update(2L, any(), requestDto);
+				productService.update(notAuthId, any(), requestDto);
 			}).isInstanceOf(BusinessException.class);
 		}
 
@@ -178,21 +171,12 @@ class ProductServiceTest extends ServiceTest {
 		@Test
 		void testDeleteFail() {
 			//given
-			ProductEntity savedProduct = ProductEntity.builder()
-				.name("test 상품")
-				.quantity(10L)
-				.price(1000L)
-				.owner(user)
-				.isDisplay(true)
-				.category(category)
-				.build();
-
 			given(userRepository.findById(2L)).willReturn(Optional.of(notProductCreator));
-			given(productRepository.findByIdWithCategory(any())).willReturn(Optional.of(savedProduct));
+			given(productRepository.findByIdWithCategory(any())).willReturn(Optional.of(product));
 			//when
 			//then
 			assertThatThrownBy(() -> {
-				productService.delete(productId, 2L);
+				productService.delete(productId, notAuthId);
 			}).isInstanceOf(BusinessException.class);
 		}
 	}
@@ -201,16 +185,7 @@ class ProductServiceTest extends ServiceTest {
 	@DisplayName("상품 상세를 확인한다.")
 	void testRead() {
 		//given
-		ProductEntity savedProduct = ProductEntity.builder()
-			.name("test 상품")
-			.quantity(10L)
-			.price(1000L)
-			.owner(user)
-			.isDisplay(true)
-			.category(category)
-			.build();
-
-		given(productRepository.findByIdWithCategoryAndThumbnail(productId)).willReturn(Optional.of(savedProduct));
+		given(productRepository.findByIdWithCategoryAndThumbnail(productId)).willReturn(Optional.of(product));
 		//whenΩ
 		productService.read(productId);
 		//then

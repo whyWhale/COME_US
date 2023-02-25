@@ -12,10 +12,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -39,10 +37,13 @@ class AuthenticationServiceTest extends ServiceTest {
 
 	@Mock
 	UserRepository userRepository;
+
 	@Mock
 	JwtProviderManager jwtProviderManager;
+
 	@Mock
 	PasswordEncoder passwordEncoder;
+
 	@Mock
 	AuthMapper authMapper;
 

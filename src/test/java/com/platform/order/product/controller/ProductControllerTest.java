@@ -59,15 +59,16 @@ class ProductControllerTest {
 	@MockBean
 	ProductService productService;
 
+	ParameterUtils<ProductPageRequestDto> paramUtils = new ParameterUtils<ProductPageRequestDto>();
+
 	@Test
 	@DisplayName("상품을 생성한다")
 	void testCreate() throws Exception {
 		//given
 		CreateProductRequestDto requestDto = new CreateProductRequestDto("test 상품", 10L, 1000L, "C001");
-		String body = objectMapper.writeValueAsString(requestDto);
 		//when
 		ResultActions perform = mockMvc.perform(post(URI_PREFIX)
-			.content(body)
+			.content(objectMapper.writeValueAsString(requestDto))
 			.contentType(MediaType.APPLICATION_JSON));
 		//then
 		perform.andExpect(status().isOk());
@@ -154,8 +155,7 @@ class ProductControllerTest {
 			return mockMvc.perform(
 				post(URI_PREFIX)
 					.content(objectMapper.writeValueAsString(requestDto))
-					.contentType(APPLICATION_JSON)
-			);
+					.contentType(APPLICATION_JSON));
 		}
 	}
 
@@ -255,8 +255,7 @@ class ProductControllerTest {
 			return mockMvc.perform(
 				patch(URI_PREFIX + "/" + productId)
 					.content(objectMapper.writeValueAsString(requestDto))
-					.contentType(APPLICATION_JSON)
-			);
+					.contentType(APPLICATION_JSON));
 		}
 	}
 
@@ -265,8 +264,9 @@ class ProductControllerTest {
 	void testDelete() throws Exception {
 		//given
 		//when
-		ResultActions perform = mockMvc.perform(delete(URI_PREFIX + "/" + productId)
-			.contentType(APPLICATION_JSON));
+		ResultActions perform = mockMvc.perform(
+			delete(URI_PREFIX + "/" + productId)
+				.contentType(APPLICATION_JSON));
 		//then
 		perform.andExpect(status().isOk());
 		verify(productService, times(1)).delete(productId, 1L);
@@ -277,8 +277,9 @@ class ProductControllerTest {
 	void testRead() throws Exception {
 		//given
 		//when
-		ResultActions perform = mockMvc.perform(get(URI_PREFIX + "/" + productId)
-			.contentType(APPLICATION_JSON));
+		ResultActions perform = mockMvc.perform(
+			get(URI_PREFIX + "/" + productId)
+				.contentType(APPLICATION_JSON));
 		//then
 		perform.andExpect(status().isOk());
 		verify(productService, times(1)).read(productId);
@@ -288,11 +289,9 @@ class ProductControllerTest {
 	@DisplayName("전체 상품들을 조회한다.")
 	void testReadAll() throws Exception {
 		//given
-		ProductPageRequestDto productPageRequest = new ProductPageRequestDto(1, 10, null, null, null,
-			null);
-		MultiValueMap<String, String> params = new ParameterUtils<ProductPageRequestDto>().toMultiValueParams(
+		var productPageRequest = new ProductPageRequestDto(1, 10, null, null, null, null);
+		MultiValueMap<String, String> params = paramUtils.toMultiValueParams(
 			objectMapper, productPageRequest);
-
 		//when
 		ResultActions perform = mockMvc.perform(get(URI_PREFIX).params(params)
 			.contentType(APPLICATION_JSON));
@@ -308,20 +307,17 @@ class ProductControllerTest {
 			return Stream.of(
 				Arguments.arguments(-1L, 10L),
 				Arguments.arguments(10L, -1L),
-				Arguments.arguments(-1L, -1L)
-			);
+				Arguments.arguments(-1L, -1L));
 		}
 
 		@Test
 		@DisplayName("이름 검색이 1자이면 BadRequest로 응답한다")
 		void failReadAllWithInvalidName() throws Exception {
 			//given
-			ProductPageRequestDto productPageRequest = new ProductPageRequestDto(1, 10, "아", null, null,
-				null);
-			MultiValueMap<String, String> params = new ParameterUtils<ProductPageRequestDto>().toMultiValueParams(
-				objectMapper, productPageRequest);
+			var productPageRequest = new ProductPageRequestDto(1, 10, "아", null, null, null);
+			MultiValueMap<String, String> params = paramUtils.toMultiValueParams(objectMapper, productPageRequest);
 			//when
-			ResultActions perform = getPerform(productPageRequest, params);
+			ResultActions perform = getPerform(params);
 			//then
 			perform.andExpect(status().isBadRequest());
 		}
@@ -331,13 +327,10 @@ class ProductControllerTest {
 		@MethodSource("getMinAndMaxPrice")
 		void failReadAllWithInvalidPrice(Long minPrice, Long maxPrice) throws Exception {
 			//given
-			ProductPageRequestDto productPageRequest = new ProductPageRequestDto(1, 10, null, maxPrice,
-				minPrice,
-				null);
-			MultiValueMap<String, String> params = new ParameterUtils<ProductPageRequestDto>().toMultiValueParams(
-				objectMapper, productPageRequest);
+			var productPageRequest = new ProductPageRequestDto(1, 10, null, maxPrice, minPrice, null);
+			MultiValueMap<String, String> params = paramUtils.toMultiValueParams(objectMapper, productPageRequest);
 			//when
-			ResultActions perform = getPerform(productPageRequest, params);
+			ResultActions perform = getPerform(params);
 			//then
 			perform.andExpect(status().isBadRequest());
 		}
@@ -346,10 +339,8 @@ class ProductControllerTest {
 		@DisplayName("정렬 조건이 2개가 넘어가면 BadRequest로 응답한다.")
 		void failReadAllWithInvalidOrdering() throws Exception {
 			//given
-			ProductPageRequestDto productPageRequest = new ProductPageRequestDto(1, 10, null, null, null,
-				null);
-			MultiValueMap<String, String> params = new ParameterUtils<ProductPageRequestDto>().toMultiValueParams(
-				objectMapper, productPageRequest);
+			var productPageRequest = new ProductPageRequestDto(1, 10, null, null, null, null);
+			MultiValueMap<String, String> params = paramUtils.toMultiValueParams(objectMapper, productPageRequest);
 			//when
 			ResultActions perform = mockMvc.perform(
 				get(URI_PREFIX).params(params)
@@ -361,8 +352,7 @@ class ProductControllerTest {
 			perform.andExpect(status().isBadRequest());
 		}
 
-		ResultActions getPerform(ProductPageRequestDto requestDto, MultiValueMap<String, String> params) throws
-			Exception {
+		ResultActions getPerform(MultiValueMap<String, String> params) throws Exception {
 			return mockMvc.perform(
 				get(URI_PREFIX).params(params)
 					.contentType(APPLICATION_JSON));
