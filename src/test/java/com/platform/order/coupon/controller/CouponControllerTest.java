@@ -2,6 +2,7 @@ package com.platform.order.coupon.controller;
 
 import static org.mockito.BDDMockito.verify;
 import static org.mockito.Mockito.times;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -19,7 +20,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -28,7 +28,6 @@ import com.platform.order.common.config.WebSecurityConfig;
 import com.platform.order.common.security.JwtProviderManager;
 import com.platform.order.common.security.constant.JwtConfig;
 import com.platform.order.common.security.service.TokenService;
-import com.platform.order.coupon.controller.CouponController;
 import com.platform.order.coupon.controller.dto.request.CreateCouponRequestDto;
 import com.platform.order.coupon.domain.entity.CouponType;
 import com.platform.order.coupon.service.CouponService;
@@ -38,8 +37,7 @@ import com.platform.order.security.WithJwtMockUser;
 @WebMvcTest({CouponController.class,
 	WebSecurityConfig.class,
 	JwtProviderManager.class,
-	JwtConfig.class
-})
+	JwtConfig.class})
 class CouponControllerTest {
 	final String URI_PREFIX = "/api/coupons";
 	@Autowired
@@ -64,11 +62,11 @@ class CouponControllerTest {
 		ResultActions perform = mockMvc.perform(
 			post(URI_PREFIX)
 				.content(objectMapper.writeValueAsString(createCouponRequest))
-				.contentType(MediaType.APPLICATION_JSON)
+				.contentType(APPLICATION_JSON)
 		);
 		// then
 		perform.andExpect(status().isOk());
-		verify(couponService, times(1)).create(createCouponRequest);
+		verify(couponService, times(1)).create(1L, createCouponRequest);
 	}
 
 	@DisplayName("쿠폰을 생성할 때")
@@ -138,9 +136,39 @@ class CouponControllerTest {
 			return mockMvc.perform(
 				post(URI_PREFIX)
 					.content(objectMapper.writeValueAsString(createCouponRequest))
-					.contentType(MediaType.APPLICATION_JSON)
+					.contentType(APPLICATION_JSON)
 			);
 		}
+	}
 
+	@Test
+	@DisplayName("쿠폰을 발급받는다.")
+	void testIssue() throws Exception {
+		//given
+		Long couponId = 1L;
+		//when
+		ResultActions perform = mockMvc.perform(
+			post(URI_PREFIX + "/issue")
+				.content(objectMapper.writeValueAsString(couponId))
+				.contentType(APPLICATION_JSON)
+		);
+		//then
+		perform.andExpect(status().isOk());
+		verify(couponService, times(1)).issue(1L, couponId);
+	}
+
+	@Test
+	@DisplayName("쿠폰을 발급받을 때 쿠폰 아이디를 전달하지 않으면 BadRequest로 응답한다.")
+	void failIssue() throws Exception {
+	    //given
+		Long couponId=null;
+	    //when
+		ResultActions perform = mockMvc.perform(
+			post(URI_PREFIX + "/issue")
+				.content(objectMapper.writeValueAsString(couponId))
+				.contentType(APPLICATION_JSON)
+		);
+	    //then
+		perform.andExpect(status().isBadRequest());
 	}
 }
