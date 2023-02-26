@@ -9,12 +9,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.platform.order.coupon.controller.dto.request.CreateCouponRequestDto;
 import com.platform.order.coupon.controller.dto.response.CreateCouponResponseDto;
 import com.platform.order.coupon.controller.dto.response.IssueCouponResponseDto;
 import com.platform.order.coupon.domain.entity.CouponEntity;
 import com.platform.order.coupon.domain.entity.CouponType;
+import com.platform.order.coupon.domain.entity.UserCouponEntity;
 import com.platform.order.coupon.domain.repository.CouponRepository;
 import com.platform.order.coupon.domain.repository.UserCouponRepository;
 import com.platform.order.coupon.service.CouponService;
@@ -52,7 +54,7 @@ public class CouponIntegrationTest extends IntegrationTest {
 	}
 
 	@AfterEach
-	public void setDown(){
+	public void setDown() {
 		userCouponRepository.deleteAllInBatch();
 		couponRepository.deleteAllInBatch();
 		userRepository.deleteAllInBatch();
@@ -62,7 +64,7 @@ public class CouponIntegrationTest extends IntegrationTest {
 	@DisplayName("쿠폰을 생성한다.")
 	void testCreate() {
 		//given
-		CreateCouponRequestDto createCouponRequest = new CreateCouponRequestDto(CouponType.FIXED, 10000L, 1000L,
+		var createCouponRequest = new CreateCouponRequestDto(CouponType.FIXED, 10000L, 1000L,
 			LocalDate.now().plusDays(60));
 		//when
 		CreateCouponResponseDto createCouponResponse = couponService.create(user.getId(), createCouponRequest);
@@ -87,10 +89,13 @@ public class CouponIntegrationTest extends IntegrationTest {
 		//when
 		IssueCouponResponseDto issueCouponResponse = couponService.issue(user.getId(), coupon.getId());
 		//then
+		CouponEntity decreasedCoupon = couponRepository.findById(coupon.getId()).orElseThrow(RuntimeException::new);
+
 		assertThat(issueCouponResponse.couponId()).isEqualTo(coupon.getId());
 		assertThat(issueCouponResponse.userId()).isEqualTo(coupon.getUser().getId());
 		assertThat(issueCouponResponse.couponType()).isEqualTo(coupon.getType());
 		assertThat(issueCouponResponse.amount()).isEqualTo(coupon.getAmount());
 		assertThat(issueCouponResponse.expiredAt()).isEqualTo(coupon.getExpiredAt());
+		assertThat(decreasedCoupon.getQuantity()).isEqualTo(coupon.getQuantity() - 1);
 	}
 }

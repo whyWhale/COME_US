@@ -38,5 +38,4 @@ public class CouponEntity extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	private UserEntity user;
-
 }

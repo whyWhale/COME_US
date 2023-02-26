@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.platform.order.common.exception.custom.BusinessException;
 import com.platform.order.common.exception.custom.NotFoundResource;
 import com.platform.order.common.exception.model.ErrorCode;
 import com.platform.order.coupon.controller.dto.request.CreateCouponRequestDto;
@@ -52,13 +53,19 @@ public class CouponService {
 		UserEntity auth = userRepository.findById(authId)
 			.orElseThrow(() -> new NotFoundResource(
 				MessageFormat.format("user id:{0} is not found.", authId),
-				ErrorCode.NOT_FOUND_RESOURCES)
-			);
+				ErrorCode.NOT_FOUND_RESOURCES));
+		boolean isAvailable = couponRepository.decreaseQuantity(couponId) == 1;
+
+		if (!isAvailable) {
+			throw new BusinessException(
+				MessageFormat.format("쿠폰 수량이 부족합니다. coupon id : {0}", couponId),
+				ErrorCode.OUT_OF_QUANTITY);
+		}
+
 		CouponEntity coupon = couponRepository.findByIdAndExpiredAtAfter(couponId, LocalDate.now())
 			.orElseThrow(() -> new NotFoundResource(
 				MessageFormat.format("coupon id:{0} is not found.", couponId),
-				ErrorCode.NOT_FOUND_RESOURCES)
-			);
+				ErrorCode.NOT_FOUND_RESOURCES));
 
 		UserCouponEntity issuedUserCoupon = userCouponRepository.save(
 			UserCouponEntity.builder()

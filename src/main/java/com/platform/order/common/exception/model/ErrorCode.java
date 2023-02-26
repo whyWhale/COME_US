@@ -4,8 +4,6 @@ import static org.springframework.http.HttpStatus.*;
 
 import org.springframework.http.HttpStatus;
 
-import com.platform.order.common.exception.model.ErrorModel;
-
 public enum ErrorCode implements ErrorModel {
 	// COMMON
 	NOT_FOUND_RESOURCES("C001", "not found resources", NOT_FOUND),
@@ -19,7 +17,7 @@ public enum ErrorCode implements ErrorModel {
 	// BUSINESS
 	NOT_OWNER("B001", "not owner", BAD_REQUEST),
 	EntityConstraint("B002", "entity constraint", BAD_REQUEST),
-
+	OUT_OF_QUANTITY("B003", "out of quantity", PRECONDITION_FAILED),
 	// IO
 	FILE_IO("I0004", "File I/O fail", BAD_REQUEST);
 	private final String code;
