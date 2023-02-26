@@ -34,9 +34,8 @@ public class CustomUserCouponRepositoryImpl implements CustomUserCouponRepositor
 		List<OrderSpecifier> orderSpecifiers = getAllOrderSpecifiers(pageable);
 
 		List<UserCouponEntity> userCoupons = queryFactory.selectFrom(userCouponEntity)
-			.join(userCouponEntity.coupon, couponEntity)
-			.join(userCouponEntity.user, userEntity)
-			.fetchJoin()
+			.join(userCouponEntity.coupon, couponEntity).fetchJoin()
+			.join(userCouponEntity.user, userEntity).fetchJoin()
 			.where(
 				userEntity.id.eq(authId),
 				issuedAtLowerThanEquals(page.getLowerIssuedAt()),
@@ -54,8 +53,8 @@ public class CustomUserCouponRepositoryImpl implements CustomUserCouponRepositor
 			.from(userCouponEntity)
 			.join(userCouponEntity.coupon, couponEntity)
 			.join(userCouponEntity.user, userEntity)
-			.fetchJoin()
 			.where(
+				userEntity.id.eq(authId),
 				issuedAtLowerThanEquals(page.getLowerIssuedAt()),
 				issuedAtUpperThanEquals(page.getUpperIssuedAt()),
 				expiredAtLowerThanEquals(page.getLowerExpiredAt()),

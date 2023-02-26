@@ -33,7 +33,7 @@ public class CouponController {
 		@AuthenticationPrincipal JwtAuthentication principal,
 		@Valid @RequestBody CreateCouponRequestDto createCouponRequest) {
 
-		return couponService.create(principal.id(),createCouponRequest);
+		return couponService.create(principal.id(), createCouponRequest);
 	}
 
 	@PostMapping("/issue")
@@ -45,8 +45,10 @@ public class CouponController {
 	}
 
 	@GetMapping("/my")
-	public PageResponseDto<ReadCouponResponseDto> read(@AuthenticationPrincipal JwtAuthentication principal, UserCouponPageRequestDto pageRequest){
+	public PageResponseDto<ReadCouponResponseDto> read(
+		@AuthenticationPrincipal JwtAuthentication principal,
+		UserCouponPageRequestDto pageRequest) {
 
-		return couponService.readAll(principal.id(),pageRequest);
+		return couponService.readAll(principal.id(), pageRequest);
 	}
 }

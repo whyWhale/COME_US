@@ -35,7 +35,7 @@ public class UserCouponEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private CouponEntity coupon;
 
-	LocalDate issuedAt;
+	private LocalDate issuedAt;
 
 	private boolean isUsable = true;
 }

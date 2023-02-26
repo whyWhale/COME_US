@@ -1,5 +1,6 @@
 package com.platform.order.coupon.service;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.verify;
@@ -8,7 +9,6 @@ import static org.mockito.Mockito.times;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,6 @@ import com.platform.order.common.exception.custom.BusinessException;
 import com.platform.order.coupon.controller.dto.request.CreateCouponRequestDto;
 import com.platform.order.coupon.domain.entity.CouponEntity;
 import com.platform.order.coupon.domain.entity.CouponType;
-import com.platform.order.coupon.domain.entity.UserCouponEntity;
 import com.platform.order.coupon.domain.repository.CouponRepository;
 import com.platform.order.coupon.domain.repository.UserCouponRepository;
 import com.platform.order.env.ServiceTest;
@@ -105,10 +104,11 @@ class CouponServiceTest extends ServiceTest {
 		int NotAvailable = 0;
 
 		given(userRepository.findById(any())).willReturn(Optional.of(user));
+
 		//when
-		Assertions.assertThatThrownBy(() -> {
+		//then
+		assertThatThrownBy(() -> {
 			couponService.issue(1L, couponId);
 		}).isInstanceOf(BusinessException.class);
-		//then
 	}
 }
