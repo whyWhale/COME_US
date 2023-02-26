@@ -4,6 +4,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class CouponController {
 	private final CouponService couponService;
 
+	@PreAuthorize("hasRole('ROLE_OWNER')")
 	@PostMapping
 	public CreateCouponResponseDto create(
 		@AuthenticationPrincipal JwtAuthentication principal,
@@ -36,6 +38,7 @@ public class CouponController {
 		return couponService.create(principal.id(), createCouponRequest);
 	}
 
+	@PreAuthorize("hasRole('ROLE_USER')")
 	@PostMapping("/issue")
 	public IssueCouponResponseDto issue(
 		@AuthenticationPrincipal JwtAuthentication principal,
@@ -44,6 +47,7 @@ public class CouponController {
 		return couponService.issue(principal.id(), couponId);
 	}
 
+	@PreAuthorize("hasRole('ROLE_USER')")
 	@GetMapping("/my")
 	public PageResponseDto<ReadCouponResponseDto> read(
 		@AuthenticationPrincipal JwtAuthentication principal,

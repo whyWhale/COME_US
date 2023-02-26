@@ -6,6 +6,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Size;
 
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,7 +40,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 public class ProductController {
 	private final ProductService productService;
-
+	@PreAuthorize("hasRole('ROLE_OWNER')")
 	@PostMapping
 	public CreateProductResponseDto create(
 		@AuthenticationPrincipal JwtAuthentication principal,
@@ -48,6 +49,7 @@ public class ProductController {
 		return productService.create(principal.id(), createProductRequest);
 	}
 
+	@PreAuthorize("hasRole('ROLE_OWNER')")
 	@PostMapping(value = "/file/{productId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public CreateProductFileResponseDto create(
 		@PathVariable Long productId,
@@ -58,6 +60,7 @@ public class ProductController {
 		return productService.createFile(productId, principal.id(), thumbnail, images);
 	}
 
+	@PreAuthorize("hasRole('ROLE_OWNER')")
 	@PatchMapping("/{productId}")
 	public UpdateProductResponseDto upadte(
 		@AuthenticationPrincipal JwtAuthentication principal,
@@ -67,6 +70,7 @@ public class ProductController {
 		return productService.update(principal.id(), productId, updateProductRequest);
 	}
 
+	@PreAuthorize("hasRole('ROLE_OWNER')")
 	@PatchMapping(value = "/file/{productId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public UpdateProductFileResponseDto update(
 		@AuthenticationPrincipal JwtAuthentication principal,
@@ -77,6 +81,7 @@ public class ProductController {
 		return productService.updateFile(productId, principal.id(), thumbnail, images);
 	}
 
+	@PreAuthorize("hasRole('ROLE_OWNER')")
 	@DeleteMapping("/{productId}")
 	public DeleteProductResponseDto delete(
 		@AuthenticationPrincipal JwtAuthentication principal,

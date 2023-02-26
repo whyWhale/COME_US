@@ -15,11 +15,11 @@ import com.platform.order.user.domain.entity.Role;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-@WithSecurityContext(factory = WithJwtMockUserCustomFactory.class)
+@WithSecurityContext(factory = MockUserCustomFactory.class)
 public @interface WithJwtMockUser {
 	String token() default "access-token";
 
 	long id() default 1L;
 
-	Role role() default Role.USER;
+	Role[] role() default {Role.USER, Role.OWNER};
 }

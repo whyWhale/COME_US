@@ -32,6 +32,7 @@ import com.platform.order.common.security.service.TokenService;
 import com.platform.order.coupon.controller.dto.request.CreateCouponRequestDto;
 import com.platform.order.coupon.service.CouponService;
 import com.platform.order.security.WithJwtMockUser;
+import com.platform.order.user.domain.entity.Role;
 
 @WithJwtMockUser
 @WebMvcTest({CouponController.class,

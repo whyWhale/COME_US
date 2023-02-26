@@ -2,6 +2,7 @@ package com.platform.order.order.controller;
 
 import javax.validation.Valid;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,6 +28,7 @@ public class OrderController {
 	 * @param creatOrderRequest
 	 * @return
 	 */
+	@PreAuthorize("hasRole('ROLE_USER')")
 	@PostMapping
 	public CreateOrderResponseDto placeOrder(@AuthenticationPrincipal JwtAuthentication principal,
 		@Valid @RequestBody CreateOrderRequestDto creatOrderRequest) {
