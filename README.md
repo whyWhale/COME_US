@@ -6,7 +6,7 @@
 3. docker-compose up -d
 
 ### ERD V1.1
-<img src="image/ErdV1.png" width="800">
+<img src="image/ErdV2.png" width="800">
 
 ### 기능 리스트 V1.1
 
@@ -16,7 +16,11 @@
   - 사용자 ROLE_USER
   - 판매업자 ROLE_OWNER
   - 관리자 ROLE_ADMIN
-- [ ] 장바구니 조회 [start]
+
+**장바구니**[start]
+- [ ] 추가
+- [ ] 조회 
+- [ ] 삭제
 
  **주문**[start]
 - [x] 주문 [사용자]
