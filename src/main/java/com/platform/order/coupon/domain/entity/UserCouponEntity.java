@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Table(name = "user_coupon")
 @Entity
-public class UserCouponEntity{
+public class UserCouponEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,4 +36,6 @@ public class UserCouponEntity{
 	private CouponEntity coupon;
 
 	LocalDate issuedAt;
+
+	private boolean isUsable = true;
 }

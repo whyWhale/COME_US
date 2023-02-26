@@ -3,15 +3,19 @@ package com.platform.order.coupon.service;
 import java.text.MessageFormat;
 import java.time.LocalDate;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.platform.order.common.exception.custom.BusinessException;
 import com.platform.order.common.exception.custom.NotFoundResource;
 import com.platform.order.common.exception.model.ErrorCode;
+import com.platform.order.common.protocal.PageResponseDto;
 import com.platform.order.coupon.controller.dto.request.CreateCouponRequestDto;
+import com.platform.order.coupon.controller.dto.request.UserCouponPageRequestDto;
 import com.platform.order.coupon.controller.dto.response.CreateCouponResponseDto;
 import com.platform.order.coupon.controller.dto.response.IssueCouponResponseDto;
+import com.platform.order.coupon.controller.dto.response.ReadCouponResponseDto;
 import com.platform.order.coupon.domain.entity.CouponEntity;
 import com.platform.order.coupon.domain.entity.UserCouponEntity;
 import com.platform.order.coupon.domain.repository.CouponRepository;
@@ -77,4 +81,11 @@ public class CouponService {
 
 		return couponMapper.toIssueCouponResponseDto(issuedUserCoupon);
 	}
+
+	public PageResponseDto<ReadCouponResponseDto> readAll(Long authId, UserCouponPageRequestDto pageRequest) {
+		Page<UserCouponEntity> userCouponPage = userCouponRepository.findAllWithConditions(pageRequest,authId);
+
+		return couponMapper.toPageResponseDto(userCouponPage);
+	}
+
 }
