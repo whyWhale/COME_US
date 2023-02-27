@@ -18,6 +18,7 @@ public enum ErrorCode implements ErrorModel {
 	NOT_OWNER("B001", "not owner", BAD_REQUEST),
 	EntityConstraint("B002", "entity constraint", BAD_REQUEST),
 	OUT_OF_QUANTITY("B003", "out of quantity", PRECONDITION_FAILED),
+	ALREADY_WISH("B004", "already wish product", PRECONDITION_FAILED),
 	// IO
 	FILE_IO("I0004", "File I/O fail", BAD_REQUEST);
 	private final String code;

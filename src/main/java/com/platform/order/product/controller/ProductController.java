@@ -31,6 +31,7 @@ import com.platform.order.product.controller.dto.response.ReadAllProductResponse
 import com.platform.order.product.controller.dto.response.ReadProductResponseDto;
 import com.platform.order.product.controller.dto.response.UpdateProductFileResponseDto;
 import com.platform.order.product.controller.dto.response.UpdateProductResponseDto;
+import com.platform.order.product.controller.dto.response.WishProductResponseDto;
 import com.platform.order.product.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
@@ -40,6 +41,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 public class ProductController {
 	private final ProductService productService;
+
 	@PreAuthorize("hasRole('ROLE_OWNER')")
 	@PostMapping
 	public CreateProductResponseDto create(
@@ -90,6 +92,15 @@ public class ProductController {
 		return productService.delete(productId, principal.id());
 	}
 
+	@PreAuthorize("hasRole('ROLE_USER')")
+	@PostMapping("/wish/{productId}")
+	public WishProductResponseDto wish(
+		@AuthenticationPrincipal JwtAuthentication principal,
+		@PathVariable Long productId) {
+
+		return productService.wish(productId, principal.id());
+	}
+
 	@GetMapping("/{productId}")
 	public ReadProductResponseDto read(@PathVariable Long productId) {
 		return productService.read(productId);
@@ -99,5 +110,4 @@ public class ProductController {
 	public PageResponseDto<ReadAllProductResponseDto> readAll(@Valid ProductPageRequestDto pageRequest) {
 		return productService.readAll(pageRequest);
 	}
-
 }

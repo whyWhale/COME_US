@@ -27,13 +27,17 @@ import com.platform.order.product.controller.dto.response.ReadAllProductResponse
 import com.platform.order.product.controller.dto.response.ReadProductResponseDto;
 import com.platform.order.product.controller.dto.response.UpdateProductFileResponseDto;
 import com.platform.order.product.controller.dto.response.UpdateProductResponseDto;
+import com.platform.order.product.controller.dto.response.WishProductResponseDto;
 import com.platform.order.product.domain.entity.CategoryEntity;
 import com.platform.order.product.domain.entity.ProductEntity;
 import com.platform.order.product.domain.entity.ProductImageEntity;
 import com.platform.order.product.domain.entity.ProductThumbnailEntity;
+import com.platform.order.product.domain.entity.UserProductEntity;
 import com.platform.order.product.domain.repository.CategoryRepository;
 import com.platform.order.product.domain.repository.ProductImageRepository;
 import com.platform.order.product.domain.repository.ProductRepository;
+import com.platform.order.product.domain.repository.UserProductRepository;
+import com.platform.order.product.service.redis.ProductRedisService;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
 
@@ -47,8 +51,10 @@ public class ProductService {
 	private final ProductRepository productRepository;
 	private final CategoryRepository categoryRepository;
 	private final ProductImageRepository imageRepository;
-	private final ProductMapper productMapper;
+	private final UserProductRepository userProductRepository;
 	private final StorageService storageService;
+	private final ProductRedisService productRedisService;
+	private final ProductMapper productMapper;
 
 	@Transactional
 	public CreateProductResponseDto create(Long authId, CreateProductRequestDto createProductRequest) {
@@ -271,6 +277,34 @@ public class ProductService {
 		Page<ProductEntity> productsPage = productRepository.findAllWithConditions(pageRequest);
 
 		return productMapper.toPageResponseDto(productsPage);
+	}
+
+	@Transactional
+	public WishProductResponseDto wish(Long productId, Long authId) {
+		boolean isAlreadyWish = userProductRepository.existsByProductIdAndWisherId(productId, authId);
+
+		if (isAlreadyWish) {
+			throw new BusinessException(
+				MessageFormat.format("is Already wish product : {0}", productId),
+				ErrorCode.ALREADY_WISH);
+		}
+
+		UserEntity auth = userRepository.findById(authId).orElseThrow(() -> new NotFoundResource(
+			MessageFormat.format("user id :{0} is not found.", authId),
+			ErrorCode.NOT_FOUND_RESOURCES)
+		);
+		ProductEntity foundProduct = productRepository.findByIdWithCategoryAndThumbnail(productId)
+			.orElseThrow(() -> new NotFoundResource(
+				MessageFormat.format("product id :{0} is not found.", productId),
+				ErrorCode.NOT_FOUND_RESOURCES));
+		UserProductEntity userProduct = userProductRepository.save(
+			UserProductEntity.builder()
+				.wisher(auth)
+				.product(foundProduct)
+				.build());
+		productRedisService.increaseWishCount(productId);
+
+		return productMapper.toWishProductResponseDto(userProduct);
 	}
 
 }

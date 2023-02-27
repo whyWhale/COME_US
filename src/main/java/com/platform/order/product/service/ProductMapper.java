@@ -14,9 +14,11 @@ import com.platform.order.product.controller.dto.response.ReadAllProductResponse
 import com.platform.order.product.controller.dto.response.ReadProductResponseDto;
 import com.platform.order.product.controller.dto.response.UpdateProductFileResponseDto;
 import com.platform.order.product.controller.dto.response.UpdateProductResponseDto;
+import com.platform.order.product.controller.dto.response.WishProductResponseDto;
 import com.platform.order.product.domain.entity.ProductEntity;
 import com.platform.order.product.domain.entity.ProductImageEntity;
 import com.platform.order.product.domain.entity.ProductThumbnailEntity;
+import com.platform.order.product.domain.entity.UserProductEntity;
 
 @Component
 public class ProductMapper {
@@ -123,5 +125,16 @@ public class ProductMapper {
 			pageable.getPageSize(),
 			productResponses
 		);
+	}
+
+	public WishProductResponseDto toWishProductResponseDto(UserProductEntity userProduct) {
+		return new WishProductResponseDto(userProduct.getId(),
+			userProduct.getProduct().getCategory().getCode(),
+			userProduct.getProduct().getCategory().getName(),
+			userProduct.getProduct().getId(),
+			userProduct.getProduct().getName(),
+			userProduct.getProduct().getPrice(),
+			userProduct.getProduct().getProductThumbnail().getPath(),
+			userProduct.getProduct().isDisplay());
 	}
 }
