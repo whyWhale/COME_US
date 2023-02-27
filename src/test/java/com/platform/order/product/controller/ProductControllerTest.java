@@ -47,6 +47,7 @@ class ProductControllerTest {
 
 	final String URI_PREFIX = "/api/products";
 	final Long productId = 1L;
+	final Long authId = 1L;
 	@Autowired
 	MockMvc mockMvc;
 
@@ -72,7 +73,7 @@ class ProductControllerTest {
 			.contentType(MediaType.APPLICATION_JSON));
 		//then
 		perform.andExpect(status().isOk());
-		verify(productService, times(1)).create(1L, requestDto);
+		verify(productService, times(1)).create(authId, requestDto);
 	}
 
 	@DisplayName("상품을 생성할 때")
@@ -172,7 +173,7 @@ class ProductControllerTest {
 				.contentType(APPLICATION_JSON));
 		//then
 		perform.andExpect(status().isOk());
-		verify(productService, times(1)).update(1L, productId, requestDto);
+		verify(productService, times(1)).update(authId, productId, requestDto);
 	}
 
 	@DisplayName("상품을 수정할 때 ")
@@ -269,7 +270,7 @@ class ProductControllerTest {
 				.contentType(APPLICATION_JSON));
 		//then
 		perform.andExpect(status().isOk());
-		verify(productService, times(1)).delete(productId, 1L);
+		verify(productService, times(1)).delete(productId, authId);
 	}
 
 	@Test
@@ -357,5 +358,18 @@ class ProductControllerTest {
 				get(URI_PREFIX).params(params)
 					.contentType(APPLICATION_JSON));
 		}
+	}
+
+	@Test
+	@DisplayName("상품을 장바구니에 담는다.")
+	void testWish() throws Exception {
+		//given
+		//when
+		ResultActions perform = mockMvc.perform(
+			post(URI_PREFIX + "/wish/" + productId)
+				.contentType(APPLICATION_JSON));
+		//then
+		perform.andExpect(status().isOk());
+		verify(productService, times(1)).wish(productId, authId);
 	}
 }

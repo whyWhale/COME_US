@@ -24,6 +24,8 @@ import com.platform.order.product.domain.entity.ProductEntity;
 import com.platform.order.product.domain.repository.CategoryRepository;
 import com.platform.order.product.domain.repository.ProductImageRepository;
 import com.platform.order.product.domain.repository.ProductRepository;
+import com.platform.order.product.domain.repository.UserProductRepository;
+import com.platform.order.product.service.redis.ProductRedisService;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
@@ -43,6 +45,12 @@ class ProductServiceTest extends ServiceTest {
 
 	@Mock
 	ProductImageRepository imageRepository;
+
+	@Mock
+	UserProductRepository userProductRepository;
+
+	@Mock
+	ProductRedisService productRedisService;
 
 	@Mock
 	ProductMapper productMapper;
@@ -201,5 +209,34 @@ class ProductServiceTest extends ServiceTest {
 		productService.readAll(any());
 		//then
 		verify(productRepository, times(1)).findAllWithConditions(any());
+	}
+
+	@Test
+	@DisplayName("상품을 장바구니에 담다.")
+	void testWish() {
+		//given
+		given(userProductRepository.existsByProductIdAndWisherId(productId, userId)).willReturn(false);
+		given(userRepository.findById(userId)).willReturn(Optional.of(user));
+		given(productRepository.findByIdWithCategoryAndThumbnail(productId)).willReturn(Optional.of(product));
+		doNothing().when(productRedisService).increaseWishCount(productId);
+		//when
+		productService.wish(productId, userId);
+		//then
+		verify(userRepository, times(1)).findById(userId);
+		verify(userProductRepository, times(1)).existsByProductIdAndWisherId(productId, userId);
+		verify(productRepository, times(1)).findByIdWithCategoryAndThumbnail(productId);
+		verify(productRedisService, times(1)).increaseWishCount(productId);
+	}
+
+	@Test
+	@DisplayName("이미 장바구니에 담겨져 있는 상품이라면 비즈니스 예외가 발생한다.")
+	void failWishWithAlreadyHaving() {
+		//given
+		given(userProductRepository.existsByProductIdAndWisherId(productId, userId)).willReturn(false);
+		//when
+		//then
+		assertThatThrownBy(() -> {
+			productService.wish(productId, userId);
+		}).isInstanceOf(BusinessException.class);
 	}
 }

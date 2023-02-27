@@ -17,11 +17,14 @@ import com.platform.order.product.controller.dto.response.CreateProductResponseD
 import com.platform.order.product.controller.dto.response.DeleteProductResponseDto;
 import com.platform.order.product.controller.dto.response.ReadProductResponseDto;
 import com.platform.order.product.controller.dto.response.UpdateProductResponseDto;
+import com.platform.order.product.controller.dto.response.WishProductResponseDto;
 import com.platform.order.product.domain.entity.CategoryEntity;
 import com.platform.order.product.domain.entity.ProductEntity;
 import com.platform.order.product.domain.entity.ProductThumbnailEntity;
+import com.platform.order.product.domain.entity.UserProductEntity;
 import com.platform.order.product.domain.repository.CategoryRepository;
 import com.platform.order.product.domain.repository.ProductRepository;
+import com.platform.order.product.domain.repository.UserProductRepository;
 import com.platform.order.product.service.ProductService;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
@@ -37,6 +40,8 @@ public class ProductIntegrationTest extends IntegrationTest {
 	CategoryRepository categoryRepository;
 	@Autowired
 	ProductRepository productRepository;
+	@Autowired
+	UserProductRepository userProductRepository;
 
 	UserEntity user;
 	CategoryEntity category;
@@ -82,6 +87,7 @@ public class ProductIntegrationTest extends IntegrationTest {
 
 	@AfterEach
 	public void finalSetUp() {
+		userProductRepository.deleteAllInBatch();
 		productRepository.deleteAllInBatch();
 		categoryRepository.deleteAllInBatch();
 		userRepository.deleteAllInBatch();
@@ -141,6 +147,22 @@ public class ProductIntegrationTest extends IntegrationTest {
 		assertThat(readProductResponseDto.name()).isEqualTo(product.getName());
 		assertThat(readProductResponseDto.quantity()).isEqualTo(product.getQuantity());
 		assertThat(readProductResponseDto.price()).isEqualTo(product.getPrice());
+	}
+
+	@Test
+	@DisplayName("상품을 장바구니에 담다.")
+	void testWish() {
+		//given
+		//when
+		WishProductResponseDto wishProductResponse = productService.wish(product.getId(), user.getId());
+		//then
+		assertThat(wishProductResponse.categoryCode()).isEqualTo(category.getCode());
+		assertThat(wishProductResponse.categoryName()).isEqualTo(category.getName());
+		assertThat(wishProductResponse.productId()).isEqualTo(product.getId());
+		assertThat(wishProductResponse.productName()).isEqualTo(product.getName());
+		assertThat(wishProductResponse.price()).isEqualTo(product.getPrice());
+		assertThat(wishProductResponse.thumbnailPath()).isEqualTo(product.getProductThumbnail().getPath());
+		assertThat(wishProductResponse.isDisplay()).isEqualTo(product.isDisplay());
 	}
 
 }
