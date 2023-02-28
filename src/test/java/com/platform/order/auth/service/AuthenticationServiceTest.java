@@ -25,7 +25,7 @@ import com.platform.order.common.exception.custom.NotFoundResource;
 import com.platform.order.common.security.JwtProviderManager;
 import com.platform.order.common.security.constant.JwtConfig;
 import com.platform.order.common.security.model.Token;
-import com.platform.order.env.ServiceTest;
+import com.platform.order.testenv.ServiceTest;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;

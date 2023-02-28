@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import com.platform.order.env.IntegrationTest;
+import com.platform.order.testenv.IntegrationTest;
 import com.platform.order.product.service.redis.ProductRedisManager;
 import com.platform.order.product.service.redis.ProductRedisService;
 

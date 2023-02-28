@@ -17,7 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import com.platform.order.common.exception.custom.BusinessException;
-import com.platform.order.env.ServiceTest;
+import com.platform.order.testenv.ServiceTest;
 import com.platform.order.order.controller.dto.request.CreateOrderRequestDto;
 import com.platform.order.order.controller.dto.response.CreateOrderResponseDto;
 import com.platform.order.order.domain.entity.OrderEntity;

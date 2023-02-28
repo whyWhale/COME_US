@@ -7,7 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.platform.order.env.RepositoryTest;
+import com.platform.order.testenv.RepositoryTest;
 import com.platform.order.product.domain.entity.ProductEntity;
 
 class ProductRepositoryTest extends RepositoryTest {

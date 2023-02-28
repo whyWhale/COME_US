@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.platform.order.coupon.domain.entity.CouponEntity;
 import com.platform.order.coupon.domain.entity.CouponType;
-import com.platform.order.env.RepositoryTest;
+import com.platform.order.testenv.RepositoryTest;
 
 class CouponRepositoryTest extends RepositoryTest {
 	@Autowired

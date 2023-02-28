@@ -1,4 +1,4 @@
-package com.platform.order.product.domain.repository.custom;
+package com.platform.order.product.domain.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 
-import com.platform.order.env.RepositoryTest;
+import com.platform.order.testenv.RepositoryTest;
 import com.platform.order.product.controller.dto.request.WishUserProductPageRequestDto;
 import com.platform.order.product.domain.entity.CategoryEntity;
 import com.platform.order.product.domain.entity.ProductEntity;

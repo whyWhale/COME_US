@@ -16,7 +16,7 @@ import org.mockito.Mock;
 
 import com.platform.order.common.exception.custom.BusinessException;
 import com.platform.order.common.storage.StorageService;
-import com.platform.order.env.ServiceTest;
+import com.platform.order.testenv.ServiceTest;
 import com.platform.order.product.controller.dto.request.CreateProductRequestDto;
 import com.platform.order.product.controller.dto.request.UpdateProductRequestDto;
 import com.platform.order.product.domain.entity.CategoryEntity;

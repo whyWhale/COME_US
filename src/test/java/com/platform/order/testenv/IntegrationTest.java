@@ -1,4 +1,4 @@
-package com.platform.order.env;
+package com.platform.order.testenv;
 
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;

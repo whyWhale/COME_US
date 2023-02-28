@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.platform.order.env.RepositoryTest;
+import com.platform.order.testenv.RepositoryTest;
 import com.platform.order.product.controller.dto.request.ProductPageRequestDto;
 import com.platform.order.product.domain.entity.CategoryEntity;
 import com.platform.order.product.domain.entity.ProductEntity;

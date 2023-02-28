@@ -18,7 +18,7 @@ import com.platform.order.coupon.controller.dto.request.UserCouponPageRequestDto
 import com.platform.order.coupon.domain.entity.CouponEntity;
 import com.platform.order.coupon.domain.entity.CouponType;
 import com.platform.order.coupon.domain.entity.UserCouponEntity;
-import com.platform.order.env.RepositoryTest;
+import com.platform.order.testenv.RepositoryTest;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
@@ -64,7 +64,6 @@ class CustomUserCouponRepositoryImplTest extends RepositoryTest {
 				.user(user)
 				.coupon(coupons.get(value))
 				.issuedAt(LocalDate.now())
-				.isUsable(true)
 				.build())
 			.toList());
 	}

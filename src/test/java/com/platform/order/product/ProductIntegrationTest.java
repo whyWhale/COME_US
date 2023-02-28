@@ -10,7 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.platform.order.env.IntegrationTest;
+import com.platform.order.testenv.IntegrationTest;
 import com.platform.order.product.controller.dto.request.CreateProductRequestDto;
 import com.platform.order.product.controller.dto.request.UpdateProductRequestDto;
 import com.platform.order.product.controller.dto.response.CreateProductResponseDto;

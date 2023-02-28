@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.platform.order.auth.controller.dto.request.LoginAuthRequestDto;
 import com.platform.order.common.security.JwtProviderManager;
 import com.platform.order.common.security.constant.JwtConfig;
-import com.platform.order.env.IntegrationTest;
+import com.platform.order.testenv.IntegrationTest;
 import com.platform.order.security.WithJwtMockUser;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;

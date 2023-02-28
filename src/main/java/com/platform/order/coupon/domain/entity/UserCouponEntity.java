@@ -37,5 +37,6 @@ public class UserCouponEntity {
 
 	private LocalDate issuedAt;
 
+	@Builder.Default
 	private boolean isUsable = true;
 }

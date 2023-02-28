@@ -21,7 +21,7 @@ import com.platform.order.coupon.domain.entity.CouponEntity;
 import com.platform.order.coupon.domain.entity.CouponType;
 import com.platform.order.coupon.domain.repository.CouponRepository;
 import com.platform.order.coupon.domain.repository.UserCouponRepository;
-import com.platform.order.env.ServiceTest;
+import com.platform.order.testenv.ServiceTest;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
