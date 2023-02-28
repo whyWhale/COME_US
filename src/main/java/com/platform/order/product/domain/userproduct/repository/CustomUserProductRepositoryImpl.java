@@ -1,9 +1,9 @@
 package com.platform.order.product.domain.userproduct.repository;
 
-import static com.platform.order.product.domain.entity.QCategoryEntity.categoryEntity;
-import static com.platform.order.product.domain.entity.QProductEntity.productEntity;
-import static com.platform.order.product.domain.entity.QProductThumbnailEntity.productThumbnailEntity;
-import static com.platform.order.product.domain.entity.QUserProductEntity.userProductEntity;
+import static com.platform.order.product.domain.category.entity.QCategoryEntity.categoryEntity;
+import static com.platform.order.product.domain.product.entity.QProductEntity.productEntity;
+import static com.platform.order.product.domain.productthumbnail.entity.QProductThumbnailEntity.productThumbnailEntity;
+import static com.platform.order.product.domain.userproduct.entity.QUserProductEntity.userProductEntity;
 import static com.platform.order.user.domain.entity.QUserEntity.userEntity;
 
 import java.time.LocalDate;

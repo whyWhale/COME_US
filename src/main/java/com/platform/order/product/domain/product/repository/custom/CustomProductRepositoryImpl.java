@@ -1,8 +1,9 @@
 package com.platform.order.product.domain.product.repository.custom;
 
-import static com.platform.order.product.domain.entity.QCategoryEntity.categoryEntity;
-import static com.platform.order.product.domain.entity.QProductEntity.productEntity;
-import static com.platform.order.product.domain.entity.QProductThumbnailEntity.productThumbnailEntity;
+
+import static com.platform.order.product.domain.category.entity.QCategoryEntity.categoryEntity;
+import static com.platform.order.product.domain.product.entity.QProductEntity.productEntity;
+import static com.platform.order.product.domain.productthumbnail.entity.QProductThumbnailEntity.productThumbnailEntity;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,7 +1,7 @@
 package com.platform.order.coupon.domain.usercoupon.repository;
 
-import static com.platform.order.coupon.domain.entity.QCouponEntity.couponEntity;
-import static com.platform.order.coupon.domain.entity.QUserCouponEntity.userCouponEntity;
+import static com.platform.order.coupon.domain.coupon.entity.QCouponEntity.couponEntity;
+import static com.platform.order.coupon.domain.usercoupon.entity.QUserCouponEntity.userCouponEntity;
 import static com.platform.order.user.domain.entity.QUserEntity.userEntity;
 
 import java.time.LocalDate;
