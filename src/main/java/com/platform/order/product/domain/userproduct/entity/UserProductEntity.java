@@ -3,6 +3,7 @@ package com.platform.order.product.domain.userproduct.entity;
 import java.time.LocalDate;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -30,13 +31,17 @@ public class UserProductEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	private UserEntity wisher;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	private ProductEntity product;
 
 	@Builder.Default
 	private LocalDate createdAt = LocalDate.now();
+
+	public boolean isWisher(UserEntity wisher) {
+		return this.wisher.equals(wisher);
+	}
 
 }

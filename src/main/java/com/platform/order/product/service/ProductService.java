@@ -21,25 +21,25 @@ import com.platform.order.product.controller.dto.request.product.CreateProductRe
 import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto;
 import com.platform.order.product.controller.dto.request.product.UpdateProductRequestDto;
 import com.platform.order.product.controller.dto.request.userproduct.WishUserProductPageRequestDto;
-import com.platform.order.product.controller.dto.response.product.file.CreateProductFileResponseDto;
 import com.platform.order.product.controller.dto.response.product.CreateProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.DeleteProductResponseDto;
-import com.platform.order.product.controller.dto.response.product.ReadProductResponseDto;
-import com.platform.order.product.controller.dto.response.product.file.UpdateProductFileResponseDto;
-import com.platform.order.product.controller.dto.response.product.UpdateProductResponseDto;
-import com.platform.order.product.controller.dto.response.userproduct.WishUserProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadAllProductResponseDto;
+import com.platform.order.product.controller.dto.response.product.ReadProductResponseDto;
+import com.platform.order.product.controller.dto.response.product.UpdateProductResponseDto;
+import com.platform.order.product.controller.dto.response.product.file.CreateProductFileResponseDto;
+import com.platform.order.product.controller.dto.response.product.file.UpdateProductFileResponseDto;
 import com.platform.order.product.controller.dto.response.userproduct.ReadAllUserProductResponseDto;
+import com.platform.order.product.controller.dto.response.userproduct.WishUserProductResponseDto;
 import com.platform.order.product.domain.category.entity.CategoryEntity;
+import com.platform.order.product.domain.category.repository.CategoryRepository;
 import com.platform.order.product.domain.product.entity.ProductEntity;
-import com.platform.order.product.service.redis.ProductRedisService;
+import com.platform.order.product.domain.product.repository.ProductRepository;
 import com.platform.order.product.domain.productimage.entity.ProductImageEntity;
+import com.platform.order.product.domain.productimage.repository.ProductImageRepository;
 import com.platform.order.product.domain.productthumbnail.entity.ProductThumbnailEntity;
 import com.platform.order.product.domain.userproduct.entity.UserProductEntity;
-import com.platform.order.product.domain.category.repository.CategoryRepository;
-import com.platform.order.product.domain.productimage.repository.ProductImageRepository;
-import com.platform.order.product.domain.product.repository.ProductRepository;
 import com.platform.order.product.domain.userproduct.repository.UserProductRepository;
+import com.platform.order.product.service.redis.ProductRedisService;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
 
@@ -90,9 +90,10 @@ public class ProductService {
 		MultipartFile thumbnail,
 		List<MultipartFile> images) {
 
-		ProductEntity foundProduct = productRepository.findById(productId).orElseThrow(() -> new NotFoundResourceException(
-			MessageFormat.format("product id :{0} is not found.", productId),
-			ErrorCode.NOT_FOUND_RESOURCES));
+		ProductEntity foundProduct = productRepository.findById(productId)
+			.orElseThrow(() -> new NotFoundResourceException(
+				MessageFormat.format("product id :{0} is not found.", productId),
+				ErrorCode.NOT_FOUND_RESOURCES));
 		UserEntity auth = userRepository.findById(authId).orElseThrow(() -> new NotFoundResourceException(
 			MessageFormat.format("user id :{0} is not found.", authId),
 			ErrorCode.NOT_FOUND_RESOURCES)
@@ -153,10 +154,11 @@ public class ProductService {
 			MessageFormat.format("user id :{0} is not found.", authId),
 			ErrorCode.NOT_FOUND_RESOURCES)
 		);
-		ProductEntity foundProduct = productRepository.findById(productId).orElseThrow(() -> new NotFoundResourceException(
-			MessageFormat.format("product id :{0} is not found.", productId),
-			ErrorCode.NOT_FOUND_RESOURCES)
-		);
+		ProductEntity foundProduct = productRepository.findById(productId)
+			.orElseThrow(() -> new NotFoundResourceException(
+				MessageFormat.format("product id :{0} is not found.", productId),
+				ErrorCode.NOT_FOUND_RESOURCES)
+			);
 
 		if (!foundProduct.isOwner(auth)) {
 			throw new BusinessException(
@@ -185,9 +187,10 @@ public class ProductService {
 			MessageFormat.format("user id :{0} is not found.", authId),
 			ErrorCode.NOT_FOUND_RESOURCES)
 		);
-		ProductEntity foundProduct = productRepository.findById(productId).orElseThrow(() -> new NotFoundResourceException(
-			MessageFormat.format("product id :{0} is not found.", productId),
-			ErrorCode.NOT_FOUND_RESOURCES));
+		ProductEntity foundProduct = productRepository.findById(productId)
+			.orElseThrow(() -> new NotFoundResourceException(
+				MessageFormat.format("product id :{0} is not found.", productId),
+				ErrorCode.NOT_FOUND_RESOURCES));
 
 		if (!foundProduct.isOwner(auth)) {
 			throw new BusinessException(
@@ -316,4 +319,15 @@ public class ProductService {
 		return productMapper.toPageResponse(pageUserProduct);
 	}
 
+	public Long deleteWishProduct(Long authId, Long userProductId) {
+		UserProductEntity userProductEntity = userProductRepository.findByIdAndWisherId(userProductId, authId)
+			.orElseThrow(() -> new NotFoundResourceException(
+				MessageFormat.format("user product id :{0} is not found.", userProductId),
+				ErrorCode.NOT_FOUND_RESOURCES));
+
+		userProductRepository.delete(userProductEntity);
+		productRedisService.decreaseWishCount(userProductEntity.getProduct().getId());
+
+		return userProductId;
+	}
 }

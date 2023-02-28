@@ -24,15 +24,15 @@ import com.platform.order.common.security.model.JwtAuthentication;
 import com.platform.order.product.controller.dto.request.product.CreateProductRequestDto;
 import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto;
 import com.platform.order.product.controller.dto.request.product.UpdateProductRequestDto;
-import com.platform.order.product.controller.dto.response.product.file.CreateProductFileResponseDto;
+import com.platform.order.product.controller.dto.request.userproduct.WishUserProductPageRequestDto;
 import com.platform.order.product.controller.dto.response.product.CreateProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.DeleteProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadAllProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadProductResponseDto;
-import com.platform.order.product.controller.dto.response.userproduct.ReadAllUserProductResponseDto;
-import com.platform.order.product.controller.dto.response.product.file.UpdateProductFileResponseDto;
 import com.platform.order.product.controller.dto.response.product.UpdateProductResponseDto;
-import com.platform.order.product.controller.dto.request.userproduct.WishUserProductPageRequestDto;
+import com.platform.order.product.controller.dto.response.product.file.CreateProductFileResponseDto;
+import com.platform.order.product.controller.dto.response.product.file.UpdateProductFileResponseDto;
+import com.platform.order.product.controller.dto.response.userproduct.ReadAllUserProductResponseDto;
 import com.platform.order.product.controller.dto.response.userproduct.WishUserProductResponseDto;
 import com.platform.order.product.service.ProductService;
 
@@ -119,6 +119,15 @@ public class ProductController {
 		@AuthenticationPrincipal JwtAuthentication principal,
 		@Valid WishUserProductPageRequestDto pageRequestDto) {
 
-		return productService.readAllWishProducts(principal.id(),pageRequestDto);
+		return productService.readAllWishProducts(principal.id(), pageRequestDto);
+	}
+
+	@PreAuthorize("hasRole('ROLE_USER')")
+	@DeleteMapping("/wish/{userProductId}")
+	public Long deleteWishProduct(@AuthenticationPrincipal JwtAuthentication principal,
+		@PathVariable Long userProductId) {
+
+		return productService.deleteWishProduct(principal.id(),userProductId);
+
 	}
 }
