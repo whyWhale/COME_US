@@ -6,6 +6,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.LongStream;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceUnit;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -81,7 +86,7 @@ class CustomUserProductRepositoryTest extends RepositoryTest {
 
 		productRepository.saveAll(products);
 
-		LongStream.rangeClosed(1, 25).mapToObj(value -> {
+		List<ProductEntity> products = LongStream.rangeClosed(1, 25).mapToObj(value -> {
 				ProductEntity product = ProductEntity.builder()
 					.name("test상품" + value)
 					.price(value)
@@ -102,7 +107,7 @@ class CustomUserProductRepositoryTest extends RepositoryTest {
 			}
 		).toList();
 
-		userProducts = products.stream().map(product -> UserProductEntity.builder()
+		userProducts = this.products.stream().map(product -> UserProductEntity.builder()
 				.wisher(user)
 				.product(product)
 				.build()).

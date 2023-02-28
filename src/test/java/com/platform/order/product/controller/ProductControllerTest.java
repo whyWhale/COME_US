@@ -388,8 +388,20 @@ class ProductControllerTest {
 			get(URI_PREFIX + "/wish")
 				.params(params)
 				.param("sorts", CREATED_ASC.name())
-				.contentType(APPLICATION_JSON)
-		);
+				.contentType(APPLICATION_JSON));
+		//then
+		perform.andExpect(status().isOk());
+	}
+
+	@Test
+	@DisplayName("장바구니에 담긴 상품을 삭제한다.")
+	void testDeleteWishProduct() throws Exception {
+		//given
+		Long userProductId = 1L;
+		//when
+		ResultActions perform = mockMvc.perform(
+			delete(URI_PREFIX + "/wish/"+productId)
+				.contentType(APPLICATION_JSON));
 		//then
 		perform.andExpect(status().isOk());
 	}

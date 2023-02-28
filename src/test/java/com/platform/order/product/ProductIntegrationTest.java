@@ -1,8 +1,11 @@
 package com.platform.order.product;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.UUID;
+
+import javax.persistence.EntityManager;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,7 +13,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.platform.order.testenv.IntegrationTest;
 import com.platform.order.product.controller.dto.request.product.CreateProductRequestDto;
 import com.platform.order.product.controller.dto.request.product.UpdateProductRequestDto;
 import com.platform.order.product.controller.dto.response.product.CreateProductResponseDto;
@@ -19,12 +21,14 @@ import com.platform.order.product.controller.dto.response.product.ReadProductRes
 import com.platform.order.product.controller.dto.response.product.UpdateProductResponseDto;
 import com.platform.order.product.controller.dto.response.userproduct.WishUserProductResponseDto;
 import com.platform.order.product.domain.category.entity.CategoryEntity;
-import com.platform.order.product.domain.product.entity.ProductEntity;
-import com.platform.order.product.domain.productthumbnail.entity.ProductThumbnailEntity;
 import com.platform.order.product.domain.category.repository.CategoryRepository;
+import com.platform.order.product.domain.product.entity.ProductEntity;
 import com.platform.order.product.domain.product.repository.ProductRepository;
+import com.platform.order.product.domain.productthumbnail.entity.ProductThumbnailEntity;
+import com.platform.order.product.domain.userproduct.entity.UserProductEntity;
 import com.platform.order.product.domain.userproduct.repository.UserProductRepository;
 import com.platform.order.product.service.ProductService;
+import com.platform.order.testenv.IntegrationTest;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
@@ -164,4 +168,18 @@ public class ProductIntegrationTest extends IntegrationTest {
 		assertThat(wishProductResponse.isDisplay()).isEqualTo(product.isDisplay());
 	}
 
+	@Test
+	@DisplayName("장바구니 목록 중 하나를 삭제한다.")
+	void testDeleteWishProduct() {
+		//given
+		UserProductEntity wishProduct = userProductRepository.save(
+			UserProductEntity.builder()
+				.wisher(user)
+				.product(product)
+				.build());
+		//when
+		Long deleteId = productService.deleteWishProduct(user.getId(), wishProduct.getId());
+		//then
+		assertThat(deleteId).isEqualTo(wishProduct.getId());
+	}
 }

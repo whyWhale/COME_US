@@ -13,19 +13,21 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import com.platform.order.common.exception.custom.BusinessException;
 import com.platform.order.common.storage.StorageService;
-import com.platform.order.testenv.ServiceTest;
 import com.platform.order.product.controller.dto.request.product.CreateProductRequestDto;
 import com.platform.order.product.controller.dto.request.product.UpdateProductRequestDto;
 import com.platform.order.product.domain.category.entity.CategoryEntity;
-import com.platform.order.product.domain.product.entity.ProductEntity;
 import com.platform.order.product.domain.category.repository.CategoryRepository;
-import com.platform.order.product.domain.productimage.repository.ProductImageRepository;
+import com.platform.order.product.domain.product.entity.ProductEntity;
 import com.platform.order.product.domain.product.repository.ProductRepository;
+import com.platform.order.product.domain.productimage.repository.ProductImageRepository;
+import com.platform.order.product.domain.userproduct.entity.UserProductEntity;
 import com.platform.order.product.domain.userproduct.repository.UserProductRepository;
 import com.platform.order.product.service.redis.ProductRedisService;
+import com.platform.order.testenv.ServiceTest;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
@@ -58,8 +60,6 @@ class ProductServiceTest extends ServiceTest {
 	@Mock
 	StorageService storageService;
 
-	final Long userId = 1L;
-	final Long productId = 1L;
 	UserEntity user;
 	CategoryEntity category;
 	ProductEntity product;
@@ -73,6 +73,7 @@ class ProductServiceTest extends ServiceTest {
 			.nickName("whale")
 			.role(Role.OWNER)
 			.build();
+		ReflectionTestUtils.setField(user, "id", 1L);
 
 		category = CategoryEntity.builder()
 			.name("아우터")
@@ -87,6 +88,7 @@ class ProductServiceTest extends ServiceTest {
 			.isDisplay(true)
 			.category(category)
 			.build();
+		ReflectionTestUtils.setField(product, "id", 1L);
 	}
 
 	@Test
@@ -100,7 +102,7 @@ class ProductServiceTest extends ServiceTest {
 		given(userRepository.findById(any())).willReturn(Optional.of(user));
 		given(categoryRepository.findByCode(any())).willReturn(Optional.of(category));
 		//when
-		productService.create(userId, requestDto);
+		productService.create(user.getId(), requestDto);
 		//then
 		verify(userRepository, times(1)).findById(any());
 		verify(categoryRepository, times(1)).findByCode(any());
@@ -128,7 +130,7 @@ class ProductServiceTest extends ServiceTest {
 		given(productRepository.findById(any())).willReturn(Optional.of(savedProduct));
 		given(categoryRepository.findByCode(any())).willReturn(Optional.of(category));
 		//when
-		productService.update(userId, any(), requestDto);
+		productService.update(user.getId(), any(), requestDto);
 		//then
 		assertThat(savedProduct.getName()).isEqualTo(requestDto.name());
 		assertThat(savedProduct.getPrice()).isEqualTo(requestDto.price());
@@ -143,7 +145,7 @@ class ProductServiceTest extends ServiceTest {
 		given(userRepository.findById(any())).willReturn(Optional.of(user));
 		given(productRepository.findByIdWithCategory(any())).willReturn(Optional.of(product));
 		//when
-		productService.delete(productId, userId);
+		productService.delete(product.getId(), user.getId());
 		//then
 		verify(userRepository, times(1)).findById(any());
 		verify(productRepository, times(1)).findByIdWithCategory(any());
@@ -184,7 +186,7 @@ class ProductServiceTest extends ServiceTest {
 			//when
 			//then
 			assertThatThrownBy(() -> {
-				productService.delete(productId, notAuthId);
+				productService.delete(product.getId(), notAuthId);
 			}).isInstanceOf(BusinessException.class);
 		}
 	}
@@ -193,11 +195,11 @@ class ProductServiceTest extends ServiceTest {
 	@DisplayName("상품 상세를 확인한다.")
 	void testRead() {
 		//given
-		given(productRepository.findByIdWithCategoryAndThumbnail(productId)).willReturn(Optional.of(product));
+		given(productRepository.findByIdWithCategoryAndThumbnail(product.getId())).willReturn(Optional.of(product));
 		//whenΩ
-		productService.read(productId);
+		productService.read(product.getId());
 		//then
-		verify(productRepository, times(1)).findByIdWithCategoryAndThumbnail(productId);
+		verify(productRepository, times(1)).findByIdWithCategoryAndThumbnail(product.getId());
 		verify(imageRepository, times(1)).findByProduct(any());
 	}
 
@@ -215,28 +217,28 @@ class ProductServiceTest extends ServiceTest {
 	@DisplayName("상품을 장바구니에 담다.")
 	void testWish() {
 		//given
-		given(userProductRepository.existsByProductIdAndWisherId(productId, userId)).willReturn(false);
-		given(userRepository.findById(userId)).willReturn(Optional.of(user));
-		given(productRepository.findByIdWithCategoryAndThumbnail(productId)).willReturn(Optional.of(product));
-		doNothing().when(productRedisService).increaseWishCount(productId);
+		given(userProductRepository.existsByProductIdAndWisherId(product.getId(), user.getId())).willReturn(false);
+		given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
+		given(productRepository.findByIdWithCategoryAndThumbnail(product.getId())).willReturn(Optional.of(product));
+		doNothing().when(productRedisService).increaseWishCount(product.getId());
 		//when
-		productService.wish(productId, userId);
+		productService.wish(product.getId(), user.getId());
 		//then
-		verify(userRepository, times(1)).findById(userId);
-		verify(userProductRepository, times(1)).existsByProductIdAndWisherId(productId, userId);
-		verify(productRepository, times(1)).findByIdWithCategoryAndThumbnail(productId);
-		verify(productRedisService, times(1)).increaseWishCount(productId);
+		verify(userRepository, times(1)).findById(user.getId());
+		verify(userProductRepository, times(1)).existsByProductIdAndWisherId(product.getId(), user.getId());
+		verify(productRepository, times(1)).findByIdWithCategoryAndThumbnail(product.getId());
+		verify(productRedisService, times(1)).increaseWishCount(product.getId());
 	}
 
 	@Test
 	@DisplayName("이미 장바구니에 담겨져 있는 상품이라면 비즈니스 예외가 발생한다.")
 	void failWishWithAlreadyHaving() {
 		//given
-		given(userProductRepository.existsByProductIdAndWisherId(productId, userId)).willReturn(false);
+		given(userProductRepository.existsByProductIdAndWisherId(product.getId(), user.getId())).willReturn(false);
 		//when
 		//then
 		assertThatThrownBy(() -> {
-			productService.wish(productId, userId);
+			productService.wish(product.getId(), user.getId());
 		}).isInstanceOf(BusinessException.class);
 	}
 
@@ -248,5 +250,26 @@ class ProductServiceTest extends ServiceTest {
 		productService.readAllWishProducts(any(), any());
 		//then
 		verify(userProductRepository, times(1)).findAllWithCondtions(any(), any());
+	}
+
+	@Test
+	@DisplayName("장바구니에 담긴 상품을 삭제한다.")
+	void testDeleteWishProduct() {
+		//given
+		UserProductEntity wishUserProduct = UserProductEntity.builder()
+			.id(1L)
+			.wisher(user)
+			.product(product)
+			.build();
+		given(userProductRepository.findByIdAndWisherId(wishUserProduct.getId(), user.getId())).willReturn(
+			Optional.of(wishUserProduct));
+		doNothing().when(userProductRepository).delete(wishUserProduct);
+		doNothing().when(productRedisService).decreaseWishCount(wishUserProduct.getProduct().getId());
+		//when
+		productService.deleteWishProduct(user.getId(), wishUserProduct.getId());
+		//then
+		verify(userProductRepository, times(1)).findByIdAndWisherId(wishUserProduct.getId(), user.getId());
+		verify(userProductRepository, times(1)).delete(wishUserProduct);
+		verify(productRedisService, times(1)).decreaseWishCount(wishUserProduct.getProduct().getId());
 	}
 }
