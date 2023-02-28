@@ -1,5 +1,7 @@
 package com.platform.order.product.domain.entity;
 
+import java.time.LocalDate;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -7,7 +9,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import com.platform.order.product.domain.entity.ProductEntity;
 import com.platform.order.user.domain.entity.UserEntity;
 
 import lombok.AccessLevel;
@@ -33,4 +34,8 @@ public class UserProductEntity {
 
 	@ManyToOne
 	private ProductEntity product;
+
+	@Builder.Default
+	private LocalDate createdAt = LocalDate.now();
+
 }

@@ -29,9 +29,11 @@ import com.platform.order.product.controller.dto.response.CreateProductResponseD
 import com.platform.order.product.controller.dto.response.DeleteProductResponseDto;
 import com.platform.order.product.controller.dto.response.ReadAllProductResponseDto;
 import com.platform.order.product.controller.dto.response.ReadProductResponseDto;
+import com.platform.order.product.controller.dto.response.ReadUserProductResponseDto;
 import com.platform.order.product.controller.dto.response.UpdateProductFileResponseDto;
 import com.platform.order.product.controller.dto.response.UpdateProductResponseDto;
-import com.platform.order.product.controller.dto.response.WishProductResponseDto;
+import com.platform.order.product.controller.dto.request.WishUserProductPageRequestDto;
+import com.platform.order.product.controller.dto.response.WishUserProductResponseDto;
 import com.platform.order.product.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
@@ -92,15 +94,6 @@ public class ProductController {
 		return productService.delete(productId, principal.id());
 	}
 
-	@PreAuthorize("hasRole('ROLE_USER')")
-	@PostMapping("/wish/{productId}")
-	public WishProductResponseDto wish(
-		@AuthenticationPrincipal JwtAuthentication principal,
-		@PathVariable Long productId) {
-
-		return productService.wish(productId, principal.id());
-	}
-
 	@GetMapping("/{productId}")
 	public ReadProductResponseDto read(@PathVariable Long productId) {
 		return productService.read(productId);
@@ -109,5 +102,23 @@ public class ProductController {
 	@GetMapping
 	public PageResponseDto<ReadAllProductResponseDto> readAll(@Valid ProductPageRequestDto pageRequest) {
 		return productService.readAll(pageRequest);
+	}
+
+	@PreAuthorize("hasRole('ROLE_USER')")
+	@PostMapping("/wish/{productId}")
+	public WishUserProductResponseDto wish(
+		@AuthenticationPrincipal JwtAuthentication principal,
+		@PathVariable Long productId) {
+
+		return productService.wish(productId, principal.id());
+	}
+
+	@PreAuthorize("hasRole('ROLE_USER')")
+	@GetMapping("/wish")
+	public PageResponseDto<ReadUserProductResponseDto> readAllWishProducts(
+		@AuthenticationPrincipal JwtAuthentication principal,
+		@Valid WishUserProductPageRequestDto pageRequestDto) {
+
+		return productService.readAllWishProducts(principal.id(),pageRequestDto);
 	}
 }

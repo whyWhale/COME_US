@@ -12,9 +12,10 @@ import com.platform.order.product.controller.dto.response.CreateProductResponseD
 import com.platform.order.product.controller.dto.response.DeleteProductResponseDto;
 import com.platform.order.product.controller.dto.response.ReadAllProductResponseDto;
 import com.platform.order.product.controller.dto.response.ReadProductResponseDto;
+import com.platform.order.product.controller.dto.response.ReadUserProductResponseDto;
 import com.platform.order.product.controller.dto.response.UpdateProductFileResponseDto;
 import com.platform.order.product.controller.dto.response.UpdateProductResponseDto;
-import com.platform.order.product.controller.dto.response.WishProductResponseDto;
+import com.platform.order.product.controller.dto.response.WishUserProductResponseDto;
 import com.platform.order.product.domain.entity.ProductEntity;
 import com.platform.order.product.domain.entity.ProductImageEntity;
 import com.platform.order.product.domain.entity.ProductThumbnailEntity;
@@ -127,8 +128,8 @@ public class ProductMapper {
 		);
 	}
 
-	public WishProductResponseDto toWishProductResponseDto(UserProductEntity userProduct) {
-		return new WishProductResponseDto(userProduct.getId(),
+	public WishUserProductResponseDto toWishProductResponseDto(UserProductEntity userProduct) {
+		return new WishUserProductResponseDto(userProduct.getId(),
 			userProduct.getProduct().getCategory().getCode(),
 			userProduct.getProduct().getCategory().getName(),
 			userProduct.getProduct().getId(),
@@ -136,5 +137,24 @@ public class ProductMapper {
 			userProduct.getProduct().getPrice(),
 			userProduct.getProduct().getProductThumbnail().getPath(),
 			userProduct.getProduct().isDisplay());
+	}
+
+	public PageResponseDto<ReadUserProductResponseDto> toPageResponse(Page<UserProductEntity> pageUserProduct) {
+		Pageable pageable = pageUserProduct.getPageable();
+
+		List<ReadUserProductResponseDto> readUserProductResponses = pageUserProduct.getContent().stream()
+			.map(userProduct -> new ReadUserProductResponseDto(userProduct.getId(),
+				userProduct.getProduct().getCategory().getName(),
+				userProduct.getProduct().getCategory().getName(),
+				userProduct.getProduct().getId(),
+				userProduct.getProduct().getName(),
+				userProduct.getProduct().getPrice(),
+				userProduct.getProduct().getProductThumbnail().getPath()))
+			.toList();
+
+		return new PageResponseDto<>(pageUserProduct.getTotalPages(),
+			pageable.getPageNumber(),
+			pageable.getPageSize(),
+			readUserProductResponses);
 	}
 }

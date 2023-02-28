@@ -20,14 +20,16 @@ import com.platform.order.common.utils.FileUtils;
 import com.platform.order.product.controller.dto.request.CreateProductRequestDto;
 import com.platform.order.product.controller.dto.request.ProductPageRequestDto;
 import com.platform.order.product.controller.dto.request.UpdateProductRequestDto;
+import com.platform.order.product.controller.dto.request.WishUserProductPageRequestDto;
 import com.platform.order.product.controller.dto.response.CreateProductFileResponseDto;
 import com.platform.order.product.controller.dto.response.CreateProductResponseDto;
 import com.platform.order.product.controller.dto.response.DeleteProductResponseDto;
 import com.platform.order.product.controller.dto.response.ReadAllProductResponseDto;
 import com.platform.order.product.controller.dto.response.ReadProductResponseDto;
+import com.platform.order.product.controller.dto.response.ReadUserProductResponseDto;
 import com.platform.order.product.controller.dto.response.UpdateProductFileResponseDto;
 import com.platform.order.product.controller.dto.response.UpdateProductResponseDto;
-import com.platform.order.product.controller.dto.response.WishProductResponseDto;
+import com.platform.order.product.controller.dto.response.WishUserProductResponseDto;
 import com.platform.order.product.domain.entity.CategoryEntity;
 import com.platform.order.product.domain.entity.ProductEntity;
 import com.platform.order.product.domain.entity.ProductImageEntity;
@@ -280,7 +282,7 @@ public class ProductService {
 	}
 
 	@Transactional
-	public WishProductResponseDto wish(Long productId, Long authId) {
+	public WishUserProductResponseDto wish(Long productId, Long authId) {
 		boolean isAlreadyWish = userProductRepository.existsByProductIdAndWisherId(productId, authId);
 
 		if (isAlreadyWish) {
@@ -305,6 +307,13 @@ public class ProductService {
 		productRedisService.increaseWishCount(productId);
 
 		return productMapper.toWishProductResponseDto(userProduct);
+	}
+
+	public PageResponseDto<ReadUserProductResponseDto> readAllWishProducts(Long authId,
+		WishUserProductPageRequestDto pageRequestDto) {
+		Page<UserProductEntity> pageUserProduct = userProductRepository.findAllWithCondtions(authId, pageRequestDto);
+
+		return productMapper.toPageResponse(pageUserProduct);
 	}
 
 }

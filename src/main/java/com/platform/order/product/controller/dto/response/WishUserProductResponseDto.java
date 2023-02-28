@@ -1,6 +1,6 @@
 package com.platform.order.product.controller.dto.response;
 
-public record WishProductResponseDto(
+public record WishUserProductResponseDto(
 	Long id,
 	String categoryCode,
 	String categoryName,
