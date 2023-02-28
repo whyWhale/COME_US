@@ -1,6 +1,6 @@
 package com.platform.order.coupon.domain.repository;
 
-import static com.platform.order.coupon.controller.dto.request.UserCouponPageRequestDto.UserCouponCondition.ISSUED_DESC;
+import static com.platform.order.coupon.controller.dto.request.usercoupon.UserCouponPageRequestDto.UserCouponCondition.ISSUED_DESC;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
@@ -14,10 +14,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.platform.order.coupon.controller.dto.request.UserCouponPageRequestDto;
-import com.platform.order.coupon.domain.entity.CouponEntity;
-import com.platform.order.coupon.domain.entity.CouponType;
-import com.platform.order.coupon.domain.entity.UserCouponEntity;
+import com.platform.order.coupon.controller.dto.request.usercoupon.UserCouponPageRequestDto;
+import com.platform.order.coupon.domain.coupon.entity.CouponEntity;
+import com.platform.order.coupon.domain.coupon.entity.CouponType;
+import com.platform.order.coupon.domain.coupon.repository.CouponRepository;
+import com.platform.order.coupon.domain.usercoupon.entity.UserCouponEntity;
+import com.platform.order.coupon.domain.usercoupon.repository.UserCouponRepository;
 import com.platform.order.testenv.RepositoryTest;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
@@ -66,13 +68,6 @@ class CustomUserCouponRepositoryImplTest extends RepositoryTest {
 				.issuedAt(LocalDate.now())
 				.build())
 			.toList());
-	}
-
-	@AfterEach
-	public void setDown() {
-		userCouponRepository.deleteAllInBatch();
-		couponRepository.deleteAllInBatch();
-		userRepository.deleteAllInBatch();
 	}
 
 	@Test

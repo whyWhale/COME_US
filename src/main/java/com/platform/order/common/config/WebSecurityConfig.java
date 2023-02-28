@@ -24,6 +24,9 @@ import com.platform.order.common.security.constant.CookieProperty;
 import com.platform.order.common.security.constant.JwtConfig;
 import com.platform.order.common.security.constant.SecurityUrlProperty;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @EnableConfigurationProperties({SecurityUrlProperty.class, JwtConfig.class, CookieProperty.class})
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -34,14 +37,6 @@ public class WebSecurityConfig {
 	private final CookieProperty cookieProperty;
 	private final SecurityUrlProperty securityUrlProperty;
 	private final JwtConfig jwtConfig;
-
-	public WebSecurityConfig(JwtProviderManager jwtProviderManager, CookieProperty cookieProperty,
-		SecurityUrlProperty securitySettingProperty, JwtConfig jwtConfig) {
-		this.jwtProviderManager = jwtProviderManager;
-		this.cookieProperty = cookieProperty;
-		this.securityUrlProperty = securitySettingProperty;
-		this.jwtConfig = jwtConfig;
-	}
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {

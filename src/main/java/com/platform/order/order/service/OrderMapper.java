@@ -6,11 +6,11 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.platform.order.order.domain.entity.OrderEntity;
-import com.platform.order.order.domain.entity.OrderProductEntity;
+import com.platform.order.order.domain.order.entity.OrderEntity;
+import com.platform.order.order.domain.orderproduct.entity.OrderProductEntity;
 import com.platform.order.order.controller.dto.response.CreateOrderResponseDto;
 
-import com.platform.order.product.domain.entity.ProductEntity;
+import com.platform.order.product.domain.product.entity.ProductEntity;
 
 @Component
 public class OrderMapper {

@@ -9,11 +9,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.platform.order.order.domain.order.repository.OrderRepository;
+import com.platform.order.order.domain.orderproduct.repository.OrderProductRepository;
 import com.platform.order.testenv.RepositoryTest;
-import com.platform.order.order.domain.entity.OrderEntity;
-import com.platform.order.order.domain.entity.OrderProductEntity;
-import com.platform.order.product.domain.entity.ProductEntity;
-import com.platform.order.product.domain.repository.ProductRepository;
+import com.platform.order.order.domain.order.entity.OrderEntity;
+import com.platform.order.order.domain.orderproduct.entity.OrderProductEntity;
+import com.platform.order.product.domain.product.entity.ProductEntity;
+import com.platform.order.product.domain.product.repository.ProductRepository;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
@@ -57,14 +59,6 @@ class CustomOrderProductRepositoryTest extends RepositoryTest {
 			.quantity(5L)
 			.build());
 		createdOrder = orderRepository.save(OrderEntity.create(user, "서울특별시 강남구 강남동", "123-123"));
-	}
-
-	@AfterEach
-	public void setDown() {
-		orderProductRepository.deleteAllInBatch();
-		orderRepository.deleteAllInBatch();
-		productRepository.deleteAllInBatch();
-		userRepository.deleteAllInBatch();
 	}
 
 	@DisplayName("주문 상품 테이블 벌크 연산 테스트")

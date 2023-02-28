@@ -1,6 +1,6 @@
 package com.platform.order.coupon.controller;
 
-import static com.platform.order.coupon.domain.entity.CouponType.FIXED;
+import static com.platform.order.coupon.domain.coupon.entity.CouponType.FIXED;
 import static org.mockito.BDDMockito.verify;
 import static org.mockito.Mockito.times;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -29,10 +29,10 @@ import com.platform.order.common.config.WebSecurityConfig;
 import com.platform.order.common.security.JwtProviderManager;
 import com.platform.order.common.security.constant.JwtConfig;
 import com.platform.order.common.security.service.TokenService;
-import com.platform.order.coupon.controller.dto.request.CreateCouponRequestDto;
+import com.platform.order.coupon.controller.dto.request.coupon.CreateCouponRequestDto;
+import com.platform.order.coupon.controller.dto.request.usercoupon.IssueUserCouponRequestDto;
 import com.platform.order.coupon.service.CouponService;
 import com.platform.order.security.WithJwtMockUser;
-import com.platform.order.user.domain.entity.Role;
 
 @WithJwtMockUser
 @WebMvcTest({CouponController.class,
@@ -141,10 +141,11 @@ class CouponControllerTest {
 	void testIssue() throws Exception {
 		//given
 		Long couponId = 1L;
+		IssueUserCouponRequestDto issueUserCouponRequest = new IssueUserCouponRequestDto(couponId);
 		//when
 		ResultActions perform = mockMvc.perform(
 			post(URI_PREFIX + "/issue")
-				.content(objectMapper.writeValueAsString(couponId))
+				.content(objectMapper.writeValueAsString(issueUserCouponRequest))
 				.contentType(APPLICATION_JSON));
 		//then
 		perform.andExpect(status().isOk());
@@ -155,11 +156,11 @@ class CouponControllerTest {
 	@DisplayName("쿠폰을 발급받을 때 쿠폰 아이디를 전달하지 않으면 BadRequest로 응답한다.")
 	void failIssue() throws Exception {
 		//given
-		Long couponId = null;
+		IssueUserCouponRequestDto issueUserCouponRequest = new IssueUserCouponRequestDto(null);
 		//when
 		ResultActions perform = mockMvc.perform(
 			post(URI_PREFIX + "/issue")
-				.content(objectMapper.writeValueAsString(couponId))
+				.content(objectMapper.writeValueAsString(issueUserCouponRequest))
 				.contentType(APPLICATION_JSON));
 		//then
 		perform.andExpect(status().isBadRequest());

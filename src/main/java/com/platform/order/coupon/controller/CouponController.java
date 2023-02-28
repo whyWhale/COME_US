@@ -1,8 +1,6 @@
 package com.platform.order.coupon.controller;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,11 +12,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.platform.order.common.protocal.PageResponseDto;
 import com.platform.order.common.security.model.JwtAuthentication;
-import com.platform.order.coupon.controller.dto.request.CreateCouponRequestDto;
-import com.platform.order.coupon.controller.dto.request.UserCouponPageRequestDto;
-import com.platform.order.coupon.controller.dto.response.CreateCouponResponseDto;
-import com.platform.order.coupon.controller.dto.response.IssueCouponResponseDto;
-import com.platform.order.coupon.controller.dto.response.ReadCouponResponseDto;
+import com.platform.order.coupon.controller.dto.request.coupon.CreateCouponRequestDto;
+import com.platform.order.coupon.controller.dto.request.usercoupon.IssueUserCouponRequestDto;
+import com.platform.order.coupon.controller.dto.request.usercoupon.UserCouponPageRequestDto;
+import com.platform.order.coupon.controller.dto.response.coupon.CreateCouponResponseDto;
+import com.platform.order.coupon.controller.dto.response.usercoupon.IssueUserCouponResponseDto;
+import com.platform.order.coupon.controller.dto.response.usercoupon.ReadUserCouponResponseDto;
 import com.platform.order.coupon.service.CouponService;
 
 import lombok.RequiredArgsConstructor;
@@ -40,16 +39,16 @@ public class CouponController {
 
 	@PreAuthorize("hasRole('ROLE_USER')")
 	@PostMapping("/issue")
-	public IssueCouponResponseDto issue(
+	public IssueUserCouponResponseDto issue(
 		@AuthenticationPrincipal JwtAuthentication principal,
-		@Valid @RequestBody @NotNull @Positive Long couponId) {
+		@Valid @RequestBody IssueUserCouponRequestDto requestDto) {
 
-		return couponService.issue(principal.id(), couponId);
+		return couponService.issue(principal.id(), requestDto.couponId());
 	}
 
 	@PreAuthorize("hasRole('ROLE_USER')")
 	@GetMapping("/my")
-	public PageResponseDto<ReadCouponResponseDto> read(
+	public PageResponseDto<ReadUserCouponResponseDto> read(
 		@AuthenticationPrincipal JwtAuthentication principal,
 		UserCouponPageRequestDto pageRequest) {
 

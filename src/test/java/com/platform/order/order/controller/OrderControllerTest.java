@@ -25,8 +25,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.platform.order.auth.controller.handler.LoginSuccessHandler;
-import com.platform.order.auth.controller.handler.LogoutSuccessHandler;
+import com.platform.order.authentication.controller.handler.LoginSuccessHandler;
+import com.platform.order.authentication.controller.handler.LogoutSuccessHandler;
 import com.platform.order.common.config.WebSecurityConfig;
 import com.platform.order.common.security.JwtProviderManager;
 import com.platform.order.common.security.constant.JwtConfig;

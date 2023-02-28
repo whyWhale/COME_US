@@ -10,13 +10,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.platform.order.coupon.controller.dto.request.CreateCouponRequestDto;
-import com.platform.order.coupon.controller.dto.response.CreateCouponResponseDto;
-import com.platform.order.coupon.controller.dto.response.IssueCouponResponseDto;
-import com.platform.order.coupon.domain.entity.CouponEntity;
-import com.platform.order.coupon.domain.entity.CouponType;
-import com.platform.order.coupon.domain.repository.CouponRepository;
-import com.platform.order.coupon.domain.repository.UserCouponRepository;
+import com.platform.order.coupon.controller.dto.request.coupon.CreateCouponRequestDto;
+import com.platform.order.coupon.controller.dto.response.coupon.CreateCouponResponseDto;
+import com.platform.order.coupon.controller.dto.response.usercoupon.IssueUserCouponResponseDto;
+import com.platform.order.coupon.domain.coupon.entity.CouponEntity;
+import com.platform.order.coupon.domain.coupon.entity.CouponType;
+import com.platform.order.coupon.domain.coupon.repository.CouponRepository;
+import com.platform.order.coupon.domain.usercoupon.repository.UserCouponRepository;
 import com.platform.order.coupon.service.CouponService;
 import com.platform.order.testenv.IntegrationTest;
 import com.platform.order.user.domain.entity.Role;
@@ -85,7 +85,7 @@ public class CouponIntegrationTest extends IntegrationTest {
 			.type(CouponType.FIXED)
 			.build());
 		//when
-		IssueCouponResponseDto issueCouponResponse = couponService.issue(user.getId(), coupon.getId());
+		IssueUserCouponResponseDto issueCouponResponse = couponService.issue(user.getId(), coupon.getId());
 		//then
 		CouponEntity decreasedCoupon = couponRepository.findById(coupon.getId()).orElseThrow(RuntimeException::new);
 

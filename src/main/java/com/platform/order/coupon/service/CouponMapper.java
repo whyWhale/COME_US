@@ -7,11 +7,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import com.platform.order.common.protocal.PageResponseDto;
-import com.platform.order.coupon.controller.dto.response.CreateCouponResponseDto;
-import com.platform.order.coupon.controller.dto.response.IssueCouponResponseDto;
-import com.platform.order.coupon.controller.dto.response.ReadCouponResponseDto;
-import com.platform.order.coupon.domain.entity.CouponEntity;
-import com.platform.order.coupon.domain.entity.UserCouponEntity;
+import com.platform.order.coupon.controller.dto.response.coupon.CreateCouponResponseDto;
+import com.platform.order.coupon.controller.dto.response.usercoupon.IssueUserCouponResponseDto;
+import com.platform.order.coupon.controller.dto.response.usercoupon.ReadUserCouponResponseDto;
+import com.platform.order.coupon.domain.coupon.entity.CouponEntity;
+import com.platform.order.coupon.domain.usercoupon.entity.UserCouponEntity;
 
 @Component
 public class CouponMapper {
@@ -25,8 +25,8 @@ public class CouponMapper {
 		);
 	}
 
-	public IssueCouponResponseDto toIssueCouponResponseDto(UserCouponEntity issuedUserCoupon) {
-		return new IssueCouponResponseDto(
+	public IssueUserCouponResponseDto toIssueCouponResponseDto(UserCouponEntity issuedUserCoupon) {
+		return new IssueUserCouponResponseDto(
 			issuedUserCoupon.getId(),
 			issuedUserCoupon.getUser().getId(),
 			issuedUserCoupon.getCoupon().getId(),
@@ -37,12 +37,12 @@ public class CouponMapper {
 		);
 	}
 
-	public PageResponseDto<ReadCouponResponseDto> toPageResponseDto(Page<UserCouponEntity> userCouponPage) {
+	public PageResponseDto<ReadUserCouponResponseDto> toPageResponseDto(Page<UserCouponEntity> userCouponPage) {
 		Pageable pageable = userCouponPage.getPageable();
 		List<UserCouponEntity> userCoupons = userCouponPage.getContent();
 
-		List<ReadCouponResponseDto> readCouponResponses = userCoupons.stream()
-			.map(userCoupon -> new ReadCouponResponseDto(
+		List<ReadUserCouponResponseDto> readCouponResponses = userCoupons.stream()
+			.map(userCoupon -> new ReadUserCouponResponseDto(
 				userCoupon.getId(),
 				userCoupon.getCoupon().getId(),
 				userCoupon.getCoupon().getType(),

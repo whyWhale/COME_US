@@ -1,9 +1,5 @@
 package com.platform.order.product.service.redis;
 
-import static com.platform.order.product.service.redis.ProductRedisManager.WISH;
-
-import java.util.Objects;
-
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +16,7 @@ public class ProductRedisService {
 
 	@RedLock(keyPrefix = WISH_RED_LOCK_PREFIX, key = "{#productId}")
 	public void increaseWishCount(Long productId) {
-		redisTemplate.opsForZSet().incrementScore(WISH.getKey(), productId.toString(), 1);
+		redisTemplate.opsForZSet().incrementScore(ProductRedisManager.WISH.getKey(), productId.toString(), 1);
 	}
 
 }

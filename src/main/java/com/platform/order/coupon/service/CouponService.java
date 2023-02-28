@@ -8,18 +8,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.platform.order.common.exception.custom.BusinessException;
-import com.platform.order.common.exception.custom.NotFoundResource;
+import com.platform.order.common.exception.custom.NotFoundResourceException;
 import com.platform.order.common.exception.model.ErrorCode;
 import com.platform.order.common.protocal.PageResponseDto;
-import com.platform.order.coupon.controller.dto.request.CreateCouponRequestDto;
-import com.platform.order.coupon.controller.dto.request.UserCouponPageRequestDto;
-import com.platform.order.coupon.controller.dto.response.CreateCouponResponseDto;
-import com.platform.order.coupon.controller.dto.response.IssueCouponResponseDto;
-import com.platform.order.coupon.controller.dto.response.ReadCouponResponseDto;
-import com.platform.order.coupon.domain.entity.CouponEntity;
-import com.platform.order.coupon.domain.entity.UserCouponEntity;
-import com.platform.order.coupon.domain.repository.CouponRepository;
-import com.platform.order.coupon.domain.repository.UserCouponRepository;
+import com.platform.order.coupon.controller.dto.request.coupon.CreateCouponRequestDto;
+import com.platform.order.coupon.controller.dto.request.usercoupon.UserCouponPageRequestDto;
+import com.platform.order.coupon.controller.dto.response.coupon.CreateCouponResponseDto;
+import com.platform.order.coupon.controller.dto.response.usercoupon.IssueUserCouponResponseDto;
+import com.platform.order.coupon.controller.dto.response.usercoupon.ReadUserCouponResponseDto;
+import com.platform.order.coupon.domain.coupon.entity.CouponEntity;
+import com.platform.order.coupon.domain.usercoupon.entity.UserCouponEntity;
+import com.platform.order.coupon.domain.coupon.repository.CouponRepository;
+import com.platform.order.coupon.domain.usercoupon.repository.UserCouponRepository;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
 
@@ -37,7 +37,7 @@ public class CouponService {
 	@Transactional
 	public CreateCouponResponseDto create(Long authId, CreateCouponRequestDto createCouponRequest) {
 		UserEntity user = userRepository.findById(authId)
-			.orElseThrow(() -> new NotFoundResource(
+			.orElseThrow(() -> new NotFoundResourceException(
 				MessageFormat.format("user id:{0} is not found.", authId),
 				ErrorCode.NOT_FOUND_RESOURCES)
 			);
@@ -53,9 +53,9 @@ public class CouponService {
 	}
 
 	@Transactional
-	public IssueCouponResponseDto issue(Long authId, Long couponId) {
+	public IssueUserCouponResponseDto issue(Long authId, Long couponId) {
 		UserEntity auth = userRepository.findById(authId)
-			.orElseThrow(() -> new NotFoundResource(
+			.orElseThrow(() -> new NotFoundResourceException(
 				MessageFormat.format("user id:{0} is not found.", authId),
 				ErrorCode.NOT_FOUND_RESOURCES));
 		boolean isAvailable = couponRepository.decreaseQuantity(couponId) == 1;
@@ -67,7 +67,7 @@ public class CouponService {
 		}
 
 		CouponEntity coupon = couponRepository.findByIdAndExpiredAtAfter(couponId, LocalDate.now())
-			.orElseThrow(() -> new NotFoundResource(
+			.orElseThrow(() -> new NotFoundResourceException(
 				MessageFormat.format("coupon id:{0} is not found.", couponId),
 				ErrorCode.NOT_FOUND_RESOURCES));
 
@@ -82,7 +82,7 @@ public class CouponService {
 		return couponMapper.toIssueCouponResponseDto(issuedUserCoupon);
 	}
 
-	public PageResponseDto<ReadCouponResponseDto> readAll(Long authId, UserCouponPageRequestDto pageRequest) {
+	public PageResponseDto<ReadUserCouponResponseDto> readAll(Long authId, UserCouponPageRequestDto pageRequest) {
 		Page<UserCouponEntity> userCouponPage = userCouponRepository.findAllWithConditions(pageRequest,authId);
 
 		return couponMapper.toPageResponseDto(userCouponPage);

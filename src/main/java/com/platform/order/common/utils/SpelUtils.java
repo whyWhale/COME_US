@@ -6,7 +6,7 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 public class SpelUtils {
 	/**
-	 * RedLock Annotation 식별할 수 있는 키값을 SPEL로 읽어와 파싱하는 역할
+	 * RedLock Annotation: SPEL로 읽어와 파싱하는 역할
 	 * @param parameterNames
 	 * @param args
 	 * @param key

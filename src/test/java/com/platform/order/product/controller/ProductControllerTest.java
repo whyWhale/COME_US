@@ -1,8 +1,8 @@
 package com.platform.order.product.controller;
 
-import static com.platform.order.product.controller.dto.request.ProductPageRequestDto.ProductCondition.PRICE_ASC;
-import static com.platform.order.product.controller.dto.request.ProductPageRequestDto.ProductCondition.PRICE_DESC;
-import static com.platform.order.product.controller.dto.request.WishUserProductPageRequestDto.UserProductOrder.CREATED_ASC;
+import static com.platform.order.product.controller.dto.request.product.ProductPageRequestDto.ProductCondition.PRICE_ASC;
+import static com.platform.order.product.controller.dto.request.product.ProductPageRequestDto.ProductCondition.PRICE_DESC;
+import static com.platform.order.product.controller.dto.request.userproduct.WishUserProductPageRequestDto.UserProductOrder.CREATED_ASC;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.verify;
 import static org.mockito.Mockito.times;
@@ -33,11 +33,11 @@ import com.platform.order.common.config.WebSecurityConfig;
 import com.platform.order.common.security.JwtProviderManager;
 import com.platform.order.common.security.constant.JwtConfig;
 import com.platform.order.common.security.service.TokenService;
-import com.platform.order.product.controller.dto.request.CreateProductRequestDto;
-import com.platform.order.product.controller.dto.request.ProductPageRequestDto;
-import com.platform.order.product.controller.dto.request.ProductPageRequestDto.ProductCondition;
-import com.platform.order.product.controller.dto.request.UpdateProductRequestDto;
-import com.platform.order.product.controller.dto.request.WishUserProductPageRequestDto;
+import com.platform.order.product.controller.dto.request.product.CreateProductRequestDto;
+import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto;
+import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto.ProductCondition;
+import com.platform.order.product.controller.dto.request.product.UpdateProductRequestDto;
+import com.platform.order.product.controller.dto.request.userproduct.WishUserProductPageRequestDto;
 import com.platform.order.product.service.ProductService;
 import com.platform.order.security.WithJwtMockUser;
 import com.platform.order.utils.ParameterUtils;

@@ -10,8 +10,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.platform.order.coupon.domain.entity.CouponEntity;
-import com.platform.order.coupon.domain.entity.CouponType;
+import com.platform.order.coupon.domain.coupon.entity.CouponEntity;
+import com.platform.order.coupon.domain.coupon.entity.CouponType;
+import com.platform.order.coupon.domain.coupon.repository.CouponRepository;
 import com.platform.order.testenv.RepositoryTest;
 
 class CouponRepositoryTest extends RepositoryTest {
@@ -30,11 +31,6 @@ class CouponRepositoryTest extends RepositoryTest {
 				.expiredAt(LocalDate.now().plusMonths(1))
 				.build()
 		);
-	}
-
-	@AfterEach
-	public void setDown() {
-		couponRepository.deleteAllInBatch();
 	}
 
 	@Test

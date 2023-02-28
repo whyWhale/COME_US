@@ -9,4 +9,13 @@ public class BusinessException extends RuntimeException {
 		super(message);
 		this.errorModel = errorModel;
 	}
+
+	public ErrorModel errorModel() {
+		return errorModel;
+	}
+
+	@Override
+	public String toString() {
+		return "[BusinessException] " + errorModel;
+	}
 }

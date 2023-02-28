@@ -21,19 +21,19 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.platform.order.common.protocal.PageResponseDto;
 import com.platform.order.common.security.model.JwtAuthentication;
-import com.platform.order.product.controller.dto.request.CreateProductRequestDto;
-import com.platform.order.product.controller.dto.request.ProductPageRequestDto;
-import com.platform.order.product.controller.dto.request.UpdateProductRequestDto;
-import com.platform.order.product.controller.dto.response.CreateProductFileResponseDto;
-import com.platform.order.product.controller.dto.response.CreateProductResponseDto;
-import com.platform.order.product.controller.dto.response.DeleteProductResponseDto;
-import com.platform.order.product.controller.dto.response.ReadAllProductResponseDto;
-import com.platform.order.product.controller.dto.response.ReadProductResponseDto;
-import com.platform.order.product.controller.dto.response.ReadUserProductResponseDto;
-import com.platform.order.product.controller.dto.response.UpdateProductFileResponseDto;
-import com.platform.order.product.controller.dto.response.UpdateProductResponseDto;
-import com.platform.order.product.controller.dto.request.WishUserProductPageRequestDto;
-import com.platform.order.product.controller.dto.response.WishUserProductResponseDto;
+import com.platform.order.product.controller.dto.request.product.CreateProductRequestDto;
+import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto;
+import com.platform.order.product.controller.dto.request.product.UpdateProductRequestDto;
+import com.platform.order.product.controller.dto.response.product.file.CreateProductFileResponseDto;
+import com.platform.order.product.controller.dto.response.product.CreateProductResponseDto;
+import com.platform.order.product.controller.dto.response.product.DeleteProductResponseDto;
+import com.platform.order.product.controller.dto.response.product.ReadAllProductResponseDto;
+import com.platform.order.product.controller.dto.response.product.ReadProductResponseDto;
+import com.platform.order.product.controller.dto.response.userproduct.ReadAllUserProductResponseDto;
+import com.platform.order.product.controller.dto.response.product.file.UpdateProductFileResponseDto;
+import com.platform.order.product.controller.dto.response.product.UpdateProductResponseDto;
+import com.platform.order.product.controller.dto.request.userproduct.WishUserProductPageRequestDto;
+import com.platform.order.product.controller.dto.response.userproduct.WishUserProductResponseDto;
 import com.platform.order.product.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
@@ -115,7 +115,7 @@ public class ProductController {
 
 	@PreAuthorize("hasRole('ROLE_USER')")
 	@GetMapping("/wish")
-	public PageResponseDto<ReadUserProductResponseDto> readAllWishProducts(
+	public PageResponseDto<ReadAllUserProductResponseDto> readAllWishProducts(
 		@AuthenticationPrincipal JwtAuthentication principal,
 		@Valid WishUserProductPageRequestDto pageRequestDto) {
 

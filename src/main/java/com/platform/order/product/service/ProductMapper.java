@@ -7,19 +7,19 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import com.platform.order.common.protocal.PageResponseDto;
-import com.platform.order.product.controller.dto.response.CreateProductFileResponseDto;
-import com.platform.order.product.controller.dto.response.CreateProductResponseDto;
-import com.platform.order.product.controller.dto.response.DeleteProductResponseDto;
-import com.platform.order.product.controller.dto.response.ReadAllProductResponseDto;
-import com.platform.order.product.controller.dto.response.ReadProductResponseDto;
-import com.platform.order.product.controller.dto.response.ReadUserProductResponseDto;
-import com.platform.order.product.controller.dto.response.UpdateProductFileResponseDto;
-import com.platform.order.product.controller.dto.response.UpdateProductResponseDto;
-import com.platform.order.product.controller.dto.response.WishUserProductResponseDto;
-import com.platform.order.product.domain.entity.ProductEntity;
-import com.platform.order.product.domain.entity.ProductImageEntity;
-import com.platform.order.product.domain.entity.ProductThumbnailEntity;
-import com.platform.order.product.domain.entity.UserProductEntity;
+import com.platform.order.product.controller.dto.response.product.file.CreateProductFileResponseDto;
+import com.platform.order.product.controller.dto.response.product.CreateProductResponseDto;
+import com.platform.order.product.controller.dto.response.product.DeleteProductResponseDto;
+import com.platform.order.product.controller.dto.response.product.ReadAllProductResponseDto;
+import com.platform.order.product.controller.dto.response.product.ReadProductResponseDto;
+import com.platform.order.product.controller.dto.response.product.file.UpdateProductFileResponseDto;
+import com.platform.order.product.controller.dto.response.product.UpdateProductResponseDto;
+import com.platform.order.product.controller.dto.response.userproduct.WishUserProductResponseDto;
+import com.platform.order.product.controller.dto.response.userproduct.ReadAllUserProductResponseDto;
+import com.platform.order.product.domain.product.entity.ProductEntity;
+import com.platform.order.product.domain.productimage.entity.ProductImageEntity;
+import com.platform.order.product.domain.productthumbnail.entity.ProductThumbnailEntity;
+import com.platform.order.product.domain.userproduct.entity.UserProductEntity;
 
 @Component
 public class ProductMapper {
@@ -139,11 +139,11 @@ public class ProductMapper {
 			userProduct.getProduct().isDisplay());
 	}
 
-	public PageResponseDto<ReadUserProductResponseDto> toPageResponse(Page<UserProductEntity> pageUserProduct) {
+	public PageResponseDto<ReadAllUserProductResponseDto> toPageResponse(Page<UserProductEntity> pageUserProduct) {
 		Pageable pageable = pageUserProduct.getPageable();
 
-		List<ReadUserProductResponseDto> readUserProductResponses = pageUserProduct.getContent().stream()
-			.map(userProduct -> new ReadUserProductResponseDto(userProduct.getId(),
+		List<ReadAllUserProductResponseDto> readUserProductResponses = pageUserProduct.getContent().stream()
+			.map(userProduct -> new ReadAllUserProductResponseDto(userProduct.getId(),
 				userProduct.getProduct().getCategory().getName(),
 				userProduct.getProduct().getCategory().getName(),
 				userProduct.getProduct().getId(),

@@ -6,16 +6,12 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Service
 public class TokenService {
-	/**
-	 * <userId, tokenValue>
-	 */
 	private final RedisTemplate<String, String> redisTemplate;
-
-	public TokenService(RedisTemplate<String, String> redisTemplate) {
-		this.redisTemplate = redisTemplate;
-	}
 
 	public void saveRefreshToken(Long userId, String refreshToken, long timeToLive) {
 		redisTemplate.opsForValue()
