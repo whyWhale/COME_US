@@ -17,11 +17,10 @@ import com.platform.order.product.controller.dto.response.CreateProductResponseD
 import com.platform.order.product.controller.dto.response.DeleteProductResponseDto;
 import com.platform.order.product.controller.dto.response.ReadProductResponseDto;
 import com.platform.order.product.controller.dto.response.UpdateProductResponseDto;
-import com.platform.order.product.controller.dto.response.WishProductResponseDto;
+import com.platform.order.product.controller.dto.response.WishUserProductResponseDto;
 import com.platform.order.product.domain.entity.CategoryEntity;
 import com.platform.order.product.domain.entity.ProductEntity;
 import com.platform.order.product.domain.entity.ProductThumbnailEntity;
-import com.platform.order.product.domain.entity.UserProductEntity;
 import com.platform.order.product.domain.repository.CategoryRepository;
 import com.platform.order.product.domain.repository.ProductRepository;
 import com.platform.order.product.domain.repository.UserProductRepository;
@@ -154,7 +153,7 @@ public class ProductIntegrationTest extends IntegrationTest {
 	void testWish() {
 		//given
 		//when
-		WishProductResponseDto wishProductResponse = productService.wish(product.getId(), user.getId());
+		WishUserProductResponseDto wishProductResponse = productService.wish(product.getId(), user.getId());
 		//then
 		assertThat(wishProductResponse.categoryCode()).isEqualTo(category.getCode());
 		assertThat(wishProductResponse.categoryName()).isEqualTo(category.getName());

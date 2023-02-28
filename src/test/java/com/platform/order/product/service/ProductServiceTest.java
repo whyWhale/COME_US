@@ -239,4 +239,14 @@ class ProductServiceTest extends ServiceTest {
 			productService.wish(productId, userId);
 		}).isInstanceOf(BusinessException.class);
 	}
+
+	@Test
+	@DisplayName("장바구니에 있는 상품 목록을 조회한다.")
+	void testReadAllWishProducts() {
+		//given
+		//when
+		productService.readAllWishProducts(any(), any());
+		//then
+		verify(userProductRepository, times(1)).findAllWithCondtions(any(), any());
+	}
 }

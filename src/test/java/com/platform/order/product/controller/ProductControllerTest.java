@@ -1,5 +1,8 @@
 package com.platform.order.product.controller;
 
+import static com.platform.order.product.controller.dto.request.ProductPageRequestDto.ProductCondition.PRICE_ASC;
+import static com.platform.order.product.controller.dto.request.ProductPageRequestDto.ProductCondition.PRICE_DESC;
+import static com.platform.order.product.controller.dto.request.WishUserProductPageRequestDto.UserProductOrder.CREATED_ASC;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.verify;
 import static org.mockito.Mockito.times;
@@ -34,6 +37,7 @@ import com.platform.order.product.controller.dto.request.CreateProductRequestDto
 import com.platform.order.product.controller.dto.request.ProductPageRequestDto;
 import com.platform.order.product.controller.dto.request.ProductPageRequestDto.ProductCondition;
 import com.platform.order.product.controller.dto.request.UpdateProductRequestDto;
+import com.platform.order.product.controller.dto.request.WishUserProductPageRequestDto;
 import com.platform.order.product.service.ProductService;
 import com.platform.order.security.WithJwtMockUser;
 import com.platform.order.utils.ParameterUtils;
@@ -345,9 +349,9 @@ class ProductControllerTest {
 			//when
 			ResultActions perform = mockMvc.perform(
 				get(URI_PREFIX).params(params)
-					.param("sorts", ProductCondition.PRICE_ASC.name())
+					.param("sorts", PRICE_ASC.name())
 					.param("sorts", ProductCondition.CREATED_ASC.name())
-					.param("sorts", ProductCondition.PRICE_DESC.name())
+					.param("sorts", PRICE_DESC.name())
 					.contentType(APPLICATION_JSON));
 			//then
 			perform.andExpect(status().isBadRequest());
@@ -371,5 +375,22 @@ class ProductControllerTest {
 		//then
 		perform.andExpect(status().isOk());
 		verify(productService, times(1)).wish(productId, authId);
+	}
+
+	@Test
+	@DisplayName("장바구니에 담긴 상품목록을 조회한다.")
+	void testReadAllWishProducts() throws Exception {
+		//given
+		var pageRequest = new WishUserProductPageRequestDto(1, 10, null, null, null);
+		var params = new ParameterUtils<>().toMultiValueParams(objectMapper, pageRequest);
+		//when
+		ResultActions perform = mockMvc.perform(
+			get(URI_PREFIX + "/wish")
+				.params(params)
+				.param("sorts", CREATED_ASC.name())
+				.contentType(APPLICATION_JSON)
+		);
+		//then
+		perform.andExpect(status().isOk());
 	}
 }
