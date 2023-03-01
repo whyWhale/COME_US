@@ -13,11 +13,13 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.data.domain.Page;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import com.platform.order.common.exception.custom.BusinessException;
 import com.platform.order.common.storage.StorageService;
 import com.platform.order.product.controller.dto.request.product.CreateProductRequestDto;
+import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto;
 import com.platform.order.product.controller.dto.request.product.UpdateProductRequestDto;
 import com.platform.order.product.domain.category.entity.CategoryEntity;
 import com.platform.order.product.domain.category.repository.CategoryRepository;
@@ -197,7 +199,7 @@ class ProductServiceTest extends ServiceTest {
 		//given
 		given(productRepository.findByIdWithCategoryAndThumbnail(product.getId())).willReturn(Optional.of(product));
 		//whenΩ
-		productService.read(product.getId());
+		productService.read(product.getId(), any());
 		//then
 		verify(productRepository, times(1)).findByIdWithCategoryAndThumbnail(product.getId());
 		verify(imageRepository, times(1)).findByProduct(any());
@@ -207,8 +209,11 @@ class ProductServiceTest extends ServiceTest {
 	@DisplayName("상품목록을 조회한다.")
 	void testReadAll() {
 		//given
+		var pageRequestDto = new ProductPageRequestDto(1, 10, null, null, null, null);
+
+		given(productRepository.findAllWithConditions(any())).willReturn(Page.empty());
 		//when
-		productService.readAll(any());
+		productService.readAll(pageRequestDto);
 		//then
 		verify(productRepository, times(1)).findAllWithConditions(any());
 	}

@@ -10,7 +10,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.UUID;
 import java.util.stream.Stream;
+
+import javax.servlet.http.Cookie;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -282,12 +285,15 @@ class ProductControllerTest {
 	void testRead() throws Exception {
 		//given
 		//when
+		String cookieValue = UUID.randomUUID().toString();
+
 		ResultActions perform = mockMvc.perform(
 			get(URI_PREFIX + "/" + productId)
+				.cookie(new Cookie("visitor", cookieValue))
 				.contentType(APPLICATION_JSON));
 		//then
 		perform.andExpect(status().isOk());
-		verify(productService, times(1)).read(productId);
+		verify(productService, times(1)).read(productId, cookieValue);
 	}
 
 	@Test
@@ -400,7 +406,7 @@ class ProductControllerTest {
 		Long userProductId = 1L;
 		//when
 		ResultActions perform = mockMvc.perform(
-			delete(URI_PREFIX + "/wish/"+productId)
+			delete(URI_PREFIX + "/wish/" + productId)
 				.contentType(APPLICATION_JSON));
 		//then
 		perform.andExpect(status().isOk());

@@ -5,8 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.UUID;
 
-import javax.persistence.EntityManager;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -145,7 +143,7 @@ public class ProductIntegrationTest extends IntegrationTest {
 	void testRead() {
 		//given
 		//when
-		ReadProductResponseDto readProductResponseDto = productService.read(product.getId());
+		var readProductResponseDto = productService.read(product.getId(), UUID.randomUUID().toString());
 		//then
 		assertThat(readProductResponseDto.name()).isEqualTo(product.getName());
 		assertThat(readProductResponseDto.quantity()).isEqualTo(product.getQuantity());
