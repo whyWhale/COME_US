@@ -46,9 +46,10 @@ public class ProductRedisService {
 	}
 
 	public long getWishCount(Long productId) {
-		return Objects.requireNonNull(redisTemplate.opsForZSet()
-				.score(SORTED_SET_WISH.getKey(), productId.toString()))
-			.longValue();
+		Double score = redisTemplate.opsForZSet()
+			.score(SORTED_SET_WISH.getKey(), productId.toString());
+
+		return score == null ? 0 : score.longValue();
 	}
 
 }
