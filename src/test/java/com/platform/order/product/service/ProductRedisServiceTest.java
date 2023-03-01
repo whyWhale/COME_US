@@ -102,7 +102,7 @@ class ProductRedisServiceTest extends IntegrationTest {
 	@DisplayName("상품 조회수 중복 카운팅을 방지할 수 있다.")
 	void testIncreaseViewCountWithDuplicate() throws InterruptedException {
 		//given
-		Long productId = 2L;
+		Long productId = 3L;
 		String cookieValue = UUID.randomUUID().toString();
 		String key = SET_VIEW.getKey() + productId;
 		int request = 10;
