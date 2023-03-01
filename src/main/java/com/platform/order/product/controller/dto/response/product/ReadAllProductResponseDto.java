@@ -5,5 +5,6 @@ public record ReadAllProductResponseDto(
 	Long quantity,
 	Long price,
 	String thumbnailPath,
-	String category) {
+	String categoryName,
+	Long wishCount) {
 }

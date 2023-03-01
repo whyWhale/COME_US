@@ -1,21 +1,22 @@
 package com.platform.order.product.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import com.platform.order.common.protocal.PageResponseDto;
-import com.platform.order.product.controller.dto.response.product.file.CreateProductFileResponseDto;
 import com.platform.order.product.controller.dto.response.product.CreateProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.DeleteProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadAllProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadProductResponseDto;
-import com.platform.order.product.controller.dto.response.product.file.UpdateProductFileResponseDto;
 import com.platform.order.product.controller.dto.response.product.UpdateProductResponseDto;
-import com.platform.order.product.controller.dto.response.userproduct.WishUserProductResponseDto;
+import com.platform.order.product.controller.dto.response.product.file.CreateProductFileResponseDto;
+import com.platform.order.product.controller.dto.response.product.file.UpdateProductFileResponseDto;
 import com.platform.order.product.controller.dto.response.userproduct.ReadAllUserProductResponseDto;
+import com.platform.order.product.controller.dto.response.userproduct.WishUserProductResponseDto;
 import com.platform.order.product.domain.product.entity.ProductEntity;
 import com.platform.order.product.domain.productimage.entity.ProductImageEntity;
 import com.platform.order.product.domain.productthumbnail.entity.ProductThumbnailEntity;
@@ -28,8 +29,7 @@ public class ProductMapper {
 			product.getName(),
 			product.getQuantity(),
 			product.getPrice(),
-			product.getCategory().getCode()
-		);
+			product.getCategory().getCode());
 	}
 
 	public CreateProductFileResponseDto productFileResponseDto(ProductThumbnailEntity thumbnail,
@@ -65,15 +65,13 @@ public class ProductMapper {
 			thumbnail.getOriginName(), thumbnail.getExtension(), thumbnail.getPath(), thumbnail.getSize());
 
 		var imageResponseDtos = productImages.stream()
-			.map(productImage ->
-				new UpdateProductFileResponseDto.ImageResponseDto(
-					productImage.getName(),
-					productImage.getOriginName(),
-					productImage.getExtension(),
-					productImage.getPath(),
-					productImage.getSize(),
-					productImage.getArrangement()
-				))
+			.map(productImage -> new UpdateProductFileResponseDto.ImageResponseDto(
+				productImage.getName(),
+				productImage.getOriginName(),
+				productImage.getExtension(),
+				productImage.getPath(),
+				productImage.getSize(),
+				productImage.getArrangement()))
 			.toList();
 
 		return new UpdateProductFileResponseDto(thumbnailResponseDto, imageResponseDtos);
@@ -87,12 +85,14 @@ public class ProductMapper {
 			foundProduct.getPrice(),
 			foundProduct.isDisplay(),
 			foundProduct.getCategory().getName(),
-			foundProduct.getCategory().getCode()
-		);
+			foundProduct.getCategory().getCode());
 	}
 
-	public ReadProductResponseDto toReadProductResponseDto(ProductEntity foundProduct,
-		List<ProductImageEntity> images) {
+	public ReadProductResponseDto toReadProductResponseDto(
+		ProductEntity foundProduct,
+		List<ProductImageEntity> images,
+		long wishCount) {
+
 		List<String> imagePaths = images.stream()
 			.map(ProductImageEntity::getPath)
 			.toList();
@@ -103,29 +103,39 @@ public class ProductMapper {
 			foundProduct.getPrice(),
 			foundProduct.getProductThumbnail().getPath(),
 			foundProduct.getCategory().getName(),
-			imagePaths
-		);
+			imagePaths,
+			wishCount);
 	}
 
-	public PageResponseDto<ReadAllProductResponseDto> toPageResponseDto(Page<ProductEntity> productsPage) {
+	public PageResponseDto<ReadAllProductResponseDto> toNoContentPageResponseDto(
+		Page<ProductEntity> productsPage,
+		Map<Long, Long> wishCounts) {
 		Pageable pageable = productsPage.getPageable();
 		List<ProductEntity> products = productsPage.getContent();
 
-		List<ReadAllProductResponseDto> productResponses = products.stream().map(product ->
-			new ReadAllProductResponseDto(
+		var productResponses = products.stream()
+			.map(product -> new ReadAllProductResponseDto(
 				product.getName(),
 				product.getQuantity(),
 				product.getPrice(),
 				product.getProductThumbnail().getPath(),
-				product.getCategory().getName())
-		).toList();
+				product.getCategory().getName(),
+				wishCounts.get(product.getId())))
+			.toList();
 
 		return new PageResponseDto<>(
 			productsPage.getTotalPages(),
 			pageable.getPageNumber(),
 			pageable.getPageSize(),
-			productResponses
-		);
+			productResponses);
+	}
+
+	public PageResponseDto<ReadAllProductResponseDto> toNoContentPageResponseDto(Page<ProductEntity> productsPage) {
+		return new PageResponseDto<>(
+			productsPage.getTotalPages(),
+			productsPage.getPageable().getPageNumber(),
+			productsPage.getPageable().getPageSize(),
+			List.of());
 	}
 
 	public WishUserProductResponseDto toWishProductResponseDto(UserProductEntity userProduct) {
@@ -142,7 +152,7 @@ public class ProductMapper {
 	public PageResponseDto<ReadAllUserProductResponseDto> toPageResponse(Page<UserProductEntity> pageUserProduct) {
 		Pageable pageable = pageUserProduct.getPageable();
 
-		List<ReadAllUserProductResponseDto> readUserProductResponses = pageUserProduct.getContent().stream()
+		var readUserProductResponses = pageUserProduct.getContent().stream()
 			.map(userProduct -> new ReadAllUserProductResponseDto(userProduct.getId(),
 				userProduct.getProduct().getCategory().getName(),
 				userProduct.getProduct().getCategory().getName(),

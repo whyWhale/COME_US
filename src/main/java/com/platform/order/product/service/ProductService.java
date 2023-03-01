@@ -2,8 +2,10 @@ package com.platform.order.product.service;
 
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -179,7 +181,6 @@ public class ProductService {
 
 		return productMapper.toUpdateProductResponseDto(updatedProduct);
 	}
-
 	@Transactional
 	public UpdateProductFileResponseDto updateFile(Long productId, Long authId, MultipartFile thumbnail,
 		List<MultipartFile> images) {
@@ -268,20 +269,31 @@ public class ProductService {
 		return productMapper.toDeleteProductResponseDto(foundProduct);
 	}
 
-	public ReadProductResponseDto read(Long productId) {
+	public ReadProductResponseDto read(Long productId, String visitor) {
 		ProductEntity foundProduct = productRepository.findByIdWithCategoryAndThumbnail(productId)
 			.orElseThrow(() -> new NotFoundResourceException(
 				MessageFormat.format("product id :{0} is not found.", productId),
 				ErrorCode.NOT_FOUND_RESOURCES));
 		List<ProductImageEntity> images = imageRepository.findByProduct(foundProduct);
 
-		return productMapper.toReadProductResponseDto(foundProduct, images);
+		productRedisService.increaseViewCount(productId, visitor);
+		long wishCount = productRedisService.getWishCount(productId);
+
+		return productMapper.toReadProductResponseDto(foundProduct, images, wishCount);
 	}
 
 	public PageResponseDto<ReadAllProductResponseDto> readAll(ProductPageRequestDto pageRequest) {
 		Page<ProductEntity> productsPage = productRepository.findAllWithConditions(pageRequest);
 
-		return productMapper.toPageResponseDto(productsPage);
+		if (productsPage.getContent().isEmpty()) {
+			return productMapper.toNoContentPageResponseDto(productsPage);
+		}
+
+		Map<Long, Long> wishCounts = productsPage.getContent().stream()
+			.map(product -> new Long[] {product.getId(), productRedisService.getWishCount(product.getId())})
+			.collect(Collectors.toMap(keyValue -> keyValue[0], keyValue -> keyValue[1]));
+
+		return productMapper.toNoContentPageResponseDto(productsPage, wishCounts);
 	}
 
 	@Transactional

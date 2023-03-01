@@ -8,5 +8,6 @@ public record ReadProductResponseDto(
 	Long price,
 	String thumbnailPath,
 	String category,
-	List<String> imagePaths) {
+	List<String> imagePaths,
+	long wishCount) {
 }

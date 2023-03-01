@@ -8,6 +8,7 @@ import javax.validation.constraints.Size;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -95,8 +96,11 @@ public class ProductController {
 	}
 
 	@GetMapping("/{productId}")
-	public ReadProductResponseDto read(@PathVariable Long productId) {
-		return productService.read(productId);
+	public ReadProductResponseDto read(
+		@PathVariable Long productId,
+		@CookieValue(name = "visitor") String visitor) {
+
+		return productService.read(productId, visitor);
 	}
 
 	@GetMapping
@@ -127,7 +131,7 @@ public class ProductController {
 	public Long deleteWishProduct(@AuthenticationPrincipal JwtAuthentication principal,
 		@PathVariable Long userProductId) {
 
-		return productService.deleteWishProduct(principal.id(),userProductId);
+		return productService.deleteWishProduct(principal.id(), userProductId);
 
 	}
 }
