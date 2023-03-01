@@ -7,14 +7,14 @@ buildscript {
 plugins {
     id 'org.springframework.boot' version '2.7.5'
     id 'io.spring.dependency-management' version '1.0.15.RELEASE'
-    id 'java'
     id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+    id 'java'
+    id 'jacoco'
 }
 
 group = 'com.platform'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
-
 
 configurations {
     compileOnly {
@@ -24,6 +24,10 @@ configurations {
 
 repositories {
     mavenCentral()
+}
+
+jacoco {
+    toolVersion = '0.8.8'
 }
 
 dependencies {
@@ -84,6 +88,7 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+    finalizedBy(jacocoTestReport)
 }
 
 def querydslDir = "$buildDir/generated/querydsl"
@@ -106,4 +111,81 @@ configurations {
         extendsFrom annotationProcessor
     }
     querydsl.extendsFrom compileClasspath
+}
+
+// jacoco
+test {
+    finalizedBy(jacocoTestReport)
+}
+
+jacocoTestReport {
+    executionData(fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec"))
+
+    reports {
+        html.enabled true
+        xml.enabled true
+        csv.enabled false
+
+        html.destination file("src/jacoco/jacoco.html")
+        xml.destination file("src/jacoco/jacoco.xml")
+    }
+    def Qdomains = []
+    for (qPattern in '**/QA'..'**/QZ') {
+        Qdomains.add(qPattern + '*')
+    }
+
+    afterEvaluate {
+        classDirectories.setFrom(
+                files(classDirectories.files.collect {
+                    fileTree(dir: it, excludes: [
+                            "**/*Application*",
+                            "**/*Config*",
+                            "**/*Dto*",
+                            "**/*Request*",
+                            "**/*Response*",
+                            "**/*Interceptor*",
+                            "**/*Exception*",
+                            "**/*Security*",
+                            "**/*Mapper*",
+                    ] + Qdomains)
+                })
+        )
+    }
+    finalizedBy(jacocoTestCoverageVerification)
+}
+
+jacocoTestCoverageVerification {
+    def Qdomains = []
+    for (qPattern in '*.QA'..'*.QZ') {
+        Qdomains.add(qPattern + '*')
+    }
+
+    violationRules {
+        rule {
+            enabled = true
+            element = 'CLASS'
+
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+            }
+
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+            }
+
+            excludes = [
+                    "**.*Application*",
+                    "**.*Config*",
+                    "**.*Dto*",
+                    "**.*Request*",
+                    "**.*Response*",
+                    "**.*Interceptor*",
+                    "**.*Exception*",
+                    "**.*Security*",
+                    "**.*Mapper*",
+            ] + Qdomains
+        }
+    }
 }
