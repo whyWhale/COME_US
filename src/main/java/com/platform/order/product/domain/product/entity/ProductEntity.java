@@ -1,6 +1,6 @@
 package com.platform.order.product.domain.product.entity;
 
-import java.text.MessageFormat;
+import static java.text.MessageFormat.format;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -71,8 +71,7 @@ public class ProductEntity extends BaseEntity {
 	public ProductThumbnailEntity updateThumbnail(ProductThumbnailEntity thumbnail) {
 		if (this.productThumbnail == null) {
 			throw new BusinessException(
-				MessageFormat.format("because thumbnail is not exist, don't update thumbnail product id : {0}]",
-					super.getId()),
+				format("because thumbnail is not exist, don't update thumbnail product id: {0}", super.getId()),
 				ErrorCode.EntityConstraint
 			);
 		}
@@ -85,5 +84,15 @@ public class ProductEntity extends BaseEntity {
 	public void delete() {
 		super.isDeleted = true;
 		this.isDisplay = false;
+	}
+
+	public void decreaseStock(Long orderQuantity) {
+		if (this.quantity < orderQuantity) {
+			throw new BusinessException(
+				format("product {0} is Out Of Quantity {1}", this.id, this.quantity),
+				ErrorCode.OUT_OF_QUANTITY);
+		}
+
+		this.quantity -= orderQuantity;
 	}
 }

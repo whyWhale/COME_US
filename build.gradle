@@ -125,9 +125,6 @@ jacocoTestReport {
         html.enabled true
         xml.enabled true
         csv.enabled false
-
-        html.destination file("src/jacoco/jacoco.html")
-        xml.destination file("src/jacoco/jacoco.xml")
     }
     def Qdomains = []
     for (qPattern in '**/QA'..'**/QZ') {

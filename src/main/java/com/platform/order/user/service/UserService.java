@@ -1,9 +1,13 @@
 package com.platform.order.user.service;
 
+import java.text.MessageFormat;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.platform.order.common.exception.custom.NotFoundResourceException;
+import com.platform.order.common.exception.model.ErrorCode;
 import com.platform.order.user.controller.dto.request.SignUpUserRequestDto;
 import com.platform.order.user.controller.dto.response.SignUpUserResponseDto;
 import com.platform.order.user.domain.entity.UserEntity;
@@ -32,6 +36,14 @@ public class UserService {
 		UserEntity registeredUser = userRepository.save(user);
 
 		return userMapper.toSignUpUserResponseDto(registeredUser);
+	}
+
+	public UserEntity getUserById(Long userId) {
+		return userRepository.findById(userId)
+			.orElseThrow(() -> new NotFoundResourceException(
+				MessageFormat.format("user id:{0} is not found.", userId),
+				ErrorCode.NOT_FOUND_RESOURCES)
+			);
 	}
 
 }

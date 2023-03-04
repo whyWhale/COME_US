@@ -27,6 +27,7 @@ import com.platform.order.common.security.exception.TokenNotFoundException;
 import com.platform.order.common.security.service.TokenService;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 
 @Component
 public class JwtProviderManager {
@@ -130,6 +131,7 @@ public class JwtProviderManager {
 		tokenService.remove(id);
 	}
 
+	@EqualsAndHashCode
 	public static class CustomClaim {
 		Long userId;
 		String[] roles;
@@ -163,32 +165,5 @@ public class JwtProviderManager {
 			this.issuedAt = decodedJWT.getIssuedAt();
 			this.expiredAt = decodedJWT.getExpiresAt();
 		}
-
-		@Override
-		public boolean equals(Object o) {
-			if (this == o)
-				return true;
-
-			if (o == null || getClass() != o.getClass())
-				return false;
-
-			CustomClaim that = (CustomClaim)o;
-
-			return new EqualsBuilder().append(userId, that.userId)
-				.append(roles, that.roles)
-				.append(issuedAt, that.issuedAt)
-				.append(expiredAt, that.expiredAt)
-				.isEquals();
-		}
-
-		@Override
-		public int hashCode() {
-			return new HashCodeBuilder(17, 37).append(userId)
-				.append(roles)
-				.append(issuedAt)
-				.append(expiredAt)
-				.toHashCode();
-		}
 	}
-
 }

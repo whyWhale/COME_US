@@ -1,32 +1,23 @@
 package com.platform.order.order.service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Component;
 
-import com.platform.order.order.domain.order.entity.OrderEntity;
-import com.platform.order.order.domain.orderproduct.entity.OrderProductEntity;
 import com.platform.order.order.controller.dto.response.CreateOrderResponseDto;
-
-import com.platform.order.product.domain.product.entity.ProductEntity;
+import com.platform.order.order.domain.order.entity.OrderEntity;
 
 @Component
 public class OrderMapper {
-	public CreateOrderResponseDto toCreateOrderResponseDto(OrderEntity order, Map<Long, Long> pickedProducts,
-		List<OrderProductEntity> savedOrderProduct) {
-		List<CreateOrderResponseDto.OrderProductResponseDto> orderProductResponseDtos = savedOrderProduct.stream().map(orderProduct -> {
-			ProductEntity productEntity = orderProduct.getProduct();
+	public CreateOrderResponseDto toMultiCreateOrderResponseDto(OrderEntity order) {
+		var createOrderProductResponses = order.getOrderproducts()
+			.stream()
+			.map(orderProduct -> new CreateOrderResponseDto.CreateOrderProductResponse(
+				orderProduct.getProduct().getId(),
+				orderProduct.getOrderQuantity(),
+				orderProduct.getToTalPrice(),
+				orderProduct.getUserCoupon() != null,
+				orderProduct.getUserCoupon() != null ? orderProduct.getUserCoupon().getCoupon().getType() : null))
+			.toList();
 
-			return new CreateOrderResponseDto.OrderProductResponseDto(
-				productEntity.getId(),
-				pickedProducts.get(productEntity.getId()),
-				productEntity.getPrice()
-			);
-		}).collect(Collectors.toList());
-
-		return new CreateOrderResponseDto(order.getId(),
-			orderProductResponseDtos);
+		return new CreateOrderResponseDto(order.getId(), createOrderProductResponses);
 	}
 }

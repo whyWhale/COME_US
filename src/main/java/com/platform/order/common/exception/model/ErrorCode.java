@@ -9,9 +9,13 @@ public enum ErrorCode implements ErrorModel {
 	NOT_FOUND_RESOURCES("C001", "not found resources", NOT_FOUND),
 	FATAL_ERROR("C002", "[fatal] Internal Server error", INTERNAL_SERVER_ERROR),
 	NOT_AUTHENTICATE("C003", "not authenticate", UNAUTHORIZED),
+	FILE_IO("I0004", "File I/O fail", INTERNAL_SERVER_ERROR),
+
 	//VALIDATION
 	BINDING_ERROR("V001", "Biding error", BAD_REQUEST),
+
 	CONSTRAINT_VIOLATION("V002", "Validation error", BAD_REQUEST),
+
 	DATA_INTEGRITY_VIOLATION("V003", "Data integrity violation", BAD_REQUEST),
 
 	// BUSINESS
@@ -19,8 +23,8 @@ public enum ErrorCode implements ErrorModel {
 	EntityConstraint("B002", "entity constraint", BAD_REQUEST),
 	OUT_OF_QUANTITY("B003", "out of quantity", PRECONDITION_FAILED),
 	ALREADY_WISH("B004", "already wish product", PRECONDITION_FAILED),
-	// IO
-	FILE_IO("I0004", "File I/O fail", BAD_REQUEST);
+	ALREADY_USE_COUPON("B006", "coupon is already use", BAD_REQUEST);
+
 	private final String code;
 	private final String message;
 	private final HttpStatus httpStatus;

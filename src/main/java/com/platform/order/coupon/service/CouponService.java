@@ -1,7 +1,9 @@
 package com.platform.order.coupon.service;
 
-import java.text.MessageFormat;
+import static java.text.MessageFormat.format;
+
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -17,8 +19,8 @@ import com.platform.order.coupon.controller.dto.response.coupon.CreateCouponResp
 import com.platform.order.coupon.controller.dto.response.usercoupon.IssueUserCouponResponseDto;
 import com.platform.order.coupon.controller.dto.response.usercoupon.ReadUserCouponResponseDto;
 import com.platform.order.coupon.domain.coupon.entity.CouponEntity;
-import com.platform.order.coupon.domain.usercoupon.entity.UserCouponEntity;
 import com.platform.order.coupon.domain.coupon.repository.CouponRepository;
+import com.platform.order.coupon.domain.usercoupon.entity.UserCouponEntity;
 import com.platform.order.coupon.domain.usercoupon.repository.UserCouponRepository;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
@@ -38,7 +40,7 @@ public class CouponService {
 	public CreateCouponResponseDto create(Long authId, CreateCouponRequestDto createCouponRequest) {
 		UserEntity user = userRepository.findById(authId)
 			.orElseThrow(() -> new NotFoundResourceException(
-				MessageFormat.format("user id:{0} is not found.", authId),
+				format("user id:{0} is not found.", authId),
 				ErrorCode.NOT_FOUND_RESOURCES)
 			);
 		CouponEntity savedCoupon = couponRepository.save(CouponEntity.builder()
@@ -56,19 +58,19 @@ public class CouponService {
 	public IssueUserCouponResponseDto issue(Long authId, Long couponId) {
 		UserEntity auth = userRepository.findById(authId)
 			.orElseThrow(() -> new NotFoundResourceException(
-				MessageFormat.format("user id:{0} is not found.", authId),
+				format("user id:{0} is not found.", authId),
 				ErrorCode.NOT_FOUND_RESOURCES));
 		boolean isAvailable = couponRepository.decreaseQuantity(couponId) == 1;
 
 		if (!isAvailable) {
 			throw new BusinessException(
-				MessageFormat.format("쿠폰 수량이 부족합니다. coupon id : {0}", couponId),
+				format("쿠폰 수량이 부족합니다. coupon id : {0}", couponId),
 				ErrorCode.OUT_OF_QUANTITY);
 		}
 
 		CouponEntity coupon = couponRepository.findByIdAndExpiredAtAfter(couponId, LocalDate.now())
 			.orElseThrow(() -> new NotFoundResourceException(
-				MessageFormat.format("coupon id:{0} is not found.", couponId),
+				format("coupon id:{0} is not found.", couponId),
 				ErrorCode.NOT_FOUND_RESOURCES));
 
 		UserCouponEntity issuedUserCoupon = userCouponRepository.save(
@@ -83,7 +85,7 @@ public class CouponService {
 	}
 
 	public PageResponseDto<ReadUserCouponResponseDto> readAll(Long authId, UserCouponPageRequestDto pageRequest) {
-		Page<UserCouponEntity> userCouponPage = userCouponRepository.findAllWithConditions(pageRequest,authId);
+		Page<UserCouponEntity> userCouponPage = userCouponRepository.findAllWithConditions(pageRequest, authId);
 
 		return couponMapper.toPageResponseDto(userCouponPage);
 	}

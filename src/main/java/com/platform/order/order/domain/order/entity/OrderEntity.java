@@ -1,11 +1,15 @@
 package com.platform.order.order.domain.order.entity;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
@@ -14,7 +18,7 @@ import org.hibernate.annotations.Where;
 
 import com.platform.order.common.BaseEntity;
 import com.platform.order.order.domain.delivery.entity.DeliveryEntity;
-import com.platform.order.user.domain.entity.UserEntity;
+import com.platform.order.order.domain.orderproduct.entity.OrderProductEntity;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -31,27 +35,44 @@ import lombok.NoArgsConstructor;
 @Entity
 public class OrderEntity extends BaseEntity {
 	@NotNull
-	@ManyToOne(fetch = FetchType.LAZY)
-	private UserEntity user;
+	private Long userId;
 
 	@NotNull
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
 	private DeliveryEntity delivery;
 
+	@Builder.Default
+	@OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST)
+	private Set<OrderProductEntity> orderproducts = new HashSet<>();
+
+	@Builder.Default
 	@NotNull
 	@Enumerated(EnumType.STRING)
-	private OrderStatus status;
+	private OrderStatus status = OrderStatus.ACCEPT;
 
-	public static OrderEntity create(UserEntity buyer, String address, String zipCode) {
+	public static OrderEntity create(Long userId, String address, String zipCode) {
 		DeliveryEntity delivery = DeliveryEntity.builder()
 			.address(address)
 			.zipCode(zipCode)
 			.build();
 
 		return OrderEntity.builder()
-			.user(buyer)
+			.userId(userId)
 			.delivery(delivery)
-			.status(OrderStatus.ACCEPT)
 			.build();
+	}
+
+	public OrderProductEntity addOrderProduct(OrderProductEntity orderProduct) {
+		orderProduct.addOrder(this);
+		this.orderproducts.add(orderProduct);
+
+		return orderProduct;
+	}
+
+	public List<OrderProductEntity> addOrderProduct(List<OrderProductEntity> orderProducts) {
+		orderProducts.forEach(orderProduct -> orderProduct.addOrder(this));
+		this.orderproducts.addAll(orderProducts);
+
+		return orderProducts;
 	}
 }

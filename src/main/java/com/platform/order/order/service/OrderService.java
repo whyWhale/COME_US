@@ -1,26 +1,24 @@
 package com.platform.order.order.service;
 
-import java.text.MessageFormat;
+import static java.time.LocalDate.now;
+
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.platform.order.common.exception.custom.BusinessException;
-import com.platform.order.common.exception.custom.NotFoundResourceException;
-import com.platform.order.common.exception.model.ErrorCode;
+import com.platform.order.coupon.domain.usercoupon.entity.UserCouponEntity;
+import com.platform.order.coupon.domain.usercoupon.repository.UserCouponRepository;
 import com.platform.order.order.controller.dto.request.CreateOrderRequestDto;
+import com.platform.order.order.controller.dto.request.CreateOrderRequestDto.OrderProductRequestDto;
 import com.platform.order.order.controller.dto.response.CreateOrderResponseDto;
 import com.platform.order.order.domain.order.entity.OrderEntity;
 import com.platform.order.order.domain.order.repository.OrderRepository;
 import com.platform.order.order.domain.orderproduct.entity.OrderProductEntity;
-import com.platform.order.order.domain.orderproduct.repository.OrderProductRepository;
-import com.platform.order.product.domain.product.entity.ProductEntity;
 import com.platform.order.product.domain.product.repository.ProductRepository;
-import com.platform.order.user.domain.entity.UserEntity;
-import com.platform.order.user.domain.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,58 +26,55 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Service
 public class OrderService {
-	private final UserRepository userRepository;
 	private final OrderRepository orderRepository;
-	private final OrderProductRepository orderProductRepository;
 	private final ProductRepository productRepository;
+	private final UserCouponRepository userCouponRepository;
 	private final OrderMapper orderMapper;
 
-	/**
-	 * todo: 다량 상품 주문 처리시 예외 생각해야함.
-	 */
-	public CreateOrderResponseDto placeOrder(Long userId, CreateOrderRequestDto creatOrderRequest) {
-		UserEntity buyer = userRepository.findById(userId)
-			.orElseThrow(() -> new NotFoundResourceException(
-				MessageFormat.format("user id:{0} is not found.", userId),
-				ErrorCode.NOT_FOUND_RESOURCES)
-			);
-
-		boolean isAvailable = creatOrderRequest.orderProducts().stream()
-			.map(orderProductRequestDto -> productRepository.updateQuantity(orderProductRequestDto.productId(),
-				orderProductRequestDto.orderQuantity())).allMatch(orderPossibility -> orderPossibility == 1);
-
-		if (!isAvailable) {
-			throw new BusinessException(
-				MessageFormat.format("products : {0} is out of stock. Or not valid product id list",
-					creatOrderRequest.orderProducts().stream()
-						.map(CreateOrderRequestDto.OrderProductRequestDto::productId)
-						.toList()),
-				ErrorCode.NOT_FOUND_RESOURCES
-			);
-		}
-
-		OrderEntity order = orderRepository.save(
-			OrderEntity.create(buyer, creatOrderRequest.address(), creatOrderRequest.zipCode())
-		);
-
-		Map<Long, Long> pickedProducts = creatOrderRequest.orderProducts()
+	@Transactional
+	public CreateOrderResponseDto order(Long authId, CreateOrderRequestDto creatOrderRequest) {
+		Map<Long, OrderProductRequestDto> orderProductRequests = creatOrderRequest.orderProductRequests()
 			.stream()
-			.collect(Collectors.toMap(CreateOrderRequestDto.OrderProductRequestDto::productId,
-				CreateOrderRequestDto.OrderProductRequestDto::orderQuantity));
-		List<ProductEntity> productEntities = productRepository.findByIdIn(pickedProducts.keySet());
-		List<OrderProductEntity> orderProducts = productEntities.stream()
-			.map(productEntity -> OrderProductEntity.builder()
-				.order(order)
-				.product(productEntity)
-				.orderQuantity(pickedProducts.get(productEntity.getId()))
-				.price(productEntity.getPrice())
-				.build()
-			)
+			.collect(Collectors.toMap(OrderProductRequestDto::productId, Function.identity()));
+		List<Long> productIds = creatOrderRequest.orderProductRequests()
+			.stream()
+			.map(OrderProductRequestDto::productId)
 			.toList();
 
-		List<OrderProductEntity> savedOrderProduct = orderProductRepository.saveAllInBulk(orderProducts);
+		OrderEntity order = OrderEntity.create(authId, creatOrderRequest.address(), creatOrderRequest.zipCode());
+		List<OrderProductEntity> orderProducts = productRepository.findByIdIn(productIds).stream()
+			.map(product -> {
+				var orderProductRequest = orderProductRequests.get(product.getId());
 
-		return orderMapper.toCreateOrderResponseDto(order, pickedProducts, savedOrderProduct);
+				return OrderProductEntity.create(product, orderProductRequest.orderQuantity());
+			}).toList();
+		order.addOrderProduct(orderProducts);
+
+		List<Long> userCouponIds = creatOrderRequest.orderProductRequests()
+			.stream()
+			.filter(OrderProductRequestDto::hasCoupon)
+			.map(OrderProductRequestDto::userCouponId)
+			.toList();
+
+		if (!userCouponIds.isEmpty()) {
+			Map<Long, UserCouponEntity> foundUserCoupons = userCouponRepository.findByIdInWithCoupon(userCouponIds,
+					now())
+				.stream()
+				.collect(Collectors.toMap(UserCouponEntity::getId, Function.identity()));
+
+			orderProducts.forEach(orderProduct -> {
+				var orderProductRequest = orderProductRequests.get(orderProduct.getProduct().getId());
+
+				if (orderProductRequest.hasCoupon()) {
+					UserCouponEntity userCoupon = foundUserCoupons.get(orderProductRequest.userCouponId());
+					orderProduct.applyCoupon(userCoupon);
+				}
+			});
+		}
+
+		OrderEntity createdOrder = orderRepository.save(order);
+
+		return orderMapper.toMultiCreateOrderResponseDto(createdOrder);
 	}
 
 }

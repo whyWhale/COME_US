@@ -12,6 +12,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Where;
 
 import com.platform.order.common.BaseEntity;
+import com.platform.order.coupon.domain.usercoupon.entity.Calculable;
 import com.platform.order.user.domain.entity.UserEntity;
 
 import lombok.AllArgsConstructor;
@@ -26,7 +27,7 @@ import lombok.NoArgsConstructor;
 @Where(clause = "deleted=false")
 @Table(name = "coupon")
 @Entity
-public class CouponEntity extends BaseEntity {
+public class CouponEntity extends BaseEntity implements Calculable {
 	@Enumerated(EnumType.STRING)
 	private CouponType type;
 
@@ -38,4 +39,9 @@ public class CouponEntity extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	private UserEntity user;
+
+	@Override
+	public long discount(Long price) {
+		return type.apply(price, this.amount);
+	}
 }

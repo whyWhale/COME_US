@@ -39,14 +39,15 @@ public class CustomOrderProductRepositoryImpl implements CustomOrderProductRepos
 
 	private void batchSave(List<OrderProductEntity> orderProducts) {
 		jdbcTemplate.batchUpdate(
-			"INSERT INTO ORDER_PRODUCT(order_id, product_id, order_quantity, price) "
+			"INSERT INTO ORDER_PRODUCT(order_id, product_id,user_couponId, order_quantity, price) "
 				+ "VALUES (?,?,?,?)", new BatchPreparedStatementSetter() {
 				@Override
 				public void setValues(PreparedStatement ps, int i) throws SQLException {
 					ps.setLong(1, orderProducts.get(i).getOrder().getId());
 					ps.setLong(2, orderProducts.get(i).getProduct().getId());
-					ps.setLong(3, orderProducts.get(i).getOrderQuantity());
-					ps.setLong(4, orderProducts.get(i).getPrice());
+					ps.setLong(3, orderProducts.get(i).getUserCoupon().getId());
+					ps.setLong(4, orderProducts.get(i).getOrderQuantity());
+					ps.setLong(5, orderProducts.get(i).getToTalPrice());
 				}
 
 				@Override
