@@ -6,7 +6,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -32,6 +31,7 @@ import com.platform.order.common.security.JwtProviderManager;
 import com.platform.order.common.security.constant.JwtConfig;
 import com.platform.order.common.security.service.TokenService;
 import com.platform.order.order.controller.dto.request.CreateOrderRequestDto;
+import com.platform.order.order.controller.dto.request.CreateOrderRequestDto.OrderProductRequestDto;
 import com.platform.order.order.service.OrderService;
 import com.platform.order.security.WithJwtMockUser;
 
@@ -67,9 +67,8 @@ class OrderControllerTest {
 	void testOrder() throws Exception {
 		//given
 		Long orderQuantity = 1L;
-		var orderProductsRequest = List.of(
-			new CreateOrderRequestDto.OrderProductRequestDto(buyingProductId, orderQuantity));
-		CreateOrderRequestDto requestDto = new CreateOrderRequestDto(orderProductsRequest, address, zipCode);
+		var orderProductsRequest = new OrderProductRequestDto(buyingProductId, orderQuantity, null);
+		var requestDto = new CreateOrderRequestDto(address, zipCode, List.of(orderProductsRequest));
 		//when
 		ResultActions perform = mockMvc.perform(
 			post(URI_PREFIX)
@@ -78,7 +77,7 @@ class OrderControllerTest {
 		);
 		//then
 		perform.andExpect(status().isOk());
-		verify(orderService, times(1)).placeOrder(1L, requestDto);
+		verify(orderService, times(1)).order(1L, requestDto);
 	}
 
 	@DisplayName("상품 주문시 ")
@@ -93,10 +92,10 @@ class OrderControllerTest {
 
 		@Test
 		@DisplayName("주문할 상품 정보가 존재하지 않으면 BadRequest로 응답한다.")
-		void failOrder() throws Exception {
+		void failOrderWithNotContainOrderProductRequest() throws Exception {
 			//given
-			var orderProductsRequest = new ArrayList<CreateOrderRequestDto.OrderProductRequestDto>();
-			CreateOrderRequestDto requestDto = new CreateOrderRequestDto(orderProductsRequest, address, zipCode);
+			List<OrderProductRequestDto> orderProductsRequest = List.of();
+			CreateOrderRequestDto requestDto = new CreateOrderRequestDto(address, zipCode, orderProductsRequest);
 			//when
 			ResultActions perform = getPerform(requestDto);
 			//then
@@ -109,9 +108,8 @@ class OrderControllerTest {
 		@ValueSource(strings = {"\t", "\n"})
 		void failOrderWithInvalidAddress(String invalidAddress) throws Exception {
 			//given
-			var orderProductsRequest = List.of(
-				new CreateOrderRequestDto.OrderProductRequestDto(buyingProductId, 1L));
-			var requestDto = new CreateOrderRequestDto(orderProductsRequest, invalidAddress, zipCode);
+			OrderProductRequestDto orderProductRequest = new OrderProductRequestDto(buyingProductId, 1L, null);
+			var requestDto = new CreateOrderRequestDto(invalidAddress, zipCode, List.of(orderProductRequest));
 			//when
 			ResultActions perform = getPerform(requestDto);
 			//then
@@ -124,9 +122,8 @@ class OrderControllerTest {
 		@ValueSource(strings = {"\t", "\n"})
 		void failOrderWithInvalidZipCode(String invalidZipCode) throws Exception {
 			//given
-			var orderProductsRequest = List.of(
-				new CreateOrderRequestDto.OrderProductRequestDto(buyingProductId, 1L));
-			var requestDto = new CreateOrderRequestDto(orderProductsRequest, address, invalidZipCode);
+			OrderProductRequestDto orderProductRequest = new OrderProductRequestDto(buyingProductId, 1L, null);
+			var requestDto = new CreateOrderRequestDto(address, invalidZipCode, List.of(orderProductRequest));
 			//when
 			ResultActions perform = getPerform(requestDto);
 			//then
@@ -136,11 +133,10 @@ class OrderControllerTest {
 		@DisplayName("주문할 상품정보에 아무것도 없으면 BadRequest로 응답한다.")
 		@ParameterizedTest(name = "{index}: productId: {0}, orderQuantity: {1}")
 		@MethodSource("provideNullWithProductIdOrOrderQuantity")
-		void failOrderWithInvalidOrderProductDto(Long productId, Long orderQuantity) throws Exception {
+		void failOrderWithInvalidOrderProduct(Long productId, Long orderQuantity) throws Exception {
 			//given
-			var orderProductsRequest = List.of(
-				new CreateOrderRequestDto.OrderProductRequestDto(productId, orderQuantity));
-			var requestDto = new CreateOrderRequestDto(orderProductsRequest, address, zipCode);
+			var orderProductsRequest = new OrderProductRequestDto(productId, orderQuantity, null);
+			var requestDto = new CreateOrderRequestDto(address, zipCode, List.of(orderProductsRequest));
 			//when
 			ResultActions perform = getPerform(requestDto);
 			//then

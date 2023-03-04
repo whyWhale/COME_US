@@ -105,6 +105,7 @@ class ProductRedisServiceTest extends IntegrationTest {
 		Long productId = 3L;
 		String cookieValue = UUID.randomUUID().toString();
 		String key = SET_VIEW.getKey() + productId;
+		redisTemplate.delete(key);
 		int request = 10;
 		ExecutorService executorService = Executors.newFixedThreadPool(10);
 		CountDownLatch latch = new CountDownLatch(request);
