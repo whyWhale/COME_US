@@ -1,6 +1,5 @@
 package com.platform.order.product.domain.product.repository.custom;
 
-
 import static com.platform.order.product.domain.category.entity.QCategoryEntity.categoryEntity;
 import static com.platform.order.product.domain.product.entity.QProductEntity.productEntity;
 import static com.platform.order.product.domain.productthumbnail.entity.QProductThumbnailEntity.productThumbnailEntity;
@@ -14,8 +13,8 @@ import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.util.StringUtils;
 
 import com.platform.order.common.utils.QueryDslUtils;
-import com.platform.order.product.domain.product.entity.ProductEntity;
 import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto;
+import com.platform.order.product.domain.product.entity.ProductEntity;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -29,7 +28,9 @@ public class CustomProductRepositoryImpl implements CustomProductRepository {
 	private final JPAQueryFactory queryFactory;
 
 	@Override
-	public Page<ProductEntity> findAllWithConditions(ProductPageRequestDto page) {
+	public Page<ProductEntity> findAllWithConditions(
+		ProductPageRequestDto page
+	) {
 		Pageable pageable = page.toPageable();
 		List<OrderSpecifier> orderSpecifiers = getAllOrderSpecifiers(pageable);
 

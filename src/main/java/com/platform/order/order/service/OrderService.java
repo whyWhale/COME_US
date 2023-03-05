@@ -10,14 +10,18 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.platform.order.common.protocal.CursorPageResponseDto;
 import com.platform.order.coupon.domain.usercoupon.entity.UserCouponEntity;
 import com.platform.order.coupon.domain.usercoupon.repository.UserCouponRepository;
 import com.platform.order.order.controller.dto.request.CreateOrderRequestDto;
 import com.platform.order.order.controller.dto.request.CreateOrderRequestDto.OrderProductRequestDto;
+import com.platform.order.order.controller.dto.request.OrderPageRequestDto;
 import com.platform.order.order.controller.dto.response.CreateOrderResponseDto;
+import com.platform.order.order.controller.dto.response.ReadMyOrderResponseDto;
 import com.platform.order.order.domain.order.entity.OrderEntity;
 import com.platform.order.order.domain.order.repository.OrderRepository;
 import com.platform.order.order.domain.orderproduct.entity.OrderProductEntity;
+import com.platform.order.order.domain.orderproduct.repository.OrderProductRepository;
 import com.platform.order.product.domain.product.repository.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -27,12 +31,16 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class OrderService {
 	private final OrderRepository orderRepository;
+	private final OrderProductRepository orderProductRepository;
 	private final ProductRepository productRepository;
 	private final UserCouponRepository userCouponRepository;
 	private final OrderMapper orderMapper;
 
 	@Transactional
-	public CreateOrderResponseDto order(Long authId, CreateOrderRequestDto creatOrderRequest) {
+	public CreateOrderResponseDto order(
+		Long authId,
+		CreateOrderRequestDto creatOrderRequest
+	) {
 		Map<Long, OrderProductRequestDto> orderProductRequests = creatOrderRequest.orderProductRequests()
 			.stream()
 			.collect(Collectors.toMap(OrderProductRequestDto::productId, Function.identity()));
@@ -77,4 +85,11 @@ public class OrderService {
 		return orderMapper.toMultiCreateOrderResponseDto(createdOrder);
 	}
 
+	public CursorPageResponseDto<ReadMyOrderResponseDto> getMyOrders(
+		Long authId,
+		OrderPageRequestDto orderPageRequest
+	) {
+		var orderProducts = orderProductRepository.findMyAllWithConditions(authId, orderPageRequest);
+		return orderMapper.toCursorPageResponse(orderProducts);
+	}
 }

@@ -7,7 +7,7 @@ public class KeywordSearchValidator implements ConstraintValidator<KeywordSearch
 
 	@Override
 	public boolean isValid(String value, ConstraintValidatorContext context) {
-		if (value == null || value == "") {
+		if (value == null || value.equals("")) {
 			return true;
 		}
 
@@ -15,6 +15,6 @@ public class KeywordSearchValidator implements ConstraintValidator<KeywordSearch
 			return false;
 		}
 
-		return false;
+		return true;
 	}
 }

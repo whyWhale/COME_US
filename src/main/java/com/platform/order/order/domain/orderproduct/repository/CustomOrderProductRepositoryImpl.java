@@ -1,60 +1,107 @@
 package com.platform.order.order.domain.orderproduct.repository;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import static com.platform.order.common.utils.QueryDslUtils.getSortedColumn;
+import static com.platform.order.coupon.domain.coupon.entity.QCouponEntity.couponEntity;
+import static com.platform.order.coupon.domain.usercoupon.entity.QUserCouponEntity.userCouponEntity;
+import static com.platform.order.order.domain.order.entity.QOrderEntity.orderEntity;
+import static com.platform.order.order.domain.orderproduct.entity.QOrderProductEntity.orderProductEntity;
+import static com.platform.order.product.domain.product.entity.QProductEntity.productEntity;
+import static com.platform.order.product.domain.productthumbnail.entity.QProductThumbnailEntity.productThumbnailEntity;
+import static java.time.LocalTime.MAX;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.data.domain.Sort;
+import org.springframework.util.StringUtils;
 
+import com.platform.order.order.controller.dto.request.OrderPageRequestDto;
 import com.platform.order.order.domain.orderproduct.entity.OrderProductEntity;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class CustomOrderProductRepositoryImpl implements CustomOrderProductRepository {
-
-	private final int DEFAULT_BATCH_SIZE = 1000;
-	private final JdbcTemplate jdbcTemplate;
+	private final JPAQueryFactory queryFactory;
 
 	@Override
-	public List<OrderProductEntity> saveAllInBulk(List<OrderProductEntity> orderProducts) {
-		List<OrderProductEntity> batches = new ArrayList<>();
+	public List<OrderProductEntity> findMyAllWithConditions(Long authId, OrderPageRequestDto pageRequest) {
+		List<OrderSpecifier> orderSpecifiers = getAllOrderSpecifiers(pageRequest.getSort());
 
-		orderProducts.forEach(orderProduct -> {
-			batches.add(orderProduct);
+		return queryFactory.selectFrom(orderProductEntity)
+			.join(orderProductEntity.order, orderEntity)
+			.join(orderProductEntity.product, productEntity).fetchJoin()
+			.join(productEntity.productThumbnail, productThumbnailEntity).fetchJoin()
+			.leftJoin(orderProductEntity.userCoupon, userCouponEntity).fetchJoin()
+			.where(
+				orderEntity.userId.eq(authId),
+				lowerThanLastId(pageRequest.getLastId()),
+				graterOrEqualThanMinPrice(pageRequest.getMinimumPrice()),
+				lessOrEqualThanMaxPrice(pageRequest.getMaximumPrice()),
+				likeProductName(pageRequest.getProductName()),
+				createdAtUpperThanEquals(pageRequest.getUpperCreatedAt()),
+				createdAtLowerThanEquals(pageRequest.getLowerCreatedAt())
+			)
+			.limit(pageRequest.getSize())
+			.orderBy(orderSpecifiers.toArray(OrderSpecifier[]::new))
+			.fetch();
+	}
 
-			if (batches.size() % DEFAULT_BATCH_SIZE == 0) {
-				batchSave(batches);
+	private BooleanExpression lowerThanLastId(Long lastId) {
+		return lastId == null ? null : orderProductEntity.id.lt(lastId);
+	}
+
+	private BooleanExpression graterOrEqualThanMinPrice(Long minPrice) {
+		return minPrice == null ? null : productEntity.price.goe(minPrice);
+	}
+
+	private BooleanExpression lessOrEqualThanMaxPrice(Long maxPrice) {
+		return maxPrice == null ? null : productEntity.price.loe(maxPrice);
+	}
+
+	private BooleanExpression likeProductName(String productName) {
+		return StringUtils.hasText(productName) ? productEntity.name.like(productName + "%") : null;
+	}
+
+	private BooleanExpression createdAtLowerThanEquals(LocalDate lowerLocalDate) {
+		return lowerLocalDate == null ? null : orderProductEntity.createdAt.loe(lowerLocalDate.atStartOfDay());
+	}
+
+	private BooleanExpression createdAtUpperThanEquals(LocalDate upperLocalDate) {
+		return upperLocalDate == null ? null : orderProductEntity.createdAt.goe(upperLocalDate.atTime(MAX));
+	}
+
+	private List<OrderSpecifier> getAllOrderSpecifiers(Sort sorts) {
+		List<OrderSpecifier> orderSpecifiers = new ArrayList<>();
+
+		if (sorts.isEmpty()) {
+			return orderSpecifiers;
+		}
+
+		sorts.forEach(order -> {
+			Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
+
+			switch (order.getProperty()) {
+				case "createdAt", "id" -> orderSpecifiers.add(
+					getSortedColumn(
+						direction,
+						orderProductEntity,
+						order.getProperty())
+				);
+				case "price" -> orderSpecifiers.add(
+					getSortedColumn(
+						direction,
+						couponEntity,
+						order.getProperty())
+				);
 			}
 		});
 
-		if (!batches.isEmpty()) {
-			batchSave(batches);
-		}
-
-		return orderProducts;
-	}
-
-	private void batchSave(List<OrderProductEntity> orderProducts) {
-		jdbcTemplate.batchUpdate(
-			"INSERT INTO ORDER_PRODUCT(order_id, product_id,user_couponId, order_quantity, price) "
-				+ "VALUES (?,?,?,?)", new BatchPreparedStatementSetter() {
-				@Override
-				public void setValues(PreparedStatement ps, int i) throws SQLException {
-					ps.setLong(1, orderProducts.get(i).getOrder().getId());
-					ps.setLong(2, orderProducts.get(i).getProduct().getId());
-					ps.setLong(3, orderProducts.get(i).getUserCoupon().getId());
-					ps.setLong(4, orderProducts.get(i).getOrderQuantity());
-					ps.setLong(5, orderProducts.get(i).getToTalPrice());
-				}
-
-				@Override
-				public int getBatchSize() {
-					return orderProducts.size();
-				}
-			}
-		);
+		return orderSpecifiers;
 	}
 }

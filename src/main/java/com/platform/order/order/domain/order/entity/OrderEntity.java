@@ -45,11 +45,6 @@ public class OrderEntity extends BaseEntity {
 	@OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST)
 	private Set<OrderProductEntity> orderproducts = new HashSet<>();
 
-	@Builder.Default
-	@NotNull
-	@Enumerated(EnumType.STRING)
-	private OrderStatus status = OrderStatus.ACCEPT;
-
 	public static OrderEntity create(Long userId, String address, String zipCode) {
 		DeliveryEntity delivery = DeliveryEntity.builder()
 			.address(address)
@@ -60,13 +55,6 @@ public class OrderEntity extends BaseEntity {
 			.userId(userId)
 			.delivery(delivery)
 			.build();
-	}
-
-	public OrderProductEntity addOrderProduct(OrderProductEntity orderProduct) {
-		orderProduct.addOrder(this);
-		this.orderproducts.add(orderProduct);
-
-		return orderProduct;
 	}
 
 	public List<OrderProductEntity> addOrderProduct(List<OrderProductEntity> orderProducts) {

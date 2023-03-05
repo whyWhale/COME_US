@@ -1,9 +1,14 @@
 package com.platform.order.order.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
+import com.platform.order.common.protocal.CursorPageResponseDto;
 import com.platform.order.order.controller.dto.response.CreateOrderResponseDto;
+import com.platform.order.order.controller.dto.response.ReadMyOrderResponseDto;
 import com.platform.order.order.domain.order.entity.OrderEntity;
+import com.platform.order.order.domain.orderproduct.entity.OrderProductEntity;
 
 @Component
 public class OrderMapper {
@@ -19,5 +24,27 @@ public class OrderMapper {
 			.toList();
 
 		return new CreateOrderResponseDto(order.getId(), createOrderProductResponses);
+	}
+
+	public CursorPageResponseDto<ReadMyOrderResponseDto> toCursorPageResponse(List<OrderProductEntity> orderProducts) {
+		var myOrderResponses = orderProducts.stream()
+			.map(orderProduct -> new ReadMyOrderResponseDto(
+				orderProduct.getId(),
+				orderProduct.getOrderQuantity(),
+				orderProduct.getToTalPrice(),
+				orderProduct.getProduct().getId(),
+				orderProduct.getProduct().getName(),
+				orderProduct.getProduct().getProductThumbnail().getPath(),
+				orderProduct.getProduct().getPrice(),
+				orderProduct.isUseCoupon(),
+				orderProduct.isUseCoupon() ? orderProduct.getUserCoupon().getCoupon().getType() : null,
+				orderProduct.isUseCoupon() ? orderProduct.getUserCoupon().getCoupon().getAmount() : null
+			))
+			.toList();
+
+		return new CursorPageResponseDto<>(
+			orderProducts.get(orderProducts.size() - 1).getId(),
+			orderProducts.size(),
+			myOrderResponses);
 	}
 }

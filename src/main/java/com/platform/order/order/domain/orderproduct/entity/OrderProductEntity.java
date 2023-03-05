@@ -1,18 +1,19 @@
 package com.platform.order.order.domain.orderproduct.entity;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
+import com.platform.order.common.BaseEntity;
 import com.platform.order.coupon.domain.usercoupon.entity.UserCouponEntity;
 import com.platform.order.order.domain.order.entity.OrderEntity;
+import com.platform.order.order.domain.order.entity.OrderStatus;
 import com.platform.order.product.domain.product.entity.ProductEntity;
 
 import lombok.AccessLevel;
@@ -27,11 +28,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Table(name = "order_product")
 @Entity
-public class OrderProductEntity {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-
+public class OrderProductEntity extends BaseEntity {
 	@NotNull
 	@Positive
 	private Long orderQuantity;
@@ -44,6 +41,11 @@ public class OrderProductEntity {
 
 	@OneToOne(fetch = FetchType.LAZY)
 	private UserCouponEntity userCoupon;
+
+	@Builder.Default
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	private OrderStatus status = OrderStatus.ACCEPT;
 
 	public static OrderProductEntity create(ProductEntity product, Long orderQuantity) {
 		product.decreaseStock(orderQuantity);
@@ -78,5 +80,9 @@ public class OrderProductEntity {
 		}
 
 		return discountPrice + product.getPrice() * (orderQuantity - 1);
+	}
+
+	public boolean isUseCoupon() {
+		return this.userCoupon != null;
 	}
 }
