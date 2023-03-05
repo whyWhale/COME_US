@@ -1,14 +1,17 @@
 package com.platform.order.order.controller;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.verify;
 import static org.mockito.Mockito.times;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -22,26 +25,24 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.util.MultiValueMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.platform.order.authentication.controller.handler.LoginSuccessHandler;
-import com.platform.order.authentication.controller.handler.LogoutSuccessHandler;
 import com.platform.order.common.config.WebSecurityConfig;
 import com.platform.order.common.security.JwtProviderManager;
 import com.platform.order.common.security.constant.JwtConfig;
 import com.platform.order.common.security.service.TokenService;
 import com.platform.order.order.controller.dto.request.CreateOrderRequestDto;
 import com.platform.order.order.controller.dto.request.CreateOrderRequestDto.OrderProductRequestDto;
+import com.platform.order.order.controller.dto.request.OrderPageRequestDto;
 import com.platform.order.order.service.OrderService;
 import com.platform.order.security.WithJwtMockUser;
+import com.platform.order.utils.ParameterUtils;
 
 @WithJwtMockUser
 @WebMvcTest({OrderController.class,
 	WebSecurityConfig.class,
 	JwtProviderManager.class,
-	LoginSuccessHandler.class,
-	LogoutSuccessHandler.class,
-	LogoutSuccessHandler.class,
 	JwtConfig.class})
 class OrderControllerTest {
 	final String URI_PREFIX = "/api/orders";
@@ -147,6 +148,132 @@ class OrderControllerTest {
 			return mockMvc.perform(
 				post(URI_PREFIX)
 					.content(objectMapper.writeValueAsString(requestDto))
+					.contentType(APPLICATION_JSON)
+			);
+		}
+	}
+
+	@Test
+	@DisplayName("나의 주문목록을 조회한다.")
+	void testGetMyOrders() throws Exception {
+		//given
+		OrderPageRequestDto pageRequest = new OrderPageRequestDto(
+			20L,
+			10,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null);
+
+		var params = new ParameterUtils<OrderPageRequestDto>().toMultiValueParams(objectMapper, pageRequest);
+		//when
+		ResultActions perform = mockMvc.perform(
+			get(URI_PREFIX)
+				.params(params)
+				.contentType(APPLICATION_JSON)
+		);
+		//then
+		perform.andExpect(status().isOk());
+		verify(orderService, times(1)).getMyOrders(any(), any());
+	}
+
+	@Nested
+	@DisplayName("주문 목록을 조회할 때")
+	class OrderPageRequestValidation {
+		ParameterUtils<OrderPageRequestDto> paramUtils = new ParameterUtils<>();
+
+		@Test
+		@DisplayName("사이즈가 없다면 BadRequest로 응답한다")
+		void failSizeWithNull() throws Exception {
+			//given
+			OrderPageRequestDto pageRequest = new OrderPageRequestDto(
+				20L,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null);
+			var params = paramUtils.toMultiValueParams(objectMapper,pageRequest);
+			//when
+			ResultActions perform = getPerform(params);
+			//then
+			perform.andExpect(status().isBadRequest());
+		}
+
+		@Test
+		@DisplayName("최소 가격 조건이 음수이면 BadReqeust로 응답한다")
+		void failMinimumWithNegative() throws Exception {
+			//given
+			OrderPageRequestDto pageRequest = new OrderPageRequestDto(
+				null,
+				10,
+				-1L,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null);
+			var params = paramUtils.toMultiValueParams(objectMapper,pageRequest);
+		    //when
+			ResultActions perform = getPerform(params);
+			//then
+			perform.andExpect(status().isBadRequest());
+		}
+
+		@Test
+		@DisplayName("최대 가격 조건이 음수이면 BadReqeust로 응답한다")
+		void failMaximumWithNegative() throws Exception {
+			//given
+			OrderPageRequestDto pageRequest = new OrderPageRequestDto(
+				null,
+				10,
+				null,
+				-1L,
+				null,
+				null,
+				null,
+				null,
+				null);
+			var params = paramUtils.toMultiValueParams(objectMapper,pageRequest);
+			//when
+			ResultActions perform = getPerform(params);
+			//then
+			perform.andExpect(status().isBadRequest());
+		}
+
+		@Test
+		@DisplayName("상품 검색 이름이 2자리 미만이면 BadReqeust로 응답한다")
+		void failProductNameWithLowerTwoLength() throws Exception {
+			//given
+			OrderPageRequestDto pageRequest = new OrderPageRequestDto(
+				null,
+				10,
+				null,
+				null,
+				null,
+				null,
+				"가",
+				null,
+				null);
+			var params = paramUtils.toMultiValueParams(objectMapper,pageRequest);
+			//when
+			ResultActions perform = getPerform(params);
+			//then
+			perform.andExpect(status().isBadRequest());
+		}
+
+		@NotNull
+		private ResultActions getPerform(MultiValueMap<String, String> params) throws Exception {
+			return mockMvc.perform(
+				get(URI_PREFIX)
+					.params(params)
 					.contentType(APPLICATION_JSON)
 			);
 		}

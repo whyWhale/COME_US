@@ -16,7 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-public final class OrderPageRequestDto extends CursorPageRequestDto {
+public class OrderPageRequestDto extends CursorPageRequestDto {
 	@PositiveOrZero
 	private Long MinimumPrice;
 
@@ -55,10 +55,10 @@ public final class OrderPageRequestDto extends CursorPageRequestDto {
 		this.sorts = sorts;
 	}
 
-	public Sort getSort() {
+	public Sort toSort() {
 		Sort.Order defaultOrder = Sort.Order.desc("id");
 
-		if (sorts.isEmpty()) {
+		if (sorts == null) {
 			return Sort.by(defaultOrder);
 		}
 

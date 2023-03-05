@@ -31,7 +31,7 @@ public class CustomOrderProductRepositoryImpl implements CustomOrderProductRepos
 
 	@Override
 	public List<OrderProductEntity> findMyAllWithConditions(Long authId, OrderPageRequestDto pageRequest) {
-		List<OrderSpecifier> orderSpecifiers = getAllOrderSpecifiers(pageRequest.getSort());
+		List<OrderSpecifier> orderSpecifiers = getAllOrderSpecifiers(pageRequest.toSort());
 
 		return queryFactory.selectFrom(orderProductEntity)
 			.join(orderProductEntity.order, orderEntity)

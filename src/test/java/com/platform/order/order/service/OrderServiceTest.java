@@ -26,6 +26,7 @@ import com.platform.order.order.controller.dto.request.CreateOrderRequestDto;
 import com.platform.order.order.controller.dto.request.CreateOrderRequestDto.OrderProductRequestDto;
 import com.platform.order.order.domain.order.entity.OrderEntity;
 import com.platform.order.order.domain.order.repository.OrderRepository;
+import com.platform.order.order.domain.orderproduct.repository.OrderProductRepository;
 import com.platform.order.product.domain.product.entity.ProductEntity;
 import com.platform.order.product.domain.product.repository.ProductRepository;
 import com.platform.order.testenv.ServiceTest;
@@ -39,6 +40,9 @@ class OrderServiceTest extends ServiceTest {
 
 	@Mock
 	OrderRepository orderRepository;
+
+	@Mock
+	OrderProductRepository orderProductRepository;
 
 	@Mock
 	ProductRepository productRepository;
@@ -139,5 +143,15 @@ class OrderServiceTest extends ServiceTest {
 		//then
 		assertThatThrownBy(() -> orderService.order(1L, createOrderRequest))
 			.isInstanceOf(BusinessException.class);
+	}
+
+	@Test
+	@DisplayName("주문 목록을 조회한다")
+	void testGetMyOrders() {
+		//given
+		//when
+		orderService.getMyOrders(any(), any());
+		//then
+		verify(orderProductRepository, times(1)).findMyAllWithConditions(any(), any());
 	}
 }
