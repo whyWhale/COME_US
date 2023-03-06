@@ -33,6 +33,7 @@ import com.platform.order.common.security.JwtProviderManager;
 import com.platform.order.common.security.constant.JwtConfig;
 import com.platform.order.common.security.service.TokenService;
 import com.platform.order.security.WithJwtMockUser;
+import com.platform.order.testenv.ControllerTest;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
 
@@ -43,15 +44,9 @@ import com.platform.order.user.domain.entity.UserEntity;
 	LogoutSuccessHandler.class,
 	LogoutSuccessHandler.class,
 	JwtConfig.class})
-class AuthenticationControllerTest {
+class AuthenticationControllerTest extends ControllerTest {
 
 	static final String URI_PREFIX = "/api/auth";
-
-	@Autowired
-	MockMvc mockMvc;
-
-	@Autowired
-	ObjectMapper objectMapper;
 
 	@Autowired
 	JwtConfig jwtConfig;
@@ -64,9 +59,6 @@ class AuthenticationControllerTest {
 
 	@MockBean
 	AuthService authService;
-
-	@MockBean
-	TokenService tokenService;
 
 	@Test
 	@DisplayName("로그인에 성공한다.")

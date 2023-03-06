@@ -43,6 +43,7 @@ import com.platform.order.product.controller.dto.request.product.UpdateProductRe
 import com.platform.order.product.controller.dto.request.userproduct.WishUserProductPageRequestDto;
 import com.platform.order.product.service.ProductService;
 import com.platform.order.security.WithJwtMockUser;
+import com.platform.order.testenv.ControllerTest;
 import com.platform.order.utils.ParameterUtils;
 
 @WithJwtMockUser
@@ -50,19 +51,11 @@ import com.platform.order.utils.ParameterUtils;
 	WebSecurityConfig.class,
 	JwtProviderManager.class,
 	JwtConfig.class})
-class ProductControllerTest {
+class ProductControllerTest extends ControllerTest {
 
 	final String URI_PREFIX = "/api/products";
 	final Long productId = 1L;
 	final Long authId = 1L;
-	@Autowired
-	MockMvc mockMvc;
-
-	@Autowired
-	ObjectMapper objectMapper;
-
-	@MockBean
-	TokenService tokenService;
 
 	@MockBean
 	ProductService productService;

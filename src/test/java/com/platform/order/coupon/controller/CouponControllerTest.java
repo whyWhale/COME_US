@@ -33,23 +33,15 @@ import com.platform.order.coupon.controller.dto.request.coupon.CreateCouponReque
 import com.platform.order.coupon.controller.dto.request.usercoupon.IssueUserCouponRequestDto;
 import com.platform.order.coupon.service.CouponService;
 import com.platform.order.security.WithJwtMockUser;
+import com.platform.order.testenv.ControllerTest;
 
 @WithJwtMockUser
 @WebMvcTest({CouponController.class,
 	WebSecurityConfig.class,
 	JwtProviderManager.class,
 	JwtConfig.class})
-class CouponControllerTest {
+class CouponControllerTest extends ControllerTest {
 	final String URI_PREFIX = "/api/coupons";
-	@Autowired
-	MockMvc mockMvc;
-
-	@Autowired
-	ObjectMapper objectMapper;
-
-	@MockBean
-	TokenService tokenService;
-
 	@MockBean
 	CouponService couponService;
 

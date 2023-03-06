@@ -37,6 +37,7 @@ import com.platform.order.order.controller.dto.request.CreateOrderRequestDto.Ord
 import com.platform.order.order.controller.dto.request.OrderPageRequestDto;
 import com.platform.order.order.service.OrderService;
 import com.platform.order.security.WithJwtMockUser;
+import com.platform.order.testenv.ControllerTest;
 import com.platform.order.utils.ParameterUtils;
 
 @WithJwtMockUser
@@ -44,20 +45,12 @@ import com.platform.order.utils.ParameterUtils;
 	WebSecurityConfig.class,
 	JwtProviderManager.class,
 	JwtConfig.class})
-class OrderControllerTest {
+class OrderControllerTest extends ControllerTest {
 	final String URI_PREFIX = "/api/orders";
-
-	@Autowired
-	MockMvc mockMvc;
-
-	@Autowired
-	ObjectMapper objectMapper;
 
 	@MockBean
 	OrderService orderService;
 
-	@MockBean
-	TokenService tokenService;
 
 	Long buyingProductId = 1L;
 	String address = "서울특별시 강남구 강남동";
