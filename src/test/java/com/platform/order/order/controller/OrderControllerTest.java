@@ -4,8 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.verify;
 import static org.mockito.Mockito.times;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
@@ -20,18 +19,14 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.util.MultiValueMap;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.platform.order.common.config.WebSecurityConfig;
 import com.platform.order.common.security.JwtProviderManager;
 import com.platform.order.common.security.constant.JwtConfig;
-import com.platform.order.common.security.service.TokenService;
 import com.platform.order.order.controller.dto.request.CreateOrderRequestDto;
 import com.platform.order.order.controller.dto.request.CreateOrderRequestDto.OrderProductRequestDto;
 import com.platform.order.order.controller.dto.request.OrderPageRequestDto;
@@ -50,7 +45,6 @@ class OrderControllerTest extends ControllerTest {
 
 	@MockBean
 	OrderService orderService;
-
 
 	Long buyingProductId = 1L;
 	String address = "서울특별시 강남구 강남동";
@@ -192,7 +186,7 @@ class OrderControllerTest extends ControllerTest {
 				null,
 				null,
 				null);
-			var params = paramUtils.toMultiValueParams(objectMapper,pageRequest);
+			var params = paramUtils.toMultiValueParams(objectMapper, pageRequest);
 			//when
 			ResultActions perform = getPerform(params);
 			//then
@@ -213,8 +207,8 @@ class OrderControllerTest extends ControllerTest {
 				null,
 				null,
 				null);
-			var params = paramUtils.toMultiValueParams(objectMapper,pageRequest);
-		    //when
+			var params = paramUtils.toMultiValueParams(objectMapper, pageRequest);
+			//when
 			ResultActions perform = getPerform(params);
 			//then
 			perform.andExpect(status().isBadRequest());
@@ -234,7 +228,7 @@ class OrderControllerTest extends ControllerTest {
 				null,
 				null,
 				null);
-			var params = paramUtils.toMultiValueParams(objectMapper,pageRequest);
+			var params = paramUtils.toMultiValueParams(objectMapper, pageRequest);
 			//when
 			ResultActions perform = getPerform(params);
 			//then
@@ -255,7 +249,7 @@ class OrderControllerTest extends ControllerTest {
 				"가",
 				null,
 				null);
-			var params = paramUtils.toMultiValueParams(objectMapper,pageRequest);
+			var params = paramUtils.toMultiValueParams(objectMapper, pageRequest);
 			//when
 			ResultActions perform = getPerform(params);
 			//then
@@ -270,5 +264,34 @@ class OrderControllerTest extends ControllerTest {
 					.contentType(APPLICATION_JSON)
 			);
 		}
+	}
+
+	@Test
+	@DisplayName("주문을 취소한다")
+	void testCancel() throws Exception {
+		//given
+		Long orderProductId = 1L;
+		//when
+		ResultActions perform = mockMvc.perform(
+			patch(URI_PREFIX + "/" + orderProductId)
+				.contentType(APPLICATION_JSON)
+		);
+		//then
+		perform.andExpect(status().isOk());
+		verify(orderService,times(1)).cancel(any(),any());
+	}
+
+	@Test
+	@DisplayName("주문을 취소할때 주문상품 식별자가 음수이면 BadRequest로 응답한다")
+	void failCancelWithNegativeValue() throws Exception {
+	    //given
+		Long invalidOrderProductId = -1L;
+	    //when
+		ResultActions perform = mockMvc.perform(
+			patch(URI_PREFIX + "/" + invalidOrderProductId)
+				.contentType(APPLICATION_JSON)
+		);
+	    //then
+		perform.andExpect(status().isBadRequest());
 	}
 }

@@ -20,7 +20,9 @@ import com.platform.order.coupon.domain.usercoupon.entity.UserCouponEntity;
 import com.platform.order.coupon.domain.usercoupon.repository.UserCouponRepository;
 import com.platform.order.order.controller.dto.request.CreateOrderRequestDto;
 import com.platform.order.order.controller.dto.response.CreateOrderResponseDto;
+import com.platform.order.order.domain.order.entity.OrderEntity;
 import com.platform.order.order.domain.order.repository.OrderRepository;
+import com.platform.order.order.domain.orderproduct.entity.OrderProductEntity;
 import com.platform.order.order.domain.orderproduct.repository.OrderProductRepository;
 import com.platform.order.order.service.OrderService;
 import com.platform.order.product.domain.product.entity.ProductEntity;
@@ -134,12 +136,27 @@ public class OrderIntegrationTest extends IntegrationTest {
 			assertThat(createOrderResponse.orderId()).isNotNull();
 			assertThat(createOrderResponse.orderProductResponses().get(0).productId()).isEqualTo(product.getId());
 			assertThat(createOrderResponse.orderProductResponses().get(0).orderQuantity()).isEqualTo(orderQuantity);
-			assertThat(createOrderResponse.orderProductResponses().get(0).totalPrice()).isGreaterThan(product.getPrice());
+			assertThat(createOrderResponse.orderProductResponses().get(0).totalPrice()).isGreaterThan(
+				product.getPrice());
 			assertThat(createOrderResponse.orderProductResponses().get(0).isUseCoupon()).isTrue();
 			assertThat(createOrderResponse.orderProductResponses().get(0).couponType())
 				.isEqualTo(userCoupon.getCoupon().getType());
 		}
-
 	}
 
+	@Test
+	@DisplayName("주문을 취소한다")
+	void testCancel() {
+		//given
+		OrderEntity order = OrderEntity.create(user.getId(), "Incheon", "123-123");
+		OrderProductEntity orderProduct = OrderProductEntity.create(product, 3L);
+		order.addOrderProduct(List.of(orderProduct));
+
+		OrderEntity savedOrder = orderRepository.save(order);
+		//when
+		Long cancelId = orderService.cancel(user.getId(), orderProduct.getId());
+		//then
+		assertThat(cancelId).isEqualTo(orderProduct.getId());
+	}
 }
+

@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,7 +26,9 @@ import com.platform.order.coupon.domain.usercoupon.repository.UserCouponReposito
 import com.platform.order.order.controller.dto.request.CreateOrderRequestDto;
 import com.platform.order.order.controller.dto.request.CreateOrderRequestDto.OrderProductRequestDto;
 import com.platform.order.order.domain.order.entity.OrderEntity;
+import com.platform.order.order.domain.order.entity.OrderStatus;
 import com.platform.order.order.domain.order.repository.OrderRepository;
+import com.platform.order.order.domain.orderproduct.entity.OrderProductEntity;
 import com.platform.order.order.domain.orderproduct.repository.OrderProductRepository;
 import com.platform.order.product.domain.product.entity.ProductEntity;
 import com.platform.order.product.domain.product.repository.ProductRepository;
@@ -58,6 +61,7 @@ class OrderServiceTest extends ServiceTest {
 	UserCouponEntity userCoupon;
 	String address = "서울특별시 강남구 강남동";
 	String zipCode = "123-12";
+	OrderProductEntity orderProduct;
 
 	@BeforeEach
 	public void setUp() {
@@ -90,6 +94,9 @@ class OrderServiceTest extends ServiceTest {
 			.coupon(coupon)
 			.issuedAt(LocalDate.now())
 			.build();
+
+		orderProduct = OrderProductEntity.create(product, 2L);
+		ReflectionTestUtils.setField(orderProduct, "id", 1L);
 	}
 
 	@Test
@@ -154,4 +161,56 @@ class OrderServiceTest extends ServiceTest {
 		//then
 		verify(orderProductRepository, times(1)).findMyAllWithConditions(any(), any());
 	}
+
+	@Test
+	@DisplayName("주문을 취소한다")
+	void testCancel() {
+		//given
+		Long orderProductId = 1L;
+		Long expectedProductQuantity = orderProduct.getProduct().getQuantity();
+
+		given(orderProductRepository.findByIdAndAuthId(any(), any())).willReturn(Optional.of(orderProduct));
+		//when
+		Long cancelId = orderService.cancel(user.getId(), orderProductId);
+		//then
+		assertThat(cancelId).isEqualTo(orderProductId);
+		assertThat(orderProduct.getStatus()).isEqualTo(OrderStatus.CANCEL);
+		assertThat(orderProduct.getProduct().getQuantity()).isGreaterThan(expectedProductQuantity);
+		verify(orderProductRepository, times(1)).findByIdAndAuthId(orderProductId, user.getId());
+	}
+
+	@Test
+	@DisplayName("쿠폰을 적용한 주문을 취소하면 쿠폰은 원래 사용가능한 상태로 돌아간다")
+	void testCancelWithUsingCoupon() {
+		//given
+		Long orderProductId = 1L;
+		Long expectedProductQuantity = orderProduct.getProduct().getQuantity();
+		orderProduct.applyCoupon(userCoupon);
+
+		given(orderProductRepository.findByIdAndAuthId(any(), any())).willReturn(Optional.of(orderProduct));
+		//when
+		Long cancelId = orderService.cancel(user.getId(), orderProductId);
+		//then
+		assertThat(cancelId).isEqualTo(orderProductId);
+		assertThat(orderProduct.getStatus()).isEqualTo(OrderStatus.CANCEL);
+		assertThat(orderProduct.getUserCoupon()).isNull();
+		assertThat(userCoupon.isUsable()).isTrue();
+		assertThat(orderProduct.getProduct().getQuantity()).isGreaterThan(expectedProductQuantity);
+		verify(orderProductRepository, times(1)).findByIdAndAuthId(orderProductId, user.getId());
+	}
+
+	@Test
+	@DisplayName("주문을 취소할 때 주문 상태가 ACCEPTED가 아니면 비즈니스 예외가 발생한다.")
+	void failNotStatusAccept() {
+		//given
+		Long orderProductId = 1L;
+		ReflectionTestUtils.setField(orderProduct, "status", OrderStatus.DELIVERING);
+		given(orderProductRepository.findByIdAndAuthId(any(), any())).willReturn(Optional.of(orderProduct));
+		//when
+		//then
+		assertThatThrownBy(() -> {
+			orderService.cancel(user.getId(), orderProductId);
+		}).isInstanceOf(BusinessException.class);
+	}
+
 }
