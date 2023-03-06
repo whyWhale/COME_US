@@ -54,4 +54,8 @@ public class UserCouponEntity {
 
 		this.isUsable = false;
 	}
+
+	public void reActivate() {
+		this.isUsable = true;
+	}
 }

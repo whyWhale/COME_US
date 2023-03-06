@@ -95,4 +95,8 @@ public class ProductEntity extends BaseEntity {
 
 		this.quantity -= orderQuantity;
 	}
+
+	public void revert(Long orderQuantity) {
+		this.quantity += orderQuantity;
+	}
 }

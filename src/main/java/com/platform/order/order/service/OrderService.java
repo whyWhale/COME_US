@@ -1,5 +1,6 @@
 package com.platform.order.order.service;
 
+import static java.text.MessageFormat.format;
 import static java.time.LocalDate.now;
 
 import java.util.List;
@@ -10,6 +11,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.platform.order.common.exception.custom.NotFoundResourceException;
+import com.platform.order.common.exception.model.ErrorCode;
 import com.platform.order.common.protocal.CursorPageResponseDto;
 import com.platform.order.coupon.domain.usercoupon.entity.UserCouponEntity;
 import com.platform.order.coupon.domain.usercoupon.repository.UserCouponRepository;
@@ -91,5 +94,22 @@ public class OrderService {
 	) {
 		var orderProducts = orderProductRepository.findMyAllWithConditions(authId, orderPageRequest);
 		return orderMapper.toCursorPageResponse(orderProducts);
+	}
+
+	@Transactional
+	public Long cancel(
+		Long authId,
+		Long orderProductId
+	) {
+		OrderProductEntity orderProduct = orderProductRepository.findByIdAndAuthId(orderProductId, authId)
+			.orElseThrow(() -> new NotFoundResourceException
+				(
+					format("orderProduct : {0}  and authId : {1} not found", orderProductId, authId),
+					ErrorCode.NOT_FOUND_RESOURCES
+				));
+
+		OrderProductEntity cancelledOrderProduct = orderProduct.cancel();
+
+		return cancelledOrderProduct.getId();
 	}
 }

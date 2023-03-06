@@ -8,7 +8,15 @@ import lombok.Getter;
 public enum OrderStatus {
 	ACCEPT("접수완료"),
 	DELIVERING("배달중"),
-	COMPLETE("완료");
+	COMPLETE("완료"),
+
+	CANCEL("접수취소"),
+	REFUND("환불");
 
 	private String status;
+
+	public boolean isCancel() {
+		return this == ACCEPT;
+	}
+
 }
