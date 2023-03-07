@@ -37,6 +37,7 @@ security:
       POST:
         - /api/auth/login
         - /api/users
+        - /test/*
       PATCH: [ ]
       PUT: [ ]
       DELETE: [ ]
@@ -52,6 +53,19 @@ cookie:
   secure: ${COOKIE_SECURE:false}
   same-site: ${COOKIE_SAME_SITE:lax}
   domain: ${DOMAIN:}
+
+cloud:
+  aws:
+    credentials:
+      accessKey: ${AWS_ACCESS_KEY}
+      secretKey: ${AWS_SECRET_KEY}
+    s3:
+      bucket: ${S3_BUCKET}
+      suffix-url: ${S3_SUFFIX_URL}
+    stack:
+      auto: false
+    region:
+      static: ${STATIC_REGION}
 
 encryptor:
   key: ${ENCRYPTOR_KEY:order-renewal}
