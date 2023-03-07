@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Table(name = "product_thunmnail_image")
 @Entity
-public class ProductThumbnailEntity{
+public class ProductThumbnailEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -26,4 +26,8 @@ public class ProductThumbnailEntity{
 	private String path;
 	private String extension;
 	private Long size;
+
+	public String generateFullFileName() {
+		return this.getName() + "." + this.getExtension();
+	}
 }

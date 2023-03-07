@@ -22,17 +22,20 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.platform.order.common.protocal.PageResponseDto;
 import com.platform.order.common.security.model.JwtAuthentication;
+import com.platform.order.common.validation.Multipart;
 import com.platform.order.product.controller.dto.request.product.CreateProductRequestDto;
 import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto;
 import com.platform.order.product.controller.dto.request.product.UpdateProductRequestDto;
 import com.platform.order.product.controller.dto.request.userproduct.WishUserProductPageRequestDto;
+import com.platform.order.product.controller.dto.response.product.CreateProductImagesResponseDto;
 import com.platform.order.product.controller.dto.response.product.CreateProductResponseDto;
+import com.platform.order.product.controller.dto.response.product.CreateThumbnailResponseDto;
 import com.platform.order.product.controller.dto.response.product.DeleteProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadAllProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadProductResponseDto;
+import com.platform.order.product.controller.dto.response.product.UpdateProductImageResponseDto;
 import com.platform.order.product.controller.dto.response.product.UpdateProductResponseDto;
-import com.platform.order.product.controller.dto.response.product.file.CreateProductFileResponseDto;
-import com.platform.order.product.controller.dto.response.product.file.UpdateProductFileResponseDto;
+import com.platform.order.product.controller.dto.response.product.UpdateProductThumbnailResponseDto;
 import com.platform.order.product.controller.dto.response.userproduct.ReadAllUserProductResponseDto;
 import com.platform.order.product.controller.dto.response.userproduct.WishUserProductResponseDto;
 import com.platform.order.product.service.ProductService;
@@ -55,14 +58,23 @@ public class ProductController {
 	}
 
 	@PreAuthorize("hasRole('ROLE_OWNER')")
-	@PostMapping(value = "/file/{productId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public CreateProductFileResponseDto create(
+	@PostMapping(value = "/thumbnail/{productId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public CreateThumbnailResponseDto createThumbnail(
 		@PathVariable Long productId,
 		@AuthenticationPrincipal JwtAuthentication principal,
-		@RequestPart MultipartFile thumbnail,
-		@Valid @Size(min = 1, max = 10) @RequestPart List<MultipartFile> images) {
+		@Multipart @RequestPart MultipartFile thumbnail) {
 
-		return productService.createFile(productId, principal.id(), thumbnail, images);
+		return productService.createThumbnail(productId, principal.id(), thumbnail);
+	}
+
+	@PreAuthorize("hasRole('ROLE_OWNER')")
+	@PostMapping(value = "/images/{productId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public List<CreateProductImagesResponseDto> createImages(
+		@PathVariable Long productId,
+		@AuthenticationPrincipal JwtAuthentication principal,
+		@Valid @Size(min = 3, max = 10) @RequestPart List<@Valid @Multipart MultipartFile> images) {
+
+		return productService.createImages(productId, principal.id(), images);
 	}
 
 	@PreAuthorize("hasRole('ROLE_OWNER')")
@@ -76,15 +88,24 @@ public class ProductController {
 	}
 
 	@PreAuthorize("hasRole('ROLE_OWNER')")
-	@PatchMapping(value = "/file/{productId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public UpdateProductFileResponseDto update(
-		@AuthenticationPrincipal JwtAuthentication principal,
+	@PatchMapping(value = "/thumbnail/{productId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public UpdateProductThumbnailResponseDto updateThumbnail(
 		@PathVariable Long productId,
-		@RequestPart MultipartFile thumbnail,
-		@Valid @Size(min = 1, max = 10) @RequestPart List<MultipartFile> images) {
+		@AuthenticationPrincipal JwtAuthentication principal,
+		@RequestPart MultipartFile thumbnail) {
 
-		return productService.updateFile(productId, principal.id(), thumbnail, images);
+		return productService.updateThumbnail(productId, principal.id(), thumbnail);
 	}
+
+	@PreAuthorize("hasRole('ROLE_OWNER')")
+	@PatchMapping(value = "/images/{productId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public List<UpdateProductImageResponseDto> updateImages(
+		@PathVariable Long productId,
+		@AuthenticationPrincipal JwtAuthentication principal,
+		@Valid @Size(min = 3, max = 10) @RequestPart List<@Valid @Multipart MultipartFile> images) {
+		return productService.updateImages(productId, principal.id(), images);
+	}
+
 
 	@PreAuthorize("hasRole('ROLE_OWNER')")
 	@DeleteMapping("/{productId}")
@@ -132,6 +153,5 @@ public class ProductController {
 		@PathVariable Long userProductId) {
 
 		return productService.deleteWishProduct(principal.id(), userProductId);
-
 	}
 }

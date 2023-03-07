@@ -52,7 +52,7 @@ public class ProductEntity extends BaseEntity {
 	}
 
 	public boolean isOwner(UserEntity auth) {
-		return this.owner.equals(auth);
+		return this.owner.getId().equals(auth.getId());
 	}
 
 	public ProductEntity update(String name, CategoryEntity category, Long price, Long quantity) {
@@ -69,13 +69,7 @@ public class ProductEntity extends BaseEntity {
 	}
 
 	public ProductThumbnailEntity updateThumbnail(ProductThumbnailEntity thumbnail) {
-		if (this.productThumbnail == null) {
-			throw new BusinessException(
-				format("because thumbnail is not exist, don't update thumbnail product id: {0}", super.getId()),
-				ErrorCode.EntityConstraint
-			);
-		}
-
+		this.productThumbnail = null;
 		this.productThumbnail = thumbnail;
 
 		return this.productThumbnail;

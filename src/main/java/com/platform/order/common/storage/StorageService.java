@@ -37,7 +37,7 @@ public class StorageService {
 		try (InputStream inputStream = multipartFile.getInputStream()) {
 			s3Client.putObject(
 				new PutObjectRequest(
-					"renewal-commerce",
+					bucket,
 					key,
 					inputStream,
 					objectMetadata

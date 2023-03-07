@@ -25,7 +25,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@EqualsAndHashCode
 @Where(clause = "deleted=false")
 @Table(name = "users")
 @Entity

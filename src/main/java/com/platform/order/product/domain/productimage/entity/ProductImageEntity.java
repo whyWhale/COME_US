@@ -35,4 +35,7 @@ public class ProductImageEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private ProductEntity product;
 
+	public String generateFullFileName() {
+		return this.getName() + "." + this.getExtension();
+	}
 }

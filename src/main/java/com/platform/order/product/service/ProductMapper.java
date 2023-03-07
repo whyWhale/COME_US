@@ -8,13 +8,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import com.platform.order.common.protocal.PageResponseDto;
+import com.platform.order.product.controller.dto.response.product.CreateProductImagesResponseDto;
 import com.platform.order.product.controller.dto.response.product.CreateProductResponseDto;
+import com.platform.order.product.controller.dto.response.product.CreateThumbnailResponseDto;
 import com.platform.order.product.controller.dto.response.product.DeleteProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadAllProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadProductResponseDto;
+import com.platform.order.product.controller.dto.response.product.UpdateProductImageResponseDto;
 import com.platform.order.product.controller.dto.response.product.UpdateProductResponseDto;
-import com.platform.order.product.controller.dto.response.product.file.CreateProductFileResponseDto;
-import com.platform.order.product.controller.dto.response.product.file.UpdateProductFileResponseDto;
+import com.platform.order.product.controller.dto.response.product.UpdateProductThumbnailResponseDto;
 import com.platform.order.product.controller.dto.response.userproduct.ReadAllUserProductResponseDto;
 import com.platform.order.product.controller.dto.response.userproduct.WishUserProductResponseDto;
 import com.platform.order.product.domain.product.entity.ProductEntity;
@@ -32,23 +34,47 @@ public class ProductMapper {
 			product.getCategory().getCode());
 	}
 
-	public CreateProductFileResponseDto productFileResponseDto(ProductThumbnailEntity thumbnail,
-		List<ProductImageEntity> images) {
-		var thumbnailResponseDto = new CreateProductFileResponseDto.thumbnailResponseDto(
-			thumbnail.getName(), thumbnail.getOriginName(), thumbnail.getExtension(),
+	public CreateThumbnailResponseDto toCreateThumbnailResponse(ProductThumbnailEntity thumbnail) {
+		return new CreateThumbnailResponseDto(thumbnail.getName(), thumbnail.getOriginName(), thumbnail.getExtension(),
 			thumbnail.getPath(), thumbnail.getSize());
+	}
 
-		var imageResponseDtos = images.stream().map(
-				productImage -> new CreateProductFileResponseDto.ImageResponseDto(
-					productImage.getName(),
-					productImage.getOriginName(),
-					productImage.getExtension(),
-					productImage.getPath(),
-					productImage.getSize(),
-					productImage.getArrangement()))
+	public List<CreateProductImagesResponseDto> toCreateProductImagesResponses(
+		List<ProductImageEntity> productImages) {
+		return productImages.stream()
+			.map(productImageEntity -> new CreateProductImagesResponseDto(
+				productImageEntity.getName(),
+				productImageEntity.getOriginName(),
+				productImageEntity.getExtension(),
+				productImageEntity.getPath(),
+				productImageEntity.getSize(),
+				productImageEntity.getArrangement()
+			))
 			.toList();
+	}
 
-		return new CreateProductFileResponseDto(thumbnailResponseDto, imageResponseDtos);
+	public List<UpdateProductImageResponseDto> toUpdateProductImageResponseDtos(
+		List<ProductImageEntity> productImageEntities) {
+		return productImageEntities.stream()
+			.map(productImageEntity -> new UpdateProductImageResponseDto(
+				productImageEntity.getName(),
+				productImageEntity.getOriginName(),
+				productImageEntity.getExtension(),
+				productImageEntity.getPath(),
+				productImageEntity.getSize(),
+				productImageEntity.getArrangement()
+			))
+			.toList();
+	}
+
+	public UpdateProductThumbnailResponseDto toUpdateProductThumbnailResponse(ProductThumbnailEntity newThumbnail) {
+		return new UpdateProductThumbnailResponseDto(
+			newThumbnail.getName(),
+			newThumbnail.getOriginName(),
+			newThumbnail.getExtension(),
+			newThumbnail.getPath(),
+			newThumbnail.getSize()
+		);
 	}
 
 	public UpdateProductResponseDto toUpdateProductResponseDto(ProductEntity product) {
@@ -57,24 +83,6 @@ public class ProductMapper {
 			product.getQuantity(),
 			product.getPrice(),
 			product.getCategory().getCode());
-	}
-
-	public UpdateProductFileResponseDto toUpdateProductFileResponseDto(ProductThumbnailEntity thumbnail,
-		List<ProductImageEntity> productImages) {
-		var thumbnailResponseDto = new UpdateProductFileResponseDto.thumbnailResponseDto(thumbnail.getName(),
-			thumbnail.getOriginName(), thumbnail.getExtension(), thumbnail.getPath(), thumbnail.getSize());
-
-		var imageResponseDtos = productImages.stream()
-			.map(productImage -> new UpdateProductFileResponseDto.ImageResponseDto(
-				productImage.getName(),
-				productImage.getOriginName(),
-				productImage.getExtension(),
-				productImage.getPath(),
-				productImage.getSize(),
-				productImage.getArrangement()))
-			.toList();
-
-		return new UpdateProductFileResponseDto(thumbnailResponseDto, imageResponseDtos);
 	}
 
 	public DeleteProductResponseDto toDeleteProductResponseDto(ProductEntity foundProduct) {
