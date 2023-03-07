@@ -3,7 +3,6 @@ package com.platform.order.coupon.service;
 import static java.text.MessageFormat.format;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -38,28 +37,16 @@ public class CouponService {
 
 	@Transactional
 	public CreateCouponResponseDto create(Long authId, CreateCouponRequestDto createCouponRequest) {
-		UserEntity user = userRepository.findById(authId)
-			.orElseThrow(() -> new NotFoundResourceException(
-				format("user id:{0} is not found.", authId),
-				ErrorCode.NOT_FOUND_RESOURCES)
-			);
-		CouponEntity savedCoupon = couponRepository.save(CouponEntity.builder()
-			.type(createCouponRequest.type())
-			.amount(createCouponRequest.amount())
-			.quantity(createCouponRequest.quantity())
-			.expiredAt(createCouponRequest.expiredAt())
-			.user(user)
-			.build());
+		UserEntity user = getAuth(authId);
+		CouponEntity coupon = couponMapper.toCoupon(createCouponRequest, user);
+		CouponEntity savedCoupon = couponRepository.save(coupon);
 
-		return couponMapper.toCreateCouponResponseDto(savedCoupon);
+		return couponMapper.toCreateCouponResponse(savedCoupon);
 	}
 
 	@Transactional
 	public IssueUserCouponResponseDto issue(Long authId, Long couponId) {
-		UserEntity auth = userRepository.findById(authId)
-			.orElseThrow(() -> new NotFoundResourceException(
-				format("user id:{0} is not found.", authId),
-				ErrorCode.NOT_FOUND_RESOURCES));
+		UserEntity auth = getAuth(authId);
 		boolean isAvailable = couponRepository.decreaseQuantity(couponId) == 1;
 
 		if (!isAvailable) {
@@ -72,22 +59,24 @@ public class CouponService {
 			.orElseThrow(() -> new NotFoundResourceException(
 				format("coupon id:{0} is not found.", couponId),
 				ErrorCode.NOT_FOUND_RESOURCES));
+		UserCouponEntity userCoupon = couponMapper.toUserCoupon(auth, coupon);
+		UserCouponEntity issuedUserCoupon = userCouponRepository.save(userCoupon);
 
-		UserCouponEntity issuedUserCoupon = userCouponRepository.save(
-			UserCouponEntity.builder()
-				.user(auth)
-				.coupon(coupon)
-				.issuedAt(LocalDate.now())
-				.build()
-		);
-
-		return couponMapper.toIssueCouponResponseDto(issuedUserCoupon);
+		return couponMapper.toIssueCouponResponse(issuedUserCoupon);
 	}
 
 	public PageResponseDto<ReadUserCouponResponseDto> readAll(Long authId, UserCouponPageRequestDto pageRequest) {
 		Page<UserCouponEntity> userCouponPage = userCouponRepository.findAllWithConditions(pageRequest, authId);
 
-		return couponMapper.toPageResponseDto(userCouponPage);
+		return couponMapper.toPageResponse(userCouponPage);
+	}
+
+	private UserEntity getAuth(Long authId) {
+		return userRepository.findById(authId)
+			.orElseThrow(() -> new NotFoundResourceException(
+				format("user id:{0} is not found.", authId),
+				ErrorCode.NOT_FOUND_RESOURCES)
+			);
 	}
 
 }

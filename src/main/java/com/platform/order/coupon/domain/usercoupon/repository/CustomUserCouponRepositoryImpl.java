@@ -101,10 +101,20 @@ public class CustomUserCouponRepositoryImpl implements CustomUserCouponRepositor
 
 			switch (order.getProperty()) {
 				case "issuedAt" -> orderSpecifiers.add(
-					QueryDslUtils.getSortedColumn(direction, userCouponEntity, order.getProperty()));
+					QueryDslUtils.getSortedColumn(
+						direction,
+						userCouponEntity,
+						order.getProperty()
+					)
+				);
 
 				case "expiredAt" -> orderSpecifiers.add(
-					QueryDslUtils.getSortedColumn(direction, couponEntity, order.getProperty()));
+					QueryDslUtils.getSortedColumn(
+						direction,
+						couponEntity,
+						order.getProperty()
+					)
+				);
 			}
 		});
 

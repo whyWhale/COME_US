@@ -1,13 +1,16 @@
 package com.platform.order.coupon.controller.dto.request.usercoupon;
 
+import static com.platform.order.coupon.controller.dto.request.usercoupon.UserCouponPageRequestDto.UserCouponOrder.getDefaultOrder;
+import static org.springframework.data.domain.Sort.Order.asc;
+import static org.springframework.data.domain.Sort.Order.desc;
+
 import java.time.LocalDate;
 import java.util.List;
-
-import javax.validation.constraints.Size;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 
 import com.platform.order.common.protocal.PageRequestDto;
 import com.platform.order.coupon.domain.coupon.entity.CouponType;
@@ -23,13 +26,19 @@ public class UserCouponPageRequestDto extends PageRequestDto {
 	private LocalDate upperExpiredAt;
 	private Boolean isUsable;
 	private CouponType couponType;
+	private List<UserCouponOrder> sorts;
 
-	@Size(max = 2)
-	private List<UserCouponCondition> sorts;
-
-	public UserCouponPageRequestDto(Integer page, Integer size, LocalDate lowerIssuedAt, LocalDate upperIssuedAt,
-		LocalDate lowerExpiredAt, LocalDate upperExpiredAt, boolean isUsable, CouponType couponType,
-		List<UserCouponCondition> sorts) {
+	public UserCouponPageRequestDto(
+		Integer page,
+		Integer size,
+		LocalDate lowerIssuedAt,
+		LocalDate upperIssuedAt,
+		LocalDate lowerExpiredAt,
+		LocalDate upperExpiredAt,
+		boolean isUsable,
+		CouponType couponType,
+		List<UserCouponOrder> sorts
+	) {
 		super(page, size);
 		this.lowerIssuedAt = lowerIssuedAt;
 		this.upperIssuedAt = upperIssuedAt;
@@ -42,29 +51,41 @@ public class UserCouponPageRequestDto extends PageRequestDto {
 
 	public Pageable toPageable() {
 		if (sorts == null) {
-			return PageRequest.of(super.page, super.size, Sort.by(Sort.Order.desc("issuedAt")));
+			return PageRequest.of(
+				super.page,
+				super.size,
+				Sort.by(getDefaultOrder())
+			);
 		}
 
-		List<Sort.Order> orders = sorts.stream()
-			.map(UserCouponPageRequestDto.UserCouponCondition::getPageableOrder)
+		List<Order> orders = sorts.stream()
+			.map(UserCouponOrder::getPageableOrder)
 			.toList();
 
-		return PageRequest.of(super.page, super.size, Sort.by(orders));
+		return PageRequest.of(
+			super.page,
+			super.size,
+			Sort.by(orders)
+		);
 	}
 
 	@Getter
 	@AllArgsConstructor
-	public enum UserCouponCondition {
+	public enum UserCouponOrder {
 		ISSUED_ASC("issuedAt", "asc"),
 		ISSUED_DESC("issuedAt", "desc"),
 		EXPIRED_ASC("expiredAt", "asc"),
 		EXPIRED_DESC("expiredAt", "desc");
+
 		String property;
 		String direction;
 
-		public Sort.Order getPageableOrder() {
-			return this.direction.equals("desc") ?
-				Sort.Order.desc(this.getProperty()) : Sort.Order.asc(this.getProperty());
+		public Order getPageableOrder() {
+			return this.direction.equals("desc") ? desc(this.getProperty()) : asc(this.getProperty());
+		}
+
+		public static Order getDefaultOrder() {
+			return ISSUED_DESC.getPageableOrder();
 		}
 	}
 

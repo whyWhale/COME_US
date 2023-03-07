@@ -1,5 +1,6 @@
 package com.platform.order.coupon.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -7,15 +8,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import com.platform.order.common.protocal.PageResponseDto;
+import com.platform.order.coupon.controller.dto.request.coupon.CreateCouponRequestDto;
 import com.platform.order.coupon.controller.dto.response.coupon.CreateCouponResponseDto;
 import com.platform.order.coupon.controller.dto.response.usercoupon.IssueUserCouponResponseDto;
 import com.platform.order.coupon.controller.dto.response.usercoupon.ReadUserCouponResponseDto;
 import com.platform.order.coupon.domain.coupon.entity.CouponEntity;
 import com.platform.order.coupon.domain.usercoupon.entity.UserCouponEntity;
+import com.platform.order.user.domain.entity.UserEntity;
 
 @Component
 public class CouponMapper {
-	public CreateCouponResponseDto toCreateCouponResponseDto(CouponEntity coupon) {
+	public CreateCouponResponseDto toCreateCouponResponse(CouponEntity coupon) {
 		return new CreateCouponResponseDto(
 			coupon.getId(),
 			coupon.getType(),
@@ -25,7 +28,7 @@ public class CouponMapper {
 		);
 	}
 
-	public IssueUserCouponResponseDto toIssueCouponResponseDto(UserCouponEntity issuedUserCoupon) {
+	public IssueUserCouponResponseDto toIssueCouponResponse(UserCouponEntity issuedUserCoupon) {
 		return new IssueUserCouponResponseDto(
 			issuedUserCoupon.getId(),
 			issuedUserCoupon.getUser().getId(),
@@ -37,20 +40,13 @@ public class CouponMapper {
 		);
 	}
 
-	public PageResponseDto<ReadUserCouponResponseDto> toPageResponseDto(Page<UserCouponEntity> userCouponPage) {
+	public PageResponseDto<ReadUserCouponResponseDto> toPageResponse(Page<UserCouponEntity> userCouponPage) {
 		Pageable pageable = userCouponPage.getPageable();
 		List<UserCouponEntity> userCoupons = userCouponPage.getContent();
 
 		List<ReadUserCouponResponseDto> readCouponResponses = userCoupons.stream()
-			.map(userCoupon -> new ReadUserCouponResponseDto(
-				userCoupon.getId(),
-				userCoupon.getCoupon().getId(),
-				userCoupon.getCoupon().getType(),
-				userCoupon.getCoupon().getAmount(),
-				userCoupon.getCoupon().getExpiredAt(),
-				userCoupon.getIssuedAt(),
-				userCoupon.isUsable()
-			)).toList();
+			.map(this::toReadUserCouponResponse)
+			.toList();
 
 		return new PageResponseDto<>(
 			userCouponPage.getTotalPages(),
@@ -58,5 +54,35 @@ public class CouponMapper {
 			pageable.getPageSize(),
 			readCouponResponses
 		);
+	}
+
+	public ReadUserCouponResponseDto toReadUserCouponResponse(UserCouponEntity userCoupon) {
+		return new ReadUserCouponResponseDto(
+			userCoupon.getId(),
+			userCoupon.getCoupon().getId(),
+			userCoupon.getCoupon().getType(),
+			userCoupon.getCoupon().getAmount(),
+			userCoupon.getCoupon().getExpiredAt(),
+			userCoupon.getIssuedAt(),
+			userCoupon.isUsable()
+		);
+	}
+
+	public CouponEntity toCoupon(CreateCouponRequestDto createCouponRequest, UserEntity user) {
+		return CouponEntity.builder()
+			.type(createCouponRequest.type())
+			.amount(createCouponRequest.amount())
+			.quantity(createCouponRequest.quantity())
+			.expiredAt(createCouponRequest.expiredAt())
+			.user(user)
+			.build();
+	}
+
+	public UserCouponEntity toUserCoupon(UserEntity auth, CouponEntity coupon) {
+		return UserCouponEntity.builder()
+			.user(auth)
+			.coupon(coupon)
+			.issuedAt(LocalDate.now())
+			.build();
 	}
 }

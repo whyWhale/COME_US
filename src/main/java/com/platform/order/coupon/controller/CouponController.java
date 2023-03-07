@@ -31,8 +31,12 @@ public class CouponController {
 	@PreAuthorize("hasRole('ROLE_OWNER')")
 	@PostMapping
 	public CreateCouponResponseDto create(
-		@AuthenticationPrincipal JwtAuthentication principal,
-		@Valid @RequestBody CreateCouponRequestDto createCouponRequest) {
+		@AuthenticationPrincipal
+		JwtAuthentication principal,
+
+		@Valid
+		@RequestBody
+		CreateCouponRequestDto createCouponRequest) {
 
 		return couponService.create(principal.id(), createCouponRequest);
 	}
@@ -40,8 +44,12 @@ public class CouponController {
 	@PreAuthorize("hasRole('ROLE_USER')")
 	@PostMapping("/issue")
 	public IssueUserCouponResponseDto issue(
-		@AuthenticationPrincipal JwtAuthentication principal,
-		@Valid @RequestBody IssueUserCouponRequestDto requestDto) {
+		@AuthenticationPrincipal
+		JwtAuthentication principal,
+
+		@Valid
+		@RequestBody
+		IssueUserCouponRequestDto requestDto) {
 
 		return couponService.issue(principal.id(), requestDto.couponId());
 	}
@@ -49,7 +57,9 @@ public class CouponController {
 	@PreAuthorize("hasRole('ROLE_USER')")
 	@GetMapping("/my")
 	public PageResponseDto<ReadUserCouponResponseDto> read(
-		@AuthenticationPrincipal JwtAuthentication principal,
+		@AuthenticationPrincipal
+		JwtAuthentication principal,
+
 		UserCouponPageRequestDto pageRequest) {
 
 		return couponService.readAll(principal.id(), pageRequest);

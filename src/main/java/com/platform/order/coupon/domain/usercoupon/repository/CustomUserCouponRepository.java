@@ -6,5 +6,5 @@ import com.platform.order.coupon.controller.dto.request.usercoupon.UserCouponPag
 import com.platform.order.coupon.domain.usercoupon.entity.UserCouponEntity;
 
 public interface CustomUserCouponRepository {
-	Page<UserCouponEntity> findAllWithConditions(UserCouponPageRequestDto page,Long authId);
+	Page<UserCouponEntity> findAllWithConditions(UserCouponPageRequestDto page, Long authId);
 }

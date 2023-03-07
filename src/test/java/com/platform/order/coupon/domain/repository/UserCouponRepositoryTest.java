@@ -1,6 +1,6 @@
 package com.platform.order.coupon.domain.repository;
 
-import static com.platform.order.coupon.controller.dto.request.usercoupon.UserCouponPageRequestDto.UserCouponCondition.ISSUED_DESC;
+import static com.platform.order.coupon.controller.dto.request.usercoupon.UserCouponPageRequestDto.UserCouponOrder.ISSUED_DESC;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
