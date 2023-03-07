@@ -5,16 +5,25 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Page;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.platform.order.common.exception.custom.BusinessException;
 import com.platform.order.common.storage.StorageService;
@@ -26,6 +35,7 @@ import com.platform.order.product.domain.category.repository.CategoryRepository;
 import com.platform.order.product.domain.product.entity.ProductEntity;
 import com.platform.order.product.domain.product.repository.ProductRepository;
 import com.platform.order.product.domain.productimage.repository.ProductImageRepository;
+import com.platform.order.product.domain.productthumbnail.entity.ProductThumbnailEntity;
 import com.platform.order.product.domain.userproduct.entity.UserProductEntity;
 import com.platform.order.product.domain.userproduct.repository.UserProductRepository;
 import com.platform.order.product.service.redis.ProductRedisService;
@@ -62,12 +72,17 @@ class ProductServiceTest extends ServiceTest {
 	@Mock
 	StorageService storageService;
 
+	ResourceLoader resourceLoader = new DefaultResourceLoader();
+
 	UserEntity user;
+	UserEntity notOwner;
 	CategoryEntity category;
 	ProductEntity product;
+	MultipartFile mockfile;
+	List<MultipartFile> mockfiles;
 
 	@BeforeEach
-	public void setUp() {
+	public void setUp() throws IOException {
 		user = UserEntity.builder()
 			.email("whywhale@cocoa.com")
 			.username("whyWhale")
@@ -76,6 +91,15 @@ class ProductServiceTest extends ServiceTest {
 			.role(Role.OWNER)
 			.build();
 		ReflectionTestUtils.setField(user, "id", 1L);
+
+		notOwner = UserEntity.builder()
+			.email("whywhale@cocoa.com")
+			.username("whyWhale")
+			.password("1")
+			.nickName("whale")
+			.role(Role.OWNER)
+			.build();
+		ReflectionTestUtils.setField(notOwner, "id", 2L);
 
 		category = CategoryEntity.builder()
 			.name("아우터")
@@ -91,6 +115,11 @@ class ProductServiceTest extends ServiceTest {
 			.category(category)
 			.build();
 		ReflectionTestUtils.setField(product, "id", 1L);
+
+		String fileName = "test.png";
+		Resource resource = resourceLoader.getResource("classpath:/static/" + fileName);
+		mockfile = new MockMultipartFile("file", fileName, null, resource.getInputStream());
+		mockfiles = Stream.generate(() -> mockfile).limit(5).toList();
 	}
 
 	@Test
@@ -109,6 +138,63 @@ class ProductServiceTest extends ServiceTest {
 		verify(userRepository, times(1)).findById(any());
 		verify(categoryRepository, times(1)).findByCode(any());
 		verify(productRepository, times(1)).save(any());
+	}
+
+	@Test
+	@DisplayName("상품 섬네일을 생성한다.")
+	void testCreateThumbnail() {
+		//given
+		given(productRepository.findById(any())).willReturn(Optional.of(product));
+		given(userRepository.findById(any())).willReturn(Optional.of(user));
+		given(storageService.upload(any(), any(), any(), any())).willReturn("uploadPath");
+		//when
+		productService.createThumbnail(product.getId(), user.getId(), mockfile);
+		//then
+		assertThat(product.getProductThumbnail().getOriginName()).isEqualTo(mockfile.getOriginalFilename());
+		verify(productRepository, times(1)).findById(any());
+		verify(userRepository, times(1)).findById(any());
+		verify(storageService, times(1)).upload(any(), any(), any(), any());
+	}
+
+	@Test
+	@DisplayName("상품 섬네일을 생성할 때, 상품을 만든 주인이 아니면 비즈니스 예외가 발생한다")
+	void failCreateThumbnailNotSameOwner() {
+		//given
+		given(productRepository.findById(any())).willReturn(Optional.of(product));
+		given(userRepository.findById(any())).willReturn(Optional.of(notOwner));
+		//when
+		//then
+		assertThatThrownBy(
+			() -> productService.createThumbnail(product.getId(), notOwner.getId(), mockfile)
+		).isInstanceOf(BusinessException.class);
+	}
+
+	@Test
+	@DisplayName("상품 이미지을 생성한다.")
+	void testCreateImages() {
+		//given
+		given(productRepository.findById(any())).willReturn(Optional.of(product));
+		given(userRepository.findById(any())).willReturn(Optional.of(user));
+		given(storageService.upload(any(), any(), any(), any())).willReturn("uploadPath");
+		//when
+		productService.createImages(product.getId(), user.getId(), mockfiles);
+		//then
+		verify(productRepository, times(1)).findById(any());
+		verify(userRepository, times(1)).findById(any());
+		verify(storageService, times(mockfiles.size())).upload(any(), any(), any(), any());
+	}
+
+	@Test
+	@DisplayName("상품 이미지를 생성할 때, 상품을 만든 주인이 아니면 비즈니스 예외가 발생한다")
+	void failCreateImagesNotSameOwner() {
+		//given
+		given(productRepository.findById(any())).willReturn(Optional.of(product));
+		given(userRepository.findById(any())).willReturn(Optional.of(notOwner));
+		//when
+		//then
+		assertThatThrownBy(
+			() -> productService.createImages(product.getId(), notOwner.getId(), mockfiles)
+		).isInstanceOf(BusinessException.class);
 	}
 
 	@Test
@@ -138,6 +224,66 @@ class ProductServiceTest extends ServiceTest {
 		assertThat(savedProduct.getPrice()).isEqualTo(requestDto.price());
 		assertThat(savedProduct.getQuantity()).isEqualTo(requestDto.quantity());
 		assertThat(savedProduct.getCategory().getCode()).isEqualTo(requestDto.categoryCode());
+	}
+
+	@Test
+	@DisplayName("상품 섬네일을 수정한다.")
+	void testUpdateThumbnail() {
+		//given
+		product.addThumbnail(ProductThumbnailEntity.builder().build());
+
+		given(productRepository.findById(any())).willReturn(Optional.of(product));
+		given(userRepository.findById(any())).willReturn(Optional.of(user));
+		given(storageService.delete(any(), any())).willReturn("deletePath");
+		given(storageService.upload(any(), any(), any(), any())).willReturn("uploadPath");
+		//when
+		productService.updateThumbnail(product.getId(), user.getId(), mockfile);
+		//then
+		assertThat(product.getProductThumbnail().getOriginName()).isEqualTo(mockfile.getOriginalFilename());
+		verify(productRepository, times(1)).findById(any());
+		verify(storageService, times(1)).upload(any(),any(),any(),any());
+		verify(storageService, times(1)).delete(any(), any());
+	}
+
+	@Test
+	@DisplayName("상품 섬네일을 수정할 때, 상품을 만든 주인이 아니면 비즈니스 예외가 발생한다")
+	void failUpdateThumbnailNotSameOwner() {
+		//given
+		given(productRepository.findById(any())).willReturn(Optional.of(product));
+		given(userRepository.findById(any())).willReturn(Optional.of(notOwner));
+		//when
+		//then
+		assertThatThrownBy(
+			() -> productService.updateThumbnail(product.getId(), notOwner.getId(), mockfile)
+		).isInstanceOf(BusinessException.class);
+	}
+
+	@Test
+	@DisplayName("상품 이미지를 수정한다.")
+	void testUpdateImages() {
+		//given
+		given(productRepository.findById(any())).willReturn(Optional.of(product));
+		given(userRepository.findById(any())).willReturn(Optional.of(user));
+		given(storageService.upload(any(), any(), any(), any())).willReturn("uploadPath");
+		//when
+		productService.updateImages(product.getId(), user.getId(), mockfiles);
+		//then
+		verify(productRepository, times(1)).findById(any());
+		verify(userRepository, times(1)).findById(any());
+		verify(storageService, times(mockfiles.size())).upload(any(),any(),any(),any());
+	}
+
+	@Test
+	@DisplayName("상품 이미지를 수정할 때, 상품을 만든 주인이 아니면 비즈니스 예외가 발생한다")
+	void failUpdateImagesNotSameOwner() {
+		//given
+		given(productRepository.findById(any())).willReturn(Optional.of(product));
+		given(userRepository.findById(any())).willReturn(Optional.of(notOwner));
+		//when
+		//then
+		assertThatThrownBy(
+			() -> productService.updateImages(product.getId(), notOwner.getId(), mockfiles)
+		).isInstanceOf(BusinessException.class);
 	}
 
 	@Test
@@ -239,7 +385,7 @@ class ProductServiceTest extends ServiceTest {
 	@DisplayName("이미 장바구니에 담겨져 있는 상품이라면 비즈니스 예외가 발생한다.")
 	void failWishWithAlreadyHaving() {
 		//given
-		given(userProductRepository.existsByProductIdAndWisherId(product.getId(), user.getId())).willReturn(false);
+		given(userProductRepository.existsByProductIdAndWisherId(product.getId(), user.getId())).willReturn(true);
 		//when
 		//then
 		assertThatThrownBy(() -> {
