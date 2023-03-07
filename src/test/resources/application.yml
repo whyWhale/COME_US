@@ -1,4 +1,6 @@
 spring:
+  main:
+    allow-bean-definition-overriding: true
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -39,6 +41,16 @@ security:
       PUT: [ ]
       DELETE: [ ]
       OPTIONS: /**
+
+cloud:
+  aws:
+    s3:
+      bucket: ${TEST_BUCKET_NAME:test}
+      suffix-url: ${TEST-SUFFIX-URL:test}
+    region:
+      static: ${AWS_REGION_STATIC:ap-northeast-2}
+    stack:
+      auto: false
 
 cookie:
   secure: false
