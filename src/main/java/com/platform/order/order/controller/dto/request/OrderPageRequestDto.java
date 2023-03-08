@@ -7,6 +7,7 @@ import java.util.List;
 import javax.validation.constraints.PositiveOrZero;
 
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 
 import com.platform.order.common.protocal.CursorPageRequestDto;
 import com.platform.order.common.validation.KeywordSearch;
@@ -56,15 +57,16 @@ public class OrderPageRequestDto extends CursorPageRequestDto {
 	}
 
 	public Sort toSort() {
-		Sort.Order defaultOrder = Sort.Order.desc("id");
+		Order defaultOrder = OrderProductSort.getDefault();
 
-		if (sorts == null) {
+		if (this.sorts == null) {
 			return Sort.by(defaultOrder);
 		}
 
-		List<Sort.Order> orders = new ArrayList<>(sorts.stream()
+		List<Order> requestOrders = sorts.stream()
 			.map(OrderProductSort::getPageableOrder)
-			.toList());
+			.toList();
+		List<Order> orders = new ArrayList<>(requestOrders);
 		orders.add(defaultOrder);
 
 		return Sort.by(orders);
@@ -81,9 +83,13 @@ public class OrderPageRequestDto extends CursorPageRequestDto {
 		String property;
 		String direction;
 
-		public Sort.Order getPageableOrder() {
+		public Order getPageableOrder() {
 			return this.direction.equals("desc") ?
-				Sort.Order.desc(this.getProperty()) : Sort.Order.asc(this.getProperty());
+				Order.desc(this.getProperty()) : Order.asc(this.getProperty());
+		}
+
+		public static Order getDefault() {
+			return Order.desc("id");
 		}
 	}
 }

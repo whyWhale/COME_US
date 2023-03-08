@@ -6,8 +6,6 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -57,10 +55,8 @@ public class OrderEntity extends BaseEntity {
 			.build();
 	}
 
-	public List<OrderProductEntity> addOrderProduct(List<OrderProductEntity> orderProducts) {
+	public void addOrderProduct(List<OrderProductEntity> orderProducts) {
 		orderProducts.forEach(orderProduct -> orderProduct.addOrder(this));
 		this.orderproducts.addAll(orderProducts);
-
-		return orderProducts;
 	}
 }

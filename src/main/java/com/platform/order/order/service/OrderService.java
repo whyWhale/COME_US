@@ -40,52 +40,29 @@ public class OrderService {
 	private final OrderMapper orderMapper;
 
 	@Transactional
-	public CreateOrderResponseDto order(
-		Long authId,
-		CreateOrderRequestDto creatOrderRequest
-	) {
-		Map<Long, OrderProductRequestDto> orderProductRequests = creatOrderRequest.orderProductRequests()
-			.stream()
+	public CreateOrderResponseDto order(Long authId, CreateOrderRequestDto creatOrderRequest) {
+		Map<Long, OrderProductRequestDto> orderProductRequests = creatOrderRequest.orderProductRequests().stream()
 			.collect(Collectors.toMap(OrderProductRequestDto::productId, Function.identity()));
-		List<Long> productIds = creatOrderRequest.orderProductRequests()
-			.stream()
-			.map(OrderProductRequestDto::productId)
+		List<Long> productIds = creatOrderRequest.orderProductRequests().stream()
+			.map(CreateOrderRequestDto.OrderProductRequestDto::productId)
 			.toList();
 
 		OrderEntity order = OrderEntity.create(authId, creatOrderRequest.address(), creatOrderRequest.zipCode());
-		List<OrderProductEntity> orderProducts = productRepository.findByIdIn(productIds).stream()
-			.map(product -> {
-				var orderProductRequest = orderProductRequests.get(product.getId());
-
-				return OrderProductEntity.create(product, orderProductRequest.orderQuantity());
-			}).toList();
+		List<OrderProductEntity> orderProducts = createOrderProducts(orderProductRequests, productIds);
 		order.addOrderProduct(orderProducts);
 
-		List<Long> userCouponIds = creatOrderRequest.orderProductRequests()
-			.stream()
-			.filter(OrderProductRequestDto::hasCoupon)
-			.map(OrderProductRequestDto::userCouponId)
+		List<Long> userCouponIds = creatOrderRequest.orderProductRequests().stream()
+			.filter(CreateOrderRequestDto.OrderProductRequestDto::hasCoupon)
+			.map(CreateOrderRequestDto.OrderProductRequestDto::userCouponId)
 			.toList();
 
 		if (!userCouponIds.isEmpty()) {
-			Map<Long, UserCouponEntity> foundUserCoupons = userCouponRepository.findByIdInWithCoupon(userCouponIds,
-					now())
-				.stream()
-				.collect(Collectors.toMap(UserCouponEntity::getId, Function.identity()));
-
-			orderProducts.forEach(orderProduct -> {
-				var orderProductRequest = orderProductRequests.get(orderProduct.getProduct().getId());
-
-				if (orderProductRequest.hasCoupon()) {
-					UserCouponEntity userCoupon = foundUserCoupons.get(orderProductRequest.userCouponId());
-					orderProduct.applyCoupon(userCoupon);
-				}
-			});
+			applyCoupon(orderProductRequests, orderProducts, userCouponIds);
 		}
 
-		OrderEntity createdOrder = orderRepository.save(order);
+		OrderEntity savedOrder = orderRepository.save(order);
 
-		return orderMapper.toMultiCreateOrderResponseDto(createdOrder);
+		return orderMapper.toCreateOrderResponseDto(savedOrder);
 	}
 
 	public CursorPageResponseDto<ReadMyOrderResponseDto> getMyOrders(
@@ -93,23 +70,49 @@ public class OrderService {
 		OrderPageRequestDto orderPageRequest
 	) {
 		var orderProducts = orderProductRepository.findMyAllWithConditions(authId, orderPageRequest);
+
 		return orderMapper.toCursorPageResponse(orderProducts);
 	}
 
 	@Transactional
-	public Long cancel(
-		Long authId,
-		Long orderProductId
-	) {
+	public Long cancel(Long authId, Long orderProductId) {
 		OrderProductEntity orderProduct = orderProductRepository.findByIdAndAuthId(orderProductId, authId)
-			.orElseThrow(() -> new NotFoundResourceException
-				(
-					format("orderProduct : {0}  and authId : {1} not found", orderProductId, authId),
-					ErrorCode.NOT_FOUND_RESOURCES
-				));
-
+			.orElseThrow(() -> new NotFoundResourceException(
+				format("orderProduct : {0}  and authId : {1} not found", orderProductId, authId),
+				ErrorCode.NOT_FOUND_RESOURCES));
 		OrderProductEntity cancelledOrderProduct = orderProduct.cancel();
 
 		return cancelledOrderProduct.getId();
+	}
+
+	private void applyCoupon(
+		Map<Long, OrderProductRequestDto> orderProductRequests,
+		List<OrderProductEntity> orderProducts,
+		List<Long> userCouponIds
+	) {
+		List<UserCouponEntity> foundUserCoupons = userCouponRepository.findByIdInWithCoupon(userCouponIds, now());
+		Map<Long, UserCouponEntity> UserCoupons = foundUserCoupons.stream()
+			.collect(Collectors.toMap(UserCouponEntity::getId, Function.identity()));
+
+		orderProducts.forEach(orderProduct -> {
+			var orderProductRequest = orderProductRequests.get(orderProduct.getProduct().getId());
+
+			if (orderProductRequest.hasCoupon()) {
+				UserCouponEntity userCoupon = UserCoupons.get(orderProductRequest.userCouponId());
+				orderProduct.applyCoupon(userCoupon);
+			}
+		});
+	}
+
+	private List<OrderProductEntity> createOrderProducts(
+		Map<Long, OrderProductRequestDto> orderProductRequests,
+		List<Long> productIds
+	) {
+		return productRepository.findByIdIn(productIds).stream()
+			.map(product -> {
+				var orderProductRequest = orderProductRequests.get(product.getId());
+
+				return OrderProductEntity.create(product, orderProductRequest.orderQuantity());
+			}).toList();
 	}
 }

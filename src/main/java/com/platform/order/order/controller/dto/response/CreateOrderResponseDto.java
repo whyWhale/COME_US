@@ -6,8 +6,8 @@ import com.platform.order.coupon.domain.coupon.entity.CouponType;
 
 public record CreateOrderResponseDto(
 	Long orderId,
-	List<CreateOrderProductResponse> orderProductResponses) {
-
+	List<CreateOrderProductResponse> orderProductResponses
+) {
 	public record CreateOrderProductResponse(
 		Long productId,
 		Long orderQuantity,

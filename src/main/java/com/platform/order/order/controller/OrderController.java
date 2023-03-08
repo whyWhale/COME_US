@@ -34,25 +34,34 @@ public class OrderController {
 
 	@PostMapping
 	public CreateOrderResponseDto order(
-		@AuthenticationPrincipal JwtAuthentication principal,
-		@Valid @RequestBody CreateOrderRequestDto creatOrderRequest
-	) {
+		@AuthenticationPrincipal
+		JwtAuthentication principal,
+
+		@Valid
+		@RequestBody
+		CreateOrderRequestDto creatOrderRequest) {
+
 		return orderService.order(principal.id(), creatOrderRequest);
 	}
 
 	@GetMapping
 	public CursorPageResponseDto<ReadMyOrderResponseDto> getMyOrders(
-		@AuthenticationPrincipal JwtAuthentication principal,
-		@Valid OrderPageRequestDto pageRequestDto
-	) {
+		@AuthenticationPrincipal
+		JwtAuthentication principal,
+
+		@Valid
+		OrderPageRequestDto pageRequestDto) {
 
 		return orderService.getMyOrders(principal.id(), pageRequestDto);
 	}
 
 	@PatchMapping("/{orderProductId}")
 	public Long cancel(
-		@AuthenticationPrincipal JwtAuthentication principal,
-		@Positive @PathVariable Long orderProductId) {
+		@AuthenticationPrincipal
+		JwtAuthentication principal,
+
+		@Positive
+		@PathVariable Long orderProductId) {
 
 		return orderService.cancel(principal.id(), orderProductId);
 	}
