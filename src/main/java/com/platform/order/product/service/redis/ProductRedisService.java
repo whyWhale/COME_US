@@ -33,7 +33,9 @@ public class ProductRedisService {
 	@RedLock(keyPrefix = VIEW_RED_LOCK_PREFIX, key = "{#productId}")
 	public void increaseViewCount(Long productId, String visitor) {
 		String productViewCountKey = generateKey(SET_VIEW, productId);
-		int result = Objects.requireNonNull(redisTemplate.opsForSet().add(productViewCountKey, visitor)).intValue();
+		int result = Objects.requireNonNull(
+			redisTemplate.opsForSet().add(productViewCountKey, visitor)
+		).intValue() ;
 
 		if (result != 0) {
 			redisTemplate.expire(productViewCountKey, 30, TimeUnit.MINUTES);

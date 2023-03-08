@@ -8,21 +8,23 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import com.platform.order.common.protocal.PageResponseDto;
+import com.platform.order.product.controller.dto.request.product.CreateProductRequestDto;
+import com.platform.order.product.controller.dto.request.product.UpdateProductRequestDto;
 import com.platform.order.product.controller.dto.response.product.CreateProductImagesResponseDto;
 import com.platform.order.product.controller.dto.response.product.CreateProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.CreateThumbnailResponseDto;
-import com.platform.order.product.controller.dto.response.product.DeleteProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadAllProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.UpdateProductImageResponseDto;
 import com.platform.order.product.controller.dto.response.product.UpdateProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.UpdateProductThumbnailResponseDto;
 import com.platform.order.product.controller.dto.response.userproduct.ReadAllUserProductResponseDto;
-import com.platform.order.product.controller.dto.response.userproduct.WishUserProductResponseDto;
+import com.platform.order.product.domain.category.entity.CategoryEntity;
 import com.platform.order.product.domain.product.entity.ProductEntity;
 import com.platform.order.product.domain.productimage.entity.ProductImageEntity;
 import com.platform.order.product.domain.productthumbnail.entity.ProductThumbnailEntity;
 import com.platform.order.product.domain.userproduct.entity.UserProductEntity;
+import com.platform.order.user.domain.entity.UserEntity;
 
 @Component
 public class ProductMapper {
@@ -85,17 +87,6 @@ public class ProductMapper {
 			product.getCategory().getCode());
 	}
 
-	public DeleteProductResponseDto toDeleteProductResponseDto(ProductEntity foundProduct) {
-		return new DeleteProductResponseDto(
-			foundProduct.getId(),
-			foundProduct.getName(),
-			foundProduct.getQuantity(),
-			foundProduct.getPrice(),
-			foundProduct.isDisplay(),
-			foundProduct.getCategory().getName(),
-			foundProduct.getCategory().getCode());
-	}
-
 	public ReadProductResponseDto toReadProductResponseDto(
 		ProductEntity foundProduct,
 		List<ProductImageEntity> images,
@@ -115,7 +106,7 @@ public class ProductMapper {
 			wishCount);
 	}
 
-	public PageResponseDto<ReadAllProductResponseDto> toNoContentPageResponseDto(
+	public PageResponseDto<ReadAllProductResponseDto> toContentPageResponseDto(
 		Page<ProductEntity> productsPage,
 		Map<Long, Long> wishCounts) {
 		Pageable pageable = productsPage.getPageable();
@@ -146,17 +137,6 @@ public class ProductMapper {
 			List.of());
 	}
 
-	public WishUserProductResponseDto toWishProductResponseDto(UserProductEntity userProduct) {
-		return new WishUserProductResponseDto(userProduct.getId(),
-			userProduct.getProduct().getCategory().getCode(),
-			userProduct.getProduct().getCategory().getName(),
-			userProduct.getProduct().getId(),
-			userProduct.getProduct().getName(),
-			userProduct.getProduct().getPrice(),
-			userProduct.getProduct().getProductThumbnail().getPath(),
-			userProduct.getProduct().isDisplay());
-	}
-
 	public PageResponseDto<ReadAllUserProductResponseDto> toPageResponse(Page<UserProductEntity> pageUserProduct) {
 		Pageable pageable = pageUserProduct.getPageable();
 
@@ -175,4 +155,31 @@ public class ProductMapper {
 			pageable.getPageSize(),
 			readUserProductResponses);
 	}
+
+	public ProductEntity toProduct(CreateProductRequestDto createProductRequest, UserEntity auth,
+		CategoryEntity category) {
+		return ProductEntity.builder()
+			.name(createProductRequest.name())
+			.quantity(createProductRequest.quantity())
+			.price(createProductRequest.price())
+			.category(category)
+			.owner(auth)
+			.build();
+	}
+
+	public ProductEntity toProduct(UpdateProductRequestDto updateProductRequest, CategoryEntity foundCategory) {
+		return ProductEntity.builder()
+			.name(updateProductRequest.name())
+			.category(foundCategory)
+			.price(updateProductRequest.price())
+			.quantity(updateProductRequest.quantity())
+			.build();
+	}
+
+	public UserProductEntity toUserProduct(UserEntity auth, ProductEntity foundProduct) {
+		return UserProductEntity.builder()
+			.wisher(auth)
+			.product(foundProduct)
+			.build();
+	};
 }

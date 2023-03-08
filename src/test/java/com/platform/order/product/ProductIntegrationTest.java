@@ -1,7 +1,6 @@
 package com.platform.order.product;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.UUID;
 
@@ -14,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.platform.order.product.controller.dto.request.product.CreateProductRequestDto;
 import com.platform.order.product.controller.dto.request.product.UpdateProductRequestDto;
 import com.platform.order.product.controller.dto.response.product.CreateProductResponseDto;
-import com.platform.order.product.controller.dto.response.product.DeleteProductResponseDto;
-import com.platform.order.product.controller.dto.response.product.ReadProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.UpdateProductResponseDto;
-import com.platform.order.product.controller.dto.response.userproduct.WishUserProductResponseDto;
 import com.platform.order.product.domain.category.entity.CategoryEntity;
 import com.platform.order.product.domain.category.repository.CategoryRepository;
 import com.platform.order.product.domain.product.entity.ProductEntity;
@@ -128,14 +124,9 @@ public class ProductIntegrationTest extends IntegrationTest {
 	void testDelete() {
 		//given
 		//when
-		DeleteProductResponseDto deleteProductResponseDto = productService.delete(product.getId(), user.getId());
+		Long deleteProductId = productService.delete(product.getId(), user.getId());
 		//then
-		assertThat(deleteProductResponseDto.name()).isEqualTo(product.getName());
-		assertThat(deleteProductResponseDto.quantity()).isEqualTo(product.getQuantity());
-		assertThat(deleteProductResponseDto.price()).isEqualTo(product.getPrice());
-		assertThat(deleteProductResponseDto.isDisplay()).isFalse();
-		assertThat(deleteProductResponseDto.categoryCode()).isEqualTo(category.getCode());
-		assertThat(deleteProductResponseDto.categoryName()).isEqualTo(category.getName());
+		assertThat(deleteProductId).isEqualTo(product.getId());
 	}
 
 	@Test
@@ -155,15 +146,9 @@ public class ProductIntegrationTest extends IntegrationTest {
 	void testWish() {
 		//given
 		//when
-		WishUserProductResponseDto wishProductResponse = productService.wish(product.getId(), user.getId());
+		Long wishProductId = productService.wishProduct(product.getId(), user.getId());
 		//then
-		assertThat(wishProductResponse.categoryCode()).isEqualTo(category.getCode());
-		assertThat(wishProductResponse.categoryName()).isEqualTo(category.getName());
-		assertThat(wishProductResponse.productId()).isEqualTo(product.getId());
-		assertThat(wishProductResponse.productName()).isEqualTo(product.getName());
-		assertThat(wishProductResponse.price()).isEqualTo(product.getPrice());
-		assertThat(wishProductResponse.thumbnailPath()).isEqualTo(product.getProductThumbnail().getPath());
-		assertThat(wishProductResponse.isDisplay()).isEqualTo(product.isDisplay());
+		assertThat(wishProductId).isEqualTo(product.getId());
 	}
 
 	@Test
@@ -176,7 +161,7 @@ public class ProductIntegrationTest extends IntegrationTest {
 				.product(product)
 				.build());
 		//when
-		Long deleteId = productService.deleteWishProduct(user.getId(), wishProduct.getId());
+		Long deleteId = productService.unWishProduct(user.getId(), wishProduct.getId());
 		//then
 		assertThat(deleteId).isEqualTo(wishProduct.getId());
 	}

@@ -23,19 +23,15 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.util.MultiValueMap;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.platform.order.common.config.WebSecurityConfig;
 import com.platform.order.common.security.JwtProviderManager;
 import com.platform.order.common.security.constant.JwtConfig;
-import com.platform.order.common.security.service.TokenService;
 import com.platform.order.product.controller.dto.request.product.CreateProductRequestDto;
 import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto;
 import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto.ProductCondition;
@@ -373,7 +369,7 @@ class ProductControllerTest extends ControllerTest {
 				.contentType(APPLICATION_JSON));
 		//then
 		perform.andExpect(status().isOk());
-		verify(productService, times(1)).wish(productId, authId);
+		verify(productService, times(1)).wishProduct(productId, authId);
 	}
 
 	@Test

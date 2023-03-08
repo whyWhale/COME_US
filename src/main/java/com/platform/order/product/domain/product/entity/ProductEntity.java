@@ -55,15 +55,15 @@ public class ProductEntity extends BaseEntity {
 		return this.owner.getId().equals(auth.getId());
 	}
 
-	public ProductEntity update(String name, CategoryEntity category, Long price, Long quantity) {
-		if (quantity == 0) {
+	public ProductEntity update(ProductEntity updateRequestProduct) {
+		if (updateRequestProduct.quantity == 0) {
 			this.isDisplay = false;
 		}
 
-		this.name = name;
-		this.price = price;
-		this.quantity = quantity;
-		this.category = category;
+		this.name = updateRequestProduct.name;
+		this.price = updateRequestProduct.price;
+		this.quantity = updateRequestProduct.quantity;
+		this.category = updateRequestProduct.category;
 
 		return this;
 	}

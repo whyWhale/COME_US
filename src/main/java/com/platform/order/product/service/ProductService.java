@@ -2,12 +2,12 @@ package com.platform.order.product.service;
 
 import static com.platform.order.common.storage.FileSuffixPath.PRODUCT_IMAGE;
 import static com.platform.order.common.storage.FileSuffixPath.PRODUCT_THUMBNAIL;
+import static com.platform.order.common.utils.FileUtils.generateFileName;
 import static com.platform.order.common.utils.FileUtils.getExtension;
 import static java.text.MessageFormat.format;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -28,14 +28,12 @@ import com.platform.order.product.controller.dto.request.userproduct.WishUserPro
 import com.platform.order.product.controller.dto.response.product.CreateProductImagesResponseDto;
 import com.platform.order.product.controller.dto.response.product.CreateProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.CreateThumbnailResponseDto;
-import com.platform.order.product.controller.dto.response.product.DeleteProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadAllProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.UpdateProductImageResponseDto;
 import com.platform.order.product.controller.dto.response.product.UpdateProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.UpdateProductThumbnailResponseDto;
 import com.platform.order.product.controller.dto.response.userproduct.ReadAllUserProductResponseDto;
-import com.platform.order.product.controller.dto.response.userproduct.WishUserProductResponseDto;
 import com.platform.order.product.domain.category.entity.CategoryEntity;
 import com.platform.order.product.domain.category.repository.CategoryRepository;
 import com.platform.order.product.domain.product.entity.ProductEntity;
@@ -66,40 +64,22 @@ public class ProductService {
 
 	@Transactional
 	public CreateProductResponseDto create(Long authId, CreateProductRequestDto createProductRequest) {
-		UserEntity owner = userRepository.findById(authId).orElseThrow(() -> new NotFoundResourceException(
-			format("user id :{0} is not found.", authId),
-			ErrorCode.NOT_FOUND_RESOURCES)
-		);
-
-		CategoryEntity category = categoryRepository.findByCode(createProductRequest.categoryCode()).orElseThrow(() ->
-			new NotFoundResourceException(
-				format("category code :{0} is not found.", createProductRequest.categoryCode()),
-				ErrorCode.NOT_FOUND_RESOURCES)
-		);
-
-		ProductEntity savedProductEntity = productRepository.save(ProductEntity.builder()
-			.name(createProductRequest.name())
-			.quantity(createProductRequest.quantity())
-			.price(createProductRequest.price())
-			.isDisplay(true)
-			.category(category)
-			.owner(owner)
-			.build());
+		UserEntity auth = getAuth(authId);
+		CategoryEntity category = getCategory(createProductRequest.categoryCode());
+		ProductEntity product = productMapper.toProduct(createProductRequest, auth, category);
+		ProductEntity savedProductEntity = productRepository.save(product);
 
 		return productMapper.toCreateProductResponseDto(savedProductEntity);
 	}
 
 	@Transactional
-	public UpdateProductResponseDto update(Long authId, Long productId, UpdateProductRequestDto updateProductRequest) {
-		UserEntity auth = userRepository.findById(authId).orElseThrow(() -> new NotFoundResourceException(
-			format("user id :{0} is not found.", authId),
-			ErrorCode.NOT_FOUND_RESOURCES)
-		);
-		ProductEntity foundProduct = productRepository.findById(productId)
-			.orElseThrow(() -> new NotFoundResourceException(
-				format("product id :{0} is not found.", productId),
-				ErrorCode.NOT_FOUND_RESOURCES)
-			);
+	public UpdateProductResponseDto update(
+		Long authId,
+		Long productId,
+		UpdateProductRequestDto updateProductRequest
+	) {
+		UserEntity auth = getAuth(authId);
+		ProductEntity foundProduct = getProduct(productId);
 
 		if (!foundProduct.isOwner(auth)) {
 			throw new BusinessException(
@@ -108,29 +88,20 @@ public class ProductService {
 			);
 		}
 
-		CategoryEntity category = categoryRepository.findByCode(updateProductRequest.categoryCode()).orElseThrow(() ->
-			new NotFoundResourceException(
-				format("category code :{0} is not found.", updateProductRequest.categoryCode()),
-				ErrorCode.NOT_FOUND_RESOURCES)
-		);
-
-		ProductEntity updatedProduct = foundProduct.update(updateProductRequest.name(), category,
-			updateProductRequest.price(),
-			updateProductRequest.quantity());
+		CategoryEntity foundCategory = getCategory(updateProductRequest.categoryCode());
+		ProductEntity updateRequestProduct = productMapper.toProduct(updateProductRequest, foundCategory);
+		ProductEntity updatedProduct = foundProduct.update(updateRequestProduct);
 
 		return productMapper.toUpdateProductResponseDto(updatedProduct);
 	}
 
 	@Transactional
-	public DeleteProductResponseDto delete(Long productId, Long authId) {
+	public Long delete(Long productId, Long authId) {
 		ProductEntity foundProduct = productRepository.findByIdWithCategory(productId)
 			.orElseThrow(() -> new NotFoundResourceException(
 				format("product id :{0} is not found.", productId),
 				ErrorCode.NOT_FOUND_RESOURCES));
-		UserEntity auth = userRepository.findById(authId).orElseThrow(() -> new NotFoundResourceException(
-			format("user id :{0} is not found.", authId),
-			ErrorCode.NOT_FOUND_RESOURCES)
-		);
+		UserEntity auth = getAuth(authId);
 
 		if (!foundProduct.isOwner(auth)) {
 			throw new BusinessException(
@@ -141,7 +112,7 @@ public class ProductService {
 
 		foundProduct.delete();
 
-		return productMapper.toDeleteProductResponseDto(foundProduct);
+		return foundProduct.getId();
 	}
 
 	public ReadProductResponseDto read(Long productId, String visitor) {
@@ -168,11 +139,11 @@ public class ProductService {
 			.map(product -> new Long[] {product.getId(), productRedisService.getWishCount(product.getId())})
 			.collect(Collectors.toMap(keyValue -> keyValue[0], keyValue -> keyValue[1]));
 
-		return productMapper.toNoContentPageResponseDto(productsPage, wishCounts);
+		return productMapper.toContentPageResponseDto(productsPage, wishCounts);
 	}
 
 	@Transactional
-	public WishUserProductResponseDto wish(Long productId, Long authId) {
+	public Long wishProduct(Long productId, Long authId) {
 		boolean isAlreadyWish = userProductRepository.existsByProductIdAndWisherId(productId, authId);
 
 		if (isAlreadyWish) {
@@ -181,32 +152,25 @@ public class ProductService {
 				ErrorCode.ALREADY_WISH);
 		}
 
-		UserEntity auth = userRepository.findById(authId).orElseThrow(() -> new NotFoundResourceException(
-			format("user id :{0} is not found.", authId),
-			ErrorCode.NOT_FOUND_RESOURCES)
-		);
-		ProductEntity foundProduct = productRepository.findByIdWithCategoryAndThumbnail(productId)
-			.orElseThrow(() -> new NotFoundResourceException(
-				format("product id :{0} is not found.", productId),
-				ErrorCode.NOT_FOUND_RESOURCES));
-		UserProductEntity userProduct = userProductRepository.save(
-			UserProductEntity.builder()
-				.wisher(auth)
-				.product(foundProduct)
-				.build());
+		UserEntity auth = getAuth(authId);
+		ProductEntity foundProduct = getProduct(productId);
+		UserProductEntity userProduct = productMapper.toUserProduct(auth, foundProduct);
+		UserProductEntity savedUserProduct = userProductRepository.save(userProduct);
 		productRedisService.increaseWishCount(productId);
 
-		return productMapper.toWishProductResponseDto(userProduct);
+		return savedUserProduct.getProduct().getId();
 	}
 
-	public PageResponseDto<ReadAllUserProductResponseDto> readAllWishProducts(Long authId,
-		WishUserProductPageRequestDto pageRequestDto) {
+	public PageResponseDto<ReadAllUserProductResponseDto> readAllWishProducts(
+		Long authId,
+		WishUserProductPageRequestDto pageRequestDto
+	) {
 		Page<UserProductEntity> pageUserProduct = userProductRepository.findAllWithCondtions(authId, pageRequestDto);
 
 		return productMapper.toPageResponse(pageUserProduct);
 	}
 
-	public Long deleteWishProduct(Long authId, Long userProductId) {
+	public Long unWishProduct(Long authId, Long userProductId) {
 		UserProductEntity userProductEntity = userProductRepository.findByIdAndWisherId(userProductId, authId)
 			.orElseThrow(() -> new NotFoundResourceException(
 				format("user product id :{0} is not found.", userProductId),
@@ -219,15 +183,13 @@ public class ProductService {
 	}
 
 	@Transactional
-	public CreateThumbnailResponseDto createThumbnail(Long productId, Long authId, MultipartFile thumbnailFile) {
-		ProductEntity foundProduct = productRepository.findById(productId)
-			.orElseThrow(() -> new NotFoundResourceException(
-				format("product id :{0} is not found.", productId),
-				ErrorCode.NOT_FOUND_RESOURCES));
-		UserEntity auth = userRepository.findById(authId).orElseThrow(() -> new NotFoundResourceException(
-			format("user id :{0} is not found.", authId),
-			ErrorCode.NOT_FOUND_RESOURCES)
-		);
+	public CreateThumbnailResponseDto createThumbnail(
+		Long productId,
+		Long authId,
+		MultipartFile thumbnailFile
+	) {
+		ProductEntity foundProduct = getProduct(productId);
+		UserEntity auth = getAuth(authId);
 
 		if (!foundProduct.isOwner(auth)) {
 			throw new BusinessException(
@@ -237,7 +199,7 @@ public class ProductService {
 		}
 
 		String thumbnailExtension = getExtension(thumbnailFile.getOriginalFilename());
-		String thumbnailFileName = UUID.randomUUID().toString();
+		String thumbnailFileName = generateFileName();
 		String thumbnailPath = storageService.upload(
 			thumbnailFile,
 			PRODUCT_THUMBNAIL,
@@ -261,14 +223,8 @@ public class ProductService {
 		Long authId,
 		List<MultipartFile> multipartImage
 	) {
-		ProductEntity foundProduct = productRepository.findById(productId)
-			.orElseThrow(() -> new NotFoundResourceException(
-				format("product id :{0} is not found.", productId),
-				ErrorCode.NOT_FOUND_RESOURCES));
-		UserEntity auth = userRepository.findById(authId).orElseThrow(() -> new NotFoundResourceException(
-			format("user id :{0} is not found.", authId),
-			ErrorCode.NOT_FOUND_RESOURCES)
-		);
+		ProductEntity foundProduct = getProduct(productId);
+		UserEntity auth = getAuth(authId);
 
 		if (!foundProduct.isOwner(auth)) {
 			throw new BusinessException(
@@ -279,7 +235,7 @@ public class ProductService {
 
 		AtomicLong arrangement = new AtomicLong();
 		List<ProductImageEntity> productImageEntities = multipartImage.stream().map(image -> {
-			String imageFileName = UUID.randomUUID().toString();
+			String imageFileName = generateFileName();
 			String originalImageName = image.getOriginalFilename();
 			String imageFileExtension = getExtension(originalImageName);
 			long imageSize = image.getSize();
@@ -302,20 +258,18 @@ public class ProductService {
 		}).toList();
 
 		List<ProductImageEntity> productImages = imageRepository.saveAllInBulk(productImageEntities);
+
 		return productMapper.toCreateProductImagesResponses(productImages);
 	}
 
 	@Transactional
-	public UpdateProductThumbnailResponseDto updateThumbnail(Long productId, Long authId,
-		MultipartFile multipartThumbnail) {
-		UserEntity auth = userRepository.findById(authId).orElseThrow(() -> new NotFoundResourceException(
-			format("user id :{0} is not found.", authId),
-			ErrorCode.NOT_FOUND_RESOURCES)
-		);
-		ProductEntity foundProduct = productRepository.findById(productId)
-			.orElseThrow(() -> new NotFoundResourceException(
-				format("product id :{0} is not found.", productId),
-				ErrorCode.NOT_FOUND_RESOURCES));
+	public UpdateProductThumbnailResponseDto updateThumbnail(
+		Long productId,
+		Long authId,
+		MultipartFile multipartThumbnail
+	) {
+		UserEntity auth = getAuth(authId);
+		ProductEntity foundProduct = getProduct(productId);
 
 		if (!foundProduct.isOwner(auth)) {
 			throw new BusinessException(
@@ -328,7 +282,7 @@ public class ProductService {
 		storageService.delete(PRODUCT_THUMBNAIL, pastThumbnail.generateFullFileName());
 
 		String thumbnailExtension = getExtension(multipartThumbnail.getOriginalFilename());
-		String thumbnailFileName = UUID.randomUUID().toString();
+		String thumbnailFileName = generateFileName();
 		String thumbnailPath = storageService.upload(
 			multipartThumbnail,
 			PRODUCT_THUMBNAIL,
@@ -346,17 +300,14 @@ public class ProductService {
 		return productMapper.toUpdateProductThumbnailResponse(newThumbnail);
 	}
 
-	public List<UpdateProductImageResponseDto> updateImages(Long productId, Long authId,
-		List<MultipartFile> multipartImages) {
+	public List<UpdateProductImageResponseDto> updateImages(
+		Long productId,
+		Long authId,
+		List<MultipartFile> multipartImages
+	) {
 
-		UserEntity auth = userRepository.findById(authId).orElseThrow(() -> new NotFoundResourceException(
-			format("user id :{0} is not found.", authId),
-			ErrorCode.NOT_FOUND_RESOURCES)
-		);
-		ProductEntity foundProduct = productRepository.findById(productId)
-			.orElseThrow(() -> new NotFoundResourceException(
-				format("product id :{0} is not found.", productId),
-				ErrorCode.NOT_FOUND_RESOURCES));
+		UserEntity auth = getAuth(authId);
+		ProductEntity foundProduct = getProduct(productId);
 
 		if (!foundProduct.isOwner(auth)) {
 			throw new BusinessException(
@@ -371,7 +322,7 @@ public class ProductService {
 
 		AtomicLong arrange = new AtomicLong();
 		List<ProductImageEntity> productImages = multipartImages.stream().map(multipartFile -> {
-			String imageFileName = UUID.randomUUID().toString();
+			String imageFileName = generateFileName();
 			String originalImageName = multipartFile.getOriginalFilename();
 			String imageFileExtension = getExtension(originalImageName);
 			long imageSize = multipartFile.getSize();
@@ -392,5 +343,28 @@ public class ProductService {
 		List<ProductImageEntity> productImageEntities = imageRepository.saveAllInBulk(productImages);
 
 		return productMapper.toUpdateProductImageResponseDtos(productImageEntities);
+	}
+
+	private ProductEntity getProduct(Long productId) {
+		return productRepository.findById(productId)
+			.orElseThrow(() -> new NotFoundResourceException(
+				format("product id :{0} is not found.", productId),
+				ErrorCode.NOT_FOUND_RESOURCES)
+			);
+	}
+
+	private UserEntity getAuth(Long authId) {
+		return userRepository.findById(authId).orElseThrow(() -> new NotFoundResourceException(
+			format("user id :{0} is not found.", authId),
+			ErrorCode.NOT_FOUND_RESOURCES)
+		);
+	}
+
+	private CategoryEntity getCategory(String code) {
+		return categoryRepository.findByCode(code).orElseThrow(() ->
+			new NotFoundResourceException(
+				format("category code :{0} is not found.", code),
+				ErrorCode.NOT_FOUND_RESOURCES)
+		);
 	}
 }
