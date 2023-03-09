@@ -26,8 +26,11 @@ import com.platform.order.common.security.constant.JwtConfig;
 import com.platform.order.common.security.exception.TokenNotFoundException;
 import com.platform.order.common.security.service.TokenService;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Component
 public class JwtProviderManager {
@@ -63,16 +66,27 @@ public class JwtProviderManager {
 	public String generateRefreshToken(Long userId) {
 		Date now = new Date();
 
-		JWTCreator.Builder builder = JWT.create();
-		builder.withIssuer(this.jwtConfig.issuer());
-		builder.withIssuedAt(now);
-		builder.withExpiresAt(new Date(now.getTime() + jwtConfig.refreshToken().expirySeconds()));
+		JWTCreator.Builder jwtBuilder = JWT.create();
+		jwtBuilder.withIssuer(this.jwtConfig.issuer());
+		jwtBuilder.withIssuedAt(now);
+		jwtBuilder.withExpiresAt(new Date(now.getTime() + jwtConfig.refreshToken().expirySeconds()));
 
-		String token = builder.sign(this.algorithm);
-
+		String token = jwtBuilder.sign(this.algorithm);
 		tokenService.saveRefreshToken(userId, token, jwtConfig.refreshToken().expirySeconds());
 
 		return token;
+	}
+
+	public String extractRefreshToken(HttpServletRequest request) {
+		if (request.getCookies() == null) {
+			throw new TokenNotFoundException("RefreshToken not found");
+		}
+
+		return Arrays.stream(request.getCookies())
+			.filter(cookie -> cookie.getName().equals(jwtConfig.refreshToken().header()))
+			.findFirst()
+			.map(Cookie::getValue)
+			.orElseThrow(() -> new TokenNotFoundException("access token value null."));
 	}
 
 	public String extractAccessToken(HttpServletRequest request) {
@@ -87,12 +101,6 @@ public class JwtProviderManager {
 			.orElseThrow(() -> new TokenNotFoundException("access token value null."));
 	}
 
-	public JwtProviderManager.CustomClaim verify(String accessToken) {
-		DecodedJWT decodedJWT = this.jwtVerifier.verify(accessToken);
-
-		return new CustomClaim(decodedJWT);
-	}
-
 	public List<GrantedAuthority> getAuthorities(CustomClaim claims) {
 		String[] roles = claims.roles;
 
@@ -102,16 +110,10 @@ public class JwtProviderManager {
 				.collect(Collectors.toList());
 	}
 
-	public String extractRefreshToken(HttpServletRequest request) {
-		if (request.getCookies() == null) {
-			throw new TokenNotFoundException("RefreshToken not found");
-		}
+	public JwtProviderManager.CustomClaim verify(String accessToken) {
+		DecodedJWT decodedJWT = this.jwtVerifier.verify(accessToken);
 
-		return Arrays.stream(request.getCookies())
-			.filter(cookie -> cookie.getName().equals(jwtConfig.refreshToken().header()))
-			.findFirst()
-			.map(Cookie::getValue)
-			.orElseThrow(() -> new TokenNotFoundException("access token value null."));
+		return new CustomClaim(decodedJWT);
 	}
 
 	public void verifyRefreshToken(String accessToken, String refreshToken) {
@@ -131,23 +133,15 @@ public class JwtProviderManager {
 		tokenService.remove(id);
 	}
 
+	@Builder
+	@AllArgsConstructor
+	@NoArgsConstructor(access = AccessLevel.PRIVATE)
 	@EqualsAndHashCode
 	public static class CustomClaim {
 		Long userId;
 		String[] roles;
 		Date issuedAt;
 		Date expiredAt;
-
-		private CustomClaim() {
-		}
-
-		@Builder
-		CustomClaim(Long userId, String[] roles, Date issuedAt, Date expiredAt) {
-			this.userId = userId;
-			this.roles = roles;
-			this.issuedAt = issuedAt;
-			this.expiredAt = expiredAt;
-		}
 
 		CustomClaim(DecodedJWT decodedJWT) {
 			Claim userId = decodedJWT.getClaim("userId");

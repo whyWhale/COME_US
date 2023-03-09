@@ -1,10 +1,13 @@
 package com.platform.order.common.security.model;
 
-import com.google.common.base.Preconditions;
+import org.springframework.util.Assert;
 
 public record JwtAuthentication(Long id, String token) {
 	public JwtAuthentication {
-		Preconditions.checkArgument(id != null, "user id is required elements");
-		Preconditions.checkArgument(!token.isBlank(), "token is required elements");
+		Assert.notNull(id, "user id is required elements");
+
+		if (token.isBlank()) {
+			throw new IllegalArgumentException("token is required elements");
+		}
 	}
 }

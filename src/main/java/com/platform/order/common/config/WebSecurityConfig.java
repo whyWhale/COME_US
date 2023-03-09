@@ -26,9 +26,9 @@ import com.platform.order.common.security.constant.SecurityUrlProperty;
 
 import lombok.RequiredArgsConstructor;
 
+@Configuration
 @RequiredArgsConstructor
 @EnableConfigurationProperties({SecurityUrlProperty.class, JwtConfig.class, CookieProperty.class})
-@Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
 public class WebSecurityConfig {

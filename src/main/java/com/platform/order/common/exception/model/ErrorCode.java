@@ -9,6 +9,7 @@ public enum ErrorCode implements ErrorModel {
 	NOT_FOUND_RESOURCES("C001", "not found resources", NOT_FOUND),
 	FATAL_ERROR("C002", "[fatal] Internal Server error", INTERNAL_SERVER_ERROR),
 	NOT_AUTHENTICATE("C003", "not authenticate", UNAUTHORIZED),
+	NOT_AUTHORIZATION("C004", "not found", FORBIDDEN),
 	FILE_IO("I0004", "File I/O fail", INTERNAL_SERVER_ERROR),
 
 	//VALIDATION

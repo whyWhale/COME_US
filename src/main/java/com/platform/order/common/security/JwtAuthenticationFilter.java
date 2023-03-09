@@ -22,38 +22,25 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.platform.order.common.security.JwtProviderManager.CustomClaim;
+import com.platform.order.common.security.constant.CookieProperty;
+import com.platform.order.common.security.constant.JwtConfig;
 import com.platform.order.common.security.exception.TokenNotFoundException;
 import com.platform.order.common.security.model.JwtAuthentication;
 import com.platform.order.common.security.model.JwtAuthenticationToken;
-import com.platform.order.common.security.constant.CookieProperty;
-import com.platform.order.common.security.constant.JwtConfig;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 	private final JwtProviderManager jwtProviderManager;
 	private final JwtConfig jwtConfig;
 	private final CookieProperty cookieProperty;
 
-	public JwtAuthenticationFilter(
-		JwtProviderManager jwtProviderManager,
-		JwtConfig jwtConfig,
-		CookieProperty cookieProperty
-	) {
-		this.jwtConfig = jwtConfig;
-		this.cookieProperty = cookieProperty;
-		this.jwtProviderManager = jwtProviderManager;
-	}
-
-	/**
-	 * note: 인증된 사용자 인지 토큰 체크
-	 * @param request
-	 * @param response
-	 * @param filterChain
-	 * @throws ServletException
-	 * @throws IOException
-	 */
 	@Override
-	protected void doFilterInternal(HttpServletRequest request,
+	protected void doFilterInternal(
+		HttpServletRequest request,
 		HttpServletResponse response,
 		FilterChain filterChain) throws ServletException, IOException {
 
@@ -69,7 +56,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private void authenticate(String accessToken, HttpServletRequest request, HttpServletResponse response) {
 		try {
-			JwtProviderManager.CustomClaim verifiedClaim = jwtProviderManager.verify(accessToken);
+			CustomClaim verifiedClaim = jwtProviderManager.verify(accessToken);
 			JwtAuthenticationToken authenticationToken = createAuthenticationToken(verifiedClaim, request, accessToken);
 
 			SecurityContextHolder.getContext().setAuthentication(authenticationToken);
@@ -85,10 +72,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		try {
 			String refreshToken = jwtProviderManager.extractRefreshToken(request);
 			jwtProviderManager.verifyRefreshToken(accessToken, refreshToken);
-			JwtProviderManager.CustomClaim claim = jwtProviderManager.decode(accessToken);
+			CustomClaim claim = jwtProviderManager.decode(accessToken);
 			String reIssuedToken = jwtProviderManager.generateAccessToken(claim);
-			JwtProviderManager.CustomClaim verifiedClaim = jwtProviderManager.verify(reIssuedToken);
-			JwtAuthenticationToken authenticationToken = createAuthenticationToken(verifiedClaim, request, reIssuedToken);
+			CustomClaim verifiedClaim = jwtProviderManager.verify(reIssuedToken);
+			JwtAuthenticationToken authenticationToken = createAuthenticationToken(verifiedClaim, request,
+				reIssuedToken);
 
 			ResponseCookie cookie = ResponseCookie.from(
 					jwtConfig.accessToken().header(),
@@ -109,7 +97,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	}
 
 	private JwtAuthenticationToken createAuthenticationToken(
-		JwtProviderManager.CustomClaim claims,
+		CustomClaim claims,
 		HttpServletRequest request,
 		String accessToken
 	) {
