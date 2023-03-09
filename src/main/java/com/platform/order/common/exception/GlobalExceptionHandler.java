@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.platform.order.common.exception.custom.BusinessException;
+import com.platform.order.common.exception.custom.CustomFileIoException;
+import com.platform.order.common.exception.custom.NotFoundResourceException;
 import com.platform.order.common.exception.model.ErrorCode;
 import com.platform.order.common.exception.model.ErrorModel;
 import com.platform.order.common.exception.protocal.ErrorResponse;
@@ -26,6 +28,20 @@ public class GlobalExceptionHandler {
 		log.error("Business exception occurred : {}", e.toString(), e);
 
 		return createResponse(e.errorModel());
+	}
+
+	@ExceptionHandler(NotFoundResourceException.class)
+	public ResponseEntity<ErrorResponse<ErrorModel>> handleNotFoundResourceException(NotFoundResourceException e) {
+		log.error("NotFoundResource exception occurred : {}", e.toString(), e);
+
+		return createResponse(ErrorCode.NOT_FOUND_RESOURCES);
+	}
+
+	@ExceptionHandler(CustomFileIoException.class)
+	public ResponseEntity<ErrorResponse<ErrorModel>> handleCustomFileIoException(CustomFileIoException e) {
+		log.error("File IO exception occurred : {}", e.toString(), e);
+
+		return createResponse(ErrorCode.FILE_IO);
 	}
 
 	@ExceptionHandler(DataIntegrityViolationException.class)

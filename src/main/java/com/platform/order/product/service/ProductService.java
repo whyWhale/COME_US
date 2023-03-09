@@ -20,7 +20,7 @@ import com.platform.order.common.exception.custom.BusinessException;
 import com.platform.order.common.exception.custom.NotFoundResourceException;
 import com.platform.order.common.exception.model.ErrorCode;
 import com.platform.order.common.pagedto.offset.PageResponseDto;
-import com.platform.order.common.storage.StorageService;
+import com.platform.order.common.storage.AwsStorageService;
 import com.platform.order.product.controller.dto.request.product.CreateProductRequestDto;
 import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto;
 import com.platform.order.product.controller.dto.request.product.UpdateProductRequestDto;
@@ -58,7 +58,7 @@ public class ProductService {
 	private final CategoryRepository categoryRepository;
 	private final ProductImageRepository imageRepository;
 	private final UserProductRepository userProductRepository;
-	private final StorageService storageService;
+	private final AwsStorageService awsStorageService;
 	private final ProductRedisService productRedisService;
 	private final ProductMapper productMapper;
 
@@ -99,8 +99,8 @@ public class ProductService {
 	public Long delete(Long productId, Long authId) {
 		ProductEntity foundProduct = productRepository.findByIdWithCategory(productId)
 			.orElseThrow(() -> new NotFoundResourceException(
-				format("product id :{0} is not found.", productId),
-				ErrorCode.NOT_FOUND_RESOURCES));
+				format("product id :{0} is not found.", productId))
+			);
 		UserEntity auth = getAuth(authId);
 
 		if (!foundProduct.isOwner(auth)) {
@@ -118,8 +118,8 @@ public class ProductService {
 	public ReadProductResponseDto read(Long productId, String visitor) {
 		ProductEntity foundProduct = productRepository.findByIdWithCategoryAndThumbnail(productId)
 			.orElseThrow(() -> new NotFoundResourceException(
-				format("product id :{0} is not found.", productId),
-				ErrorCode.NOT_FOUND_RESOURCES));
+				format("product id :{0} is not found.", productId)
+			));
 		List<ProductImageEntity> images = imageRepository.findByProduct(foundProduct);
 
 		productRedisService.increaseViewCount(productId, visitor);
@@ -173,8 +173,8 @@ public class ProductService {
 	public Long unWishProduct(Long authId, Long userProductId) {
 		UserProductEntity userProductEntity = userProductRepository.findByIdAndWisherId(userProductId, authId)
 			.orElseThrow(() -> new NotFoundResourceException(
-				format("user product id :{0} is not found.", userProductId),
-				ErrorCode.NOT_FOUND_RESOURCES));
+				format("user product id :{0} is not found.", userProductId)
+			));
 
 		userProductRepository.delete(userProductEntity);
 		productRedisService.decreaseWishCount(userProductEntity.getProduct().getId());
@@ -200,14 +200,14 @@ public class ProductService {
 
 		String thumbnailExtension = getExtension(thumbnailFile.getOriginalFilename());
 		String thumbnailFileName = generateFileName();
-		String thumbnailPath = storageService.upload(
+		String thumbnailPath = awsStorageService.upload(
 			thumbnailFile,
 			PRODUCT_THUMBNAIL,
 			thumbnailFileName,
 			thumbnailExtension);
 
 		ProductThumbnailEntity thumbnail = foundProduct.addThumbnail(ProductThumbnailEntity.builder()
-			.name(thumbnailFileName)
+			.fileName(thumbnailFileName)
 			.originName(thumbnailFile.getOriginalFilename())
 			.path(thumbnailPath)
 			.size(thumbnailFile.getSize())
@@ -239,7 +239,7 @@ public class ProductService {
 			String originalImageName = image.getOriginalFilename();
 			String imageFileExtension = getExtension(originalImageName);
 			long imageSize = image.getSize();
-			String imagePath = storageService.upload(
+			String imagePath = awsStorageService.upload(
 				image,
 				PRODUCT_IMAGE,
 				imageFileName,
@@ -248,7 +248,7 @@ public class ProductService {
 
 			return ProductImageEntity.builder()
 				.originName(originalImageName)
-				.name(imageFileName)
+				.fileName(imageFileName)
 				.path(imagePath)
 				.extension(imageFileExtension)
 				.size(imageSize)
@@ -279,18 +279,18 @@ public class ProductService {
 		}
 
 		ProductThumbnailEntity pastThumbnail = foundProduct.getProductThumbnail();
-		storageService.delete(PRODUCT_THUMBNAIL, pastThumbnail.generateFullFileName());
+		awsStorageService.delete(PRODUCT_THUMBNAIL, pastThumbnail.generateFullFileName());
 
 		String thumbnailExtension = getExtension(multipartThumbnail.getOriginalFilename());
 		String thumbnailFileName = generateFileName();
-		String thumbnailPath = storageService.upload(
+		String thumbnailPath = awsStorageService.upload(
 			multipartThumbnail,
 			PRODUCT_THUMBNAIL,
 			thumbnailFileName,
 			thumbnailExtension);
 
 		ProductThumbnailEntity newThumbnail = foundProduct.updateThumbnail(ProductThumbnailEntity.builder()
-			.name(thumbnailFileName)
+			.fileName(thumbnailFileName)
 			.originName(multipartThumbnail.getOriginalFilename())
 			.path(thumbnailPath)
 			.size(multipartThumbnail.getSize())
@@ -317,7 +317,7 @@ public class ProductService {
 		}
 
 		imageRepository.findByProduct(foundProduct)
-			.forEach(image -> storageService.delete(PRODUCT_IMAGE, image.getPath()));
+			.forEach(image -> awsStorageService.delete(PRODUCT_IMAGE, image.getPath()));
 		imageRepository.deleteBatchByProductId(foundProduct.getId());
 
 		AtomicLong arrange = new AtomicLong();
@@ -326,12 +326,12 @@ public class ProductService {
 			String originalImageName = multipartFile.getOriginalFilename();
 			String imageFileExtension = getExtension(originalImageName);
 			long imageSize = multipartFile.getSize();
-			String imagePath = storageService.upload(multipartFile, PRODUCT_IMAGE, imageFileName,
+			String imagePath = awsStorageService.upload(multipartFile, PRODUCT_IMAGE, imageFileName,
 				imageFileExtension);
 
 			return ProductImageEntity.builder()
 				.originName(multipartFile.getOriginalFilename())
-				.name(imageFileName)
+				.fileName(imageFileName)
 				.path(imagePath)
 				.extension(imageFileExtension)
 				.size(imageSize)
@@ -348,23 +348,21 @@ public class ProductService {
 	private ProductEntity getProduct(Long productId) {
 		return productRepository.findById(productId)
 			.orElseThrow(() -> new NotFoundResourceException(
-				format("product id :{0} is not found.", productId),
-				ErrorCode.NOT_FOUND_RESOURCES)
-			);
+				format("product id :{0} is not found.", productId)
+			));
 	}
 
 	private UserEntity getAuth(Long authId) {
-		return userRepository.findById(authId).orElseThrow(() -> new NotFoundResourceException(
-			format("user id :{0} is not found.", authId),
-			ErrorCode.NOT_FOUND_RESOURCES)
-		);
+		return userRepository.findById(authId)
+			.orElseThrow(() -> new NotFoundResourceException(
+				format("user id :{0} is not found.", authId)
+			));
 	}
 
 	private CategoryEntity getCategory(String code) {
-		return categoryRepository.findByCode(code).orElseThrow(() ->
-			new NotFoundResourceException(
-				format("category code :{0} is not found.", code),
-				ErrorCode.NOT_FOUND_RESOURCES)
-		);
+		return categoryRepository.findByCode(code)
+			.orElseThrow(() -> new NotFoundResourceException(
+				format("category code :{0} is not found.", code)
+			));
 	}
 }

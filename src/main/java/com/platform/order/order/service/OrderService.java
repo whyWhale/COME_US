@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.platform.order.common.exception.custom.NotFoundResourceException;
-import com.platform.order.common.exception.model.ErrorCode;
 import com.platform.order.common.pagedto.cursor.CursorPageResponseDto;
 import com.platform.order.coupon.domain.usercoupon.entity.UserCouponEntity;
 import com.platform.order.coupon.domain.usercoupon.repository.UserCouponRepository;
@@ -78,8 +77,8 @@ public class OrderService {
 	public Long cancel(Long authId, Long orderProductId) {
 		OrderProductEntity orderProduct = orderProductRepository.findByIdAndAuthId(orderProductId, authId)
 			.orElseThrow(() -> new NotFoundResourceException(
-				format("orderProduct : {0}  and authId : {1} not found", orderProductId, authId),
-				ErrorCode.NOT_FOUND_RESOURCES));
+				format("orderProduct : {0}  and authId : {1} not found", orderProductId, authId)
+			));
 		OrderProductEntity cancelledOrderProduct = orderProduct.cancel();
 
 		return cancelledOrderProduct.getId();

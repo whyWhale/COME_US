@@ -3,17 +3,16 @@ package com.platform.order.common.exception.custom;
 import com.platform.order.common.exception.model.ErrorCode;
 import com.platform.order.common.exception.model.ErrorModel;
 
-public class NotFoundResourceException extends RuntimeException{
+public class CustomFileIoException extends RuntimeException {
 	private final ErrorModel errorModel;
 
-	public NotFoundResourceException(String message) {
+	public CustomFileIoException(String message) {
 		super(message);
-		this.errorModel = ErrorCode.NOT_FOUND_RESOURCES;
+		this.errorModel = ErrorCode.FILE_IO;
 	}
 
 	@Override
 	public String toString() {
 		return "[FileIOException] " + errorModel;
 	}
-
 }

@@ -57,8 +57,8 @@ public class CouponService {
 
 		CouponEntity coupon = couponRepository.findByIdAndExpiredAtAfter(couponId, LocalDate.now())
 			.orElseThrow(() -> new NotFoundResourceException(
-				format("coupon id:{0} is not found.", couponId),
-				ErrorCode.NOT_FOUND_RESOURCES));
+				format("coupon id:{0} is not found.", couponId)
+			));
 		UserCouponEntity userCoupon = couponMapper.toUserCoupon(auth, coupon);
 		UserCouponEntity issuedUserCoupon = userCouponRepository.save(userCoupon);
 
@@ -74,9 +74,8 @@ public class CouponService {
 	private UserEntity getAuth(Long authId) {
 		return userRepository.findById(authId)
 			.orElseThrow(() -> new NotFoundResourceException(
-				format("user id:{0} is not found.", authId),
-				ErrorCode.NOT_FOUND_RESOURCES)
-			);
+				format("user id:{0} is not found.", authId)
+			));
 	}
 
 }

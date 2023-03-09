@@ -37,7 +37,7 @@ public class ProductMapper {
 	}
 
 	public CreateThumbnailResponseDto toCreateThumbnailResponse(ProductThumbnailEntity thumbnail) {
-		return new CreateThumbnailResponseDto(thumbnail.getName(), thumbnail.getOriginName(), thumbnail.getExtension(),
+		return new CreateThumbnailResponseDto(thumbnail.getFileName(), thumbnail.getOriginName(), thumbnail.getExtension(),
 			thumbnail.getPath(), thumbnail.getSize());
 	}
 
@@ -45,7 +45,7 @@ public class ProductMapper {
 		List<ProductImageEntity> productImages) {
 		return productImages.stream()
 			.map(productImageEntity -> new CreateProductImagesResponseDto(
-				productImageEntity.getName(),
+				productImageEntity.getFileName(),
 				productImageEntity.getOriginName(),
 				productImageEntity.getExtension(),
 				productImageEntity.getPath(),
@@ -59,7 +59,7 @@ public class ProductMapper {
 		List<ProductImageEntity> productImageEntities) {
 		return productImageEntities.stream()
 			.map(productImageEntity -> new UpdateProductImageResponseDto(
-				productImageEntity.getName(),
+				productImageEntity.getFileName(),
 				productImageEntity.getOriginName(),
 				productImageEntity.getExtension(),
 				productImageEntity.getPath(),
@@ -71,7 +71,7 @@ public class ProductMapper {
 
 	public UpdateProductThumbnailResponseDto toUpdateProductThumbnailResponse(ProductThumbnailEntity newThumbnail) {
 		return new UpdateProductThumbnailResponseDto(
-			newThumbnail.getName(),
+			newThumbnail.getFileName(),
 			newThumbnail.getOriginName(),
 			newThumbnail.getExtension(),
 			newThumbnail.getPath(),
