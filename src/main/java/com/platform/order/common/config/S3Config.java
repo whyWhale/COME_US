@@ -1,6 +1,6 @@
 package com.platform.order.common.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -11,20 +11,21 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.platform.order.common.config.constant.AwsProperty;
 
-@Profile({"local"})
+import lombok.RequiredArgsConstructor;
+
+@Profile({"dev"})
+@RequiredArgsConstructor
+@EnableConfigurationProperties(AwsProperty.class)
 @Configuration
 public class S3Config {
-	@Value("${cloud.aws.credentials.access-key}")
-	private String accessKey;
 
-	@Value("${cloud.aws.credentials.secret-key}")
-	private String secretKey;
-
+	private final AwsProperty awsProperty;
 
 	@Bean
-	public AmazonS3 amazonS3Client() {
-		AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
+	public AmazonS3 amazonS3() {
+		AWSCredentials credentials = new BasicAWSCredentials(awsProperty.accessKey(), awsProperty.secretKey());
 
 		return AmazonS3ClientBuilder
 			.standard()
