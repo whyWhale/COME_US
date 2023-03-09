@@ -12,12 +12,11 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.Where;
 
-import com.platform.order.common.BaseEntity;
+import com.platform.order.common.supperentity.BaseEntity;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

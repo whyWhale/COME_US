@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Where;
 
-import com.platform.order.common.BaseEntity;
+import com.platform.order.common.supperentity.BaseEntity;
 import com.platform.order.order.domain.delivery.entity.DeliveryEntity;
 import com.platform.order.order.domain.orderproduct.entity.OrderProductEntity;
 

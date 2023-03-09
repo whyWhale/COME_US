@@ -72,7 +72,7 @@ public class ProductIntegrationTest extends IntegrationTest {
 			.build();
 
 		productEntity.addThumbnail(ProductThumbnailEntity.builder()
-			.name(UUID.randomUUID().toString())
+			.fileName(UUID.randomUUID().toString())
 			.extension("png")
 			.size(100023L)
 			.path("storage path")

@@ -4,7 +4,7 @@ values  (1,'2023-02-16 16:35:15.338158', false, '2023-02-16 16:35:15.338158', 'w
 
 INSERT INTO delivery (id,address, zip_code) VALUES (1,'123-1', '123-1');
 
-insert into product_thunmnail_image (id, extension, name, origin_name, path, size)
+insert into product_thunmnail_image (id, extension, file_name, origin_name, path, size)
 values  (1, 'png', '12391jni4', 'djnasd', 'testPath', 1203128),
         (2, 'png', '12391jni1', 'djnasd', 'testPath', 1203128),
         (3, 'png', '12391jni2', 'djnasd', 'testPath', 1203128),

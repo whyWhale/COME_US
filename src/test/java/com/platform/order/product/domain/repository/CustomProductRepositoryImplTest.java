@@ -51,7 +51,7 @@ class CustomProductRepositoryImplTest extends RepositoryTest {
 					.build();
 
 				product.addThumbnail(ProductThumbnailEntity.builder()
-					.name(UUID.randomUUID().toString())
+					.fileName(UUID.randomUUID().toString())
 					.extension("png")
 					.size(100023L)
 					.path("storage path")
@@ -100,7 +100,7 @@ class CustomProductRepositoryImplTest extends RepositoryTest {
 				.build();
 
 			product.addThumbnail(ProductThumbnailEntity.builder()
-				.name(UUID.randomUUID().toString())
+				.fileName(UUID.randomUUID().toString())
 				.extension("png")
 				.size(100023L)
 				.path("storage path")

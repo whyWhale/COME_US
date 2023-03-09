@@ -31,7 +31,7 @@ public class CustomProductImageRepositoryImpl implements CustomProductImageRepos
 				public void setValues(PreparedStatement ps, int i) throws SQLException {
 					ps.setLong(1, productImages.get(i).getProduct().getId());
 					ps.setString(2, productImages.get(i).getOriginName());
-					ps.setString(3, productImages.get(i).getName());
+					ps.setString(3, productImages.get(i).getFileName());
 					ps.setString(4, productImages.get(i).getPath());
 					ps.setString(5, productImages.get(i).getExtension());
 					ps.setLong(6, productImages.get(i).getSize());

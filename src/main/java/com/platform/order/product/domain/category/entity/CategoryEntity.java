@@ -1,12 +1,11 @@
 package com.platform.order.product.domain.category.entity;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Where;
 
-import com.platform.order.common.BaseEntity;
+import com.platform.order.common.supperentity.BaseEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

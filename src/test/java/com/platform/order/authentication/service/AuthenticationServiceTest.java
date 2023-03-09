@@ -132,7 +132,7 @@ class AuthenticationServiceTest extends ServiceTest {
 			//then
 			Assertions.assertThatThrownBy(() -> {
 				authService.login(requestDto);
-			}).isInstanceOf(BusinessException.class);
+			}).isInstanceOf(NotFoundResourceException.class);
 		}
 
 		@Test

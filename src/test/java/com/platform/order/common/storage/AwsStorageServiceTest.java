@@ -16,10 +16,10 @@ import org.springframework.mock.web.MockMultipartFile;
 import com.amazonaws.services.s3.AmazonS3;
 import com.platform.order.testenv.IntegrationTest;
 
-class StorageServiceTest extends IntegrationTest {
+class AwsStorageServiceTest extends IntegrationTest {
 
 	@Autowired
-	StorageService storageService;
+	AwsStorageService awsStorageService;
 
 	@Autowired
 	ResourceLoader resourceLoader;
@@ -40,7 +40,7 @@ class StorageServiceTest extends IntegrationTest {
 		FileSuffixPath fileSuffixPath = PRODUCT_THUMBNAIL;
 		String extension = "png";
 		// when
-		String uploadPath = storageService.upload(multipartFile, fileSuffixPath, multipartFile.getName(), extension);
+		String uploadPath = awsStorageService.upload(multipartFile, fileSuffixPath, multipartFile.getName(), extension);
 		// then
 		Assertions.assertThat(uploadPath).isNotNull();
 	}
@@ -49,7 +49,7 @@ class StorageServiceTest extends IntegrationTest {
 	void testDelete() {
 		// given
 		// when
-		String deleteUrl = storageService.delete(PRODUCT_THUMBNAIL, "test.png");
+		String deleteUrl = awsStorageService.delete(PRODUCT_THUMBNAIL, "test.png");
 		// then
 		Assertions.assertThat(deleteUrl).isNotNull();
 	}

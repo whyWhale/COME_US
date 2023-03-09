@@ -6,28 +6,33 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import lombok.AllArgsConstructor;
+import com.platform.order.common.supperentity.FileBaseEntity;
+
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "product_thunmnail_image")
 @Entity
-public class ProductThumbnailEntity {
+public class ProductThumbnailEntity extends FileBaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private String originName;
-	private String name;
-	private String path;
-	private String extension;
-	private Long size;
 
-	public String generateFullFileName() {
-		return this.getName() + "." + this.getExtension();
+	@Builder
+	public ProductThumbnailEntity(
+		String originName,
+		String fileName,
+		String path,
+		String extension,
+		Long size,
+		Long id
+	) {
+		super(originName, fileName, path, extension, size);
+		this.id = id;
 	}
+
 }

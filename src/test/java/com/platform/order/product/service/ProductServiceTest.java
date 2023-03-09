@@ -28,7 +28,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.platform.order.common.exception.custom.BusinessException;
-import com.platform.order.common.storage.StorageService;
+import com.platform.order.common.storage.AwsStorageService;
 import com.platform.order.product.controller.dto.request.product.CreateProductRequestDto;
 import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto;
 import com.platform.order.product.controller.dto.request.product.UpdateProductRequestDto;
@@ -72,7 +72,7 @@ class ProductServiceTest extends ServiceTest {
 	ProductMapper productMapper;
 
 	@Mock
-	StorageService storageService;
+	AwsStorageService awsStorageService;
 
 	ResourceLoader resourceLoader = new DefaultResourceLoader();
 
@@ -118,7 +118,7 @@ class ProductServiceTest extends ServiceTest {
 			.build();
 
 		product.addThumbnail(ProductThumbnailEntity.builder()
-			.name(UUID.randomUUID().toString())
+			.fileName(UUID.randomUUID().toString())
 			.originName("test")
 			.extension("png")
 			.path("path")
@@ -156,14 +156,14 @@ class ProductServiceTest extends ServiceTest {
 		//given
 		given(productRepository.findById(any())).willReturn(Optional.of(product));
 		given(userRepository.findById(any())).willReturn(Optional.of(user));
-		given(storageService.upload(any(), any(), any(), any())).willReturn("uploadPath");
+		given(awsStorageService.upload(any(), any(), any(), any())).willReturn("uploadPath");
 		//when
 		productService.createThumbnail(product.getId(), user.getId(), mockfile);
 		//then
 		assertThat(product.getProductThumbnail().getOriginName()).isEqualTo(mockfile.getOriginalFilename());
 		verify(productRepository, times(1)).findById(any());
 		verify(userRepository, times(1)).findById(any());
-		verify(storageService, times(1)).upload(any(), any(), any(), any());
+		verify(awsStorageService, times(1)).upload(any(), any(), any(), any());
 	}
 
 	@Test
@@ -185,13 +185,13 @@ class ProductServiceTest extends ServiceTest {
 		//given
 		given(productRepository.findById(any())).willReturn(Optional.of(product));
 		given(userRepository.findById(any())).willReturn(Optional.of(user));
-		given(storageService.upload(any(), any(), any(), any())).willReturn("uploadPath");
+		given(awsStorageService.upload(any(), any(), any(), any())).willReturn("uploadPath");
 		//when
 		productService.createImages(product.getId(), user.getId(), mockfiles);
 		//then
 		verify(productRepository, times(1)).findById(any());
 		verify(userRepository, times(1)).findById(any());
-		verify(storageService, times(mockfiles.size())).upload(any(), any(), any(), any());
+		verify(awsStorageService, times(mockfiles.size())).upload(any(), any(), any(), any());
 	}
 
 	@Test
@@ -244,15 +244,15 @@ class ProductServiceTest extends ServiceTest {
 
 		given(productRepository.findById(any())).willReturn(Optional.of(product));
 		given(userRepository.findById(any())).willReturn(Optional.of(user));
-		given(storageService.delete(any(), any())).willReturn("deletePath");
-		given(storageService.upload(any(), any(), any(), any())).willReturn("uploadPath");
+		given(awsStorageService.delete(any(), any())).willReturn("deletePath");
+		given(awsStorageService.upload(any(), any(), any(), any())).willReturn("uploadPath");
 		//when
 		productService.updateThumbnail(product.getId(), user.getId(), mockfile);
 		//then
 		assertThat(product.getProductThumbnail().getOriginName()).isEqualTo(mockfile.getOriginalFilename());
 		verify(productRepository, times(1)).findById(any());
-		verify(storageService, times(1)).upload(any(), any(), any(), any());
-		verify(storageService, times(1)).delete(any(), any());
+		verify(awsStorageService, times(1)).upload(any(), any(), any(), any());
+		verify(awsStorageService, times(1)).delete(any(), any());
 	}
 
 	@Test
@@ -274,13 +274,13 @@ class ProductServiceTest extends ServiceTest {
 		//given
 		given(productRepository.findById(any())).willReturn(Optional.of(product));
 		given(userRepository.findById(any())).willReturn(Optional.of(user));
-		given(storageService.upload(any(), any(), any(), any())).willReturn("uploadPath");
+		given(awsStorageService.upload(any(), any(), any(), any())).willReturn("uploadPath");
 		//when
 		productService.updateImages(product.getId(), user.getId(), mockfiles);
 		//then
 		verify(productRepository, times(1)).findById(any());
 		verify(userRepository, times(1)).findById(any());
-		verify(storageService, times(mockfiles.size())).upload(any(), any(), any(), any());
+		verify(awsStorageService, times(mockfiles.size())).upload(any(), any(), any(), any());
 	}
 
 	@Test

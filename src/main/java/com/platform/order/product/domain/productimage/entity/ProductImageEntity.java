@@ -8,34 +8,42 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.platform.order.common.supperentity.FileBaseEntity;
 import com.platform.order.product.domain.product.entity.ProductEntity;
 
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "product_image")
 @Entity
-public class ProductImageEntity {
+public class ProductImageEntity extends FileBaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private String originName;
-	private String name;
-	private String path;
-	private String extension;
-	private Long size;
+
 	private Long arrangement;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	private ProductEntity product;
 
-	public String generateFullFileName() {
-		return this.getName() + "." + this.getExtension();
+	@Builder
+	public ProductImageEntity(
+		String originName,
+		String fileName,
+		String path,
+		String extension,
+		Long size,
+		Long id,
+		Long arrangement,
+		ProductEntity product
+	) {
+		super(originName, fileName, path, extension, size);
+		this.id = id;
+		this.arrangement = arrangement;
+		this.product = product;
 	}
 }
