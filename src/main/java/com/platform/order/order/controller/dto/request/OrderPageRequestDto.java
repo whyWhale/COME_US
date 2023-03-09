@@ -9,7 +9,7 @@ import javax.validation.constraints.PositiveOrZero;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 
-import com.platform.order.common.protocal.CursorPageRequestDto;
+import com.platform.order.common.pagedto.cursor.CursorPageRequestDto;
 import com.platform.order.common.validation.KeywordSearch;
 import com.platform.order.order.domain.order.entity.OrderStatus;
 

@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.platform.order.common.exception.custom.NotFoundResourceException;
 import com.platform.order.common.exception.model.ErrorCode;
-import com.platform.order.common.protocal.CursorPageResponseDto;
+import com.platform.order.common.pagedto.cursor.CursorPageResponseDto;
 import com.platform.order.coupon.domain.usercoupon.entity.UserCouponEntity;
 import com.platform.order.coupon.domain.usercoupon.repository.UserCouponRepository;
 import com.platform.order.order.controller.dto.request.CreateOrderRequestDto;

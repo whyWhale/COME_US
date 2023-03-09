@@ -1,15 +1,10 @@
 package com.platform.order.order.service;
 
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.platform.order.common.protocal.CursorPageResponseDto;
-import com.platform.order.coupon.domain.usercoupon.entity.UserCouponEntity;
-import com.platform.order.order.controller.dto.request.CreateOrderRequestDto;
+import com.platform.order.common.pagedto.cursor.CursorPageResponseDto;
 import com.platform.order.order.controller.dto.response.CreateOrderResponseDto;
 import com.platform.order.order.controller.dto.response.ReadMyOrderResponseDto;
 import com.platform.order.order.domain.order.entity.OrderEntity;

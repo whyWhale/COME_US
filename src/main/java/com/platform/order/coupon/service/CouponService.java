@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.platform.order.common.exception.custom.BusinessException;
 import com.platform.order.common.exception.custom.NotFoundResourceException;
 import com.platform.order.common.exception.model.ErrorCode;
-import com.platform.order.common.protocal.PageResponseDto;
+import com.platform.order.common.pagedto.offset.PageResponseDto;
 import com.platform.order.coupon.controller.dto.request.coupon.CreateCouponRequestDto;
 import com.platform.order.coupon.controller.dto.request.usercoupon.UserCouponPageRequestDto;
 import com.platform.order.coupon.controller.dto.response.coupon.CreateCouponResponseDto;

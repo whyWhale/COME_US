@@ -12,7 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 
-import com.platform.order.common.protocal.PageRequestDto;
+import com.platform.order.common.pagedto.offset.PageRequestDto;
 import com.platform.order.coupon.domain.coupon.entity.CouponType;
 
 import lombok.AllArgsConstructor;

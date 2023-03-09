@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-import com.platform.order.common.protocal.PageResponseDto;
+import com.platform.order.common.pagedto.offset.PageResponseDto;
 import com.platform.order.product.controller.dto.request.product.CreateProductRequestDto;
 import com.platform.order.product.controller.dto.request.product.UpdateProductRequestDto;
 import com.platform.order.product.controller.dto.response.product.CreateProductImagesResponseDto;

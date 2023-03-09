@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-import com.platform.order.common.protocal.PageResponseDto;
+import com.platform.order.common.pagedto.offset.PageResponseDto;
 import com.platform.order.coupon.controller.dto.request.coupon.CreateCouponRequestDto;
 import com.platform.order.coupon.controller.dto.response.coupon.CreateCouponResponseDto;
 import com.platform.order.coupon.controller.dto.response.usercoupon.IssueUserCouponResponseDto;

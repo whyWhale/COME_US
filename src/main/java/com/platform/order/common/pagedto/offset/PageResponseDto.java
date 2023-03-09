@@ -1,4 +1,4 @@
-package com.platform.order.common.protocal;
+package com.platform.order.common.pagedto.offset;
 
 import java.util.List;
 
