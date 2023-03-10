@@ -4,6 +4,7 @@ import java.text.MessageFormat;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.platform.order.authentication.controller.dto.request.LoginAuthRequestDto;
 import com.platform.order.authentication.controller.dto.response.LoginAuthResponseDto;
@@ -17,6 +18,7 @@ import com.platform.order.user.domain.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
 public class AuthService {

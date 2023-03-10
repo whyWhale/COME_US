@@ -15,7 +15,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
  * @Document: aws s3 에뮬레이터
  */
 @TestConfiguration
-public class LocalStackS3Config {
+public class TestLocalStackS3Config {
 	private static final DockerImageName LOCAL_STACK_IMAGE = DockerImageName.parse("localstack/localstack");
 
 	@Value("${cloud.aws.s3.bucket}")

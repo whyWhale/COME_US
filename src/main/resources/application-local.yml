@@ -1,9 +1,17 @@
 spring:
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    username: ${MYSQL_USERNAME:root}
-    password: ${MYSQL_PASSWORD:password}
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/${MYSQL_DATABASE:order-renewal}?rewriteBatchedStatements=true
+    master:
+      hikari:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        username: ${MYSQL_USERNAME:root}
+        password: ${MYSQL_PASSWORD:password}
+        jdbc-url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/${MYSQL_DATABASE:order-renewal}?rewriteBatchedStatements=true
+    slave:
+      hikari:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        username: ${MYSQL_USERNAME:root}
+        password: ${MYSQL_PASSWORD:password}
+        jdbc-url: jdbc:mysql://${MYSQL_HOST:localhost}:3307/${MYSQL_DATABASE:order-renewal}
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -11,8 +19,11 @@ spring:
       hibernate:
         format_sql: true
   redis:
-    host: ${REDIS_HOST:localhost}
-    port: ${REDIS_PORT:6379}
+    cluster:
+      nodes:
+        - ${REDIS_HOST1:localhost:6379}
+        - ${REDIS_HOST2:localhost:6380}
+        - ${REDIS_HOST3:localhost:6381}
 
 jwt:
   issuer: order-renewal
@@ -34,10 +45,11 @@ security:
         - /health
         - /api/products/*
         - /api/products
+        - /test/**
       POST:
         - /api/auth/login
         - /api/users
-        - /test/*
+        - /test/**
       PATCH: [ ]
       PUT: [ ]
       DELETE: [ ]
@@ -52,7 +64,7 @@ security:
 cookie:
   secure: ${COOKIE_SECURE:false}
   same-site: ${COOKIE_SAME_SITE:lax}
-  domain: ${DOMAIN:}
+  domain: ${DOMAIN:localhost}
 
 cloud:
   aws:

@@ -7,10 +7,10 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.utility.DockerImageName;
 
-import com.platform.order.config.LocalStackS3Config;
+import com.platform.order.config.TestLocalStackS3Config;
 
 @ActiveProfiles("application-container")
-@Import({LocalStackS3Config.class})
+@Import({TestLocalStackS3Config.class})
 @SpringBootTest
 public class IntegrationTest {
 	@Container

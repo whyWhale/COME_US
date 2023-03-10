@@ -1,28 +1,39 @@
 spring:
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    username: ${MYSQL_USERNAME:root}
-    password: ${MYSQL_PASSWORD:password}
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/${MYSQL_DATABASE:order-renewal}?rewriteBatchedStatements=true
+    master:
+      hikari:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        username: ${MYSQL_USERNAME}
+        password: ${MYSQL_PASSWORD}
+        jdbc-url: ${MYSQL_JDBC_MASTER_URL}
+    slave:
+      hikari:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        username: ${MYSQL_USERNAME}
+        password: ${MYSQL_PASSWORD}
+        jdbc-url: ${MYSQL_JDBC_SLAVE_URL}
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
     properties:
       hibernate:
         format_sql: true
   redis:
-    host: ${REDIS_HOST:localhost}
-    port: ${REDIS_PORT:6379}
+    cluster:
+      nodes:
+        - ${REDIS_HOST1}
+        - ${REDIS_HOST2}
+        - ${REDIS_HOST3}
 
 jwt:
-  issuer: order-renewal
+  issuer: ${ISSUER}
   access-token:
-    header: access-token
-    expiry-seconds: ${ACCESS_EXPIRY_SECOND:ENC(43VpAPQWzFtX6I2vbopM+Q==)}
+    header: ${ACCESS_TOKEN_HEADER}
+    expiry-seconds: ${ACCESS_EXPIRY_SECOND}
   refresh-token:
-    header: refresh-token
-    expiry-seconds: ${REFRESH_EXPIRY_SECOND:ENC(jGxk7kBP4xV+MkSyHX/Sjg==)}
-  secret-key: ${SECRET_KEY:ENC(E9Of+Ca7DdsBBGMfwKam9M7ty9QsAvgw)}
+    header: ${REFRESH_TOKEN_HEADER}
+    expiry-seconds: ${REFRESH_EXPIRY_SECOND}
+  secret-key: ${SECRET_KEY}
 
 security:
   url-pattern-config:
@@ -33,11 +44,9 @@ security:
         - /swagger-ui.html/**
         - /health
         - /api/products/*
-        - /api/products
       POST:
         - /api/auth/login
         - /api/users
-        - /test/*
       PATCH: [ ]
       PUT: [ ]
       DELETE: [ ]
@@ -50,9 +59,9 @@ security:
       OPTIONS: /**
 
 cookie:
-  secure: ${COOKIE_SECURE:false}
-  same-site: ${COOKIE_SAME_SITE:lax}
-  domain: ${DOMAIN:}
+  secure: ${COOKIE_SECURE}
+  same-site: ${COOKIE_SAME_SITE}
+  domain: ${DOMAIN}
 
 cloud:
   aws:
@@ -68,7 +77,7 @@ cloud:
       static: ${STATIC_REGION}
 
 encryptor:
-  key: ${ENCRYPTOR_KEY:order-renewal}
+  key: ${ENCRYPTOR_KEY}
 
 logging:
   level:

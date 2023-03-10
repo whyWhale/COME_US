@@ -15,7 +15,7 @@ import com.platform.order.common.config.constant.AwsProperty;
 
 import lombok.RequiredArgsConstructor;
 
-@Profile({"dev"})
+@Profile({"prod"})
 @RequiredArgsConstructor
 @EnableConfigurationProperties(AwsProperty.class)
 @Configuration
