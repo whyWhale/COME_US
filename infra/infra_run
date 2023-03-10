@@ -1,4 +1,0 @@
-#!/usr/bin/env sh
-docker network create order-renewal-part
-
-docker-compose up

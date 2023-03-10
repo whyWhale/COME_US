@@ -11,52 +11,108 @@ volumes:
     driver: local
 
 services:
-  order-mysql:
-    image: mysql:latest
-    container_name: order-mysql
-    ports:
-      - 3306:3306
+  mysql-master:
+    image: mysql:8.0
+    container_name: mysql-master
     environment:
-      TZ: Asia/Seoul
-      MYSQL_DATABASE: order-renewal
       MYSQL_ROOT_PASSWORD: password
-      MYSQL_USER: order
-      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: order-renewal
+      TZ: Asia/Seoul
     volumes:
-      - ./db/mysql/data:/var/lib/mysql
-      - ./db/mysql/init:/docker-entrypoint-initdb.d
-    platform: linux/amd64
-    restart: always
-
-  order-mysql-phpmyadmin:
-    depends_on:
-      - order-mysql
-    image: phpmyadmin/phpmyadmin
-    container_name: order-mysql-phpmyadmin
+      - ./mysql-replication/master/my.cnf:/etc/mysql/my.cnf
+      - ./mysql-replication/master/data:/var/lib/mysql
+      - ./mysql-replication/master/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - 8082:80
+      - "3306:3306"
+
+  mysql-slave-1:
+    image: mysql:8.0
+    container_name: mysql-slave-1
     environment:
-      PMA_HOST: order-mysql
-      MYSQL_ROOT_PASSWORD: password 
-    platform: linux/amd64
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: order-renewal
+      TZ: Asia/Seoul
+    volumes:
+      - ./mysql-replication/slave/my.cnf:/etc/mysql/my.cnf
+      - ./mysql-replication/slave/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3307:3306"
+    depends_on:
+      - mysql-master
+
+  mysql-phpmyadmin:
+    depends_on:
+      - mysql-master
+    image: phpmyadmin/phpmyadmin
+    container_name: mysql-phpmyadmin
+    ports:
+      - "8082:80"
+    environment:
+      PMA_HOST: mysql-master
+      MYSQL_ROOT_PASSWORD: password
     restart: always
 
-  redis:
-    image: redis:latest
-    container_name: redis
+  redis-node1:
+    platform: linux/x86_64 # m1 MacOS의 경우
+    image: redis:6.2
+    container_name: redis-node1
+    volumes: # 작성한 설정 파일을 볼륨을 통해 컨테이너에 공유
+      - ./redis-cluster/redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
     ports:
-      - 6379:6379
-    volumes:
-      - data:/data
+      - "6380:6380"
+      - "6381:6381"
+      - "6379:6379"
+
+  redis-node2:
+    network_mode: "service:redis-node1"
     platform: linux/x86_64
-    restart: always
+    image: redis:6.2
+    container_name: redis-node2
+    volumes:
+      - ./redis-cluster/redis1.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+
+  redis-node3:
+    network_mode: "service:redis-node1"
+    platform: linux/x86_64
+    image: redis:6.2
+    container_name: redis-node3
+    volumes:
+      - ./redis-cluster/redis2.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+
+  redis-cluster-entry:
+    network_mode: "service:redis-node1"
+    platform: linux/x86_64
+    image: redis:6.2
+    container_name: redis-cluster-entry
+    command: redis-cli --cluster create 127.0.0.1:6379 127.0.0.1:6380 127.0.0.1:6381 --cluster-yes
+    depends_on:
+      - redis-node1
+      - redis-node2
+      - redis-node3
+    restart: on-failure
 
   redis-commander:
     image: rediscommander/redis-commander:latest
     container_name: redis-commander
     environment:
-      - REDIS_HOSTS=local:redis:6379
+      - REDIS_HOSTS=local:redis-node1:6379
     ports:
-      - 8081:8081
+      - "8087:8081"
     platform: linux/x86_64
     restart: always
+
+  localstack:
+    image: localstack/localstack
+    container_name: localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=S3
+      - DEFAULT_REGION=ap-northeast-2
+      - DATA_DIR=/tmp/localstack/data
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - DEBUG=1
