@@ -9,7 +9,7 @@ import org.testcontainers.utility.DockerImageName;
 
 import com.platform.order.config.TestLocalStackS3Config;
 
-@ActiveProfiles("application-container")
+@ActiveProfiles("container")
 @Import({TestLocalStackS3Config.class})
 @SpringBootTest
 public class IntegrationTest {

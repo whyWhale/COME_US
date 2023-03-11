@@ -1,4 +1,4 @@
-package com.platform.order.coupon.domain.repository;
+package com.platform.order.scheduler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -9,18 +9,22 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.platform.order.common.scheduler.ScheduleService;
 import com.platform.order.coupon.domain.coupon.entity.CouponEntity;
 import com.platform.order.coupon.domain.coupon.entity.CouponType;
 import com.platform.order.coupon.domain.coupon.repository.CouponRepository;
 import com.platform.order.coupon.domain.usercoupon.entity.UserCouponEntity;
 import com.platform.order.coupon.domain.usercoupon.repository.UserCouponRepository;
-import com.platform.order.testenv.RepositoryTest;
+import com.platform.order.testenv.IntegrationTest;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
 
+public class ScheduleServiceTest extends IntegrationTest {
 
-class CouponRepositoryTest extends RepositoryTest {
+	@Autowired
+	ScheduleService scheduleService;
+
 	@Autowired
 	CouponRepository couponRepository;
 
@@ -41,15 +45,15 @@ class CouponRepositoryTest extends RepositoryTest {
 				.type(CouponType.FIXED)
 				.quantity(100L)
 				.amount(10000L)
-				.expiredAt(LocalDate.now().plusMonths(1))
+				.expiredAt(LocalDate.now().minusDays(1))
 				.build()
 		);
 
 		user = userRepository.save(UserEntity.builder()
-			.email("whywhale@cocoa.com")
-			.username("whyWhale")
+			.email("kaikaio@cocoa.com")
+			.username("kaikaiokk")
 			.password("1")
-			.nickName("whale")
+			.nickName("kaikaio")
 			.role(Role.USER)
 			.build());
 
@@ -60,31 +64,17 @@ class CouponRepositoryTest extends RepositoryTest {
 	}
 
 	@Test
-	@DisplayName("재고 감소 Native 쿼리로 수량이 정상적으로 차감되면 1을 리턴한다.")
-	void testDecreaseQuantity() {
+	@DisplayName("쿠폰이 만료되면 사용자가 발급받은 쿠폰의 isUsable 컬럼은 false가 되고 쿠폰은 deleted =true 인상태로 변경된다")
+	void testExpireCouponAndUserCouponIsUsableOff() {
 		//given
-		//when
-		boolean isAvailable = couponRepository.decreaseQuantity(coupon.getId()) == 1;
-		//then
-		assertThat(isAvailable).isTrue();
-	}
+		LocalDate tomrrow = LocalDate.now().plusDays(1);
 
-	@Test
-	@DisplayName("재고 감소 Native 쿼리로 수량이 차감되지 않으면 0을 리턴한다.")
-	void failDecreaseQuantity() {
-		//given
-		CouponEntity notIssueCoupon = couponRepository.save(
-			CouponEntity.builder()
-				.type(CouponType.FIXED)
-				.quantity(0L)
-				.amount(10000L)
-				.expiredAt(LocalDate.now().plusMonths(1))
-				.build()
-		);
 		//when
-		boolean isAvailable = couponRepository.decreaseQuantity(notIssueCoupon.getId()) == 1;
-
+		scheduleService.expireCoupon();
 		//then
-		assertThat(isAvailable).isFalse();
+		UserCouponEntity userCouponEntity = userCouponRepository.findById(userCoupon.getId())
+			.orElseThrow(RuntimeException::new);
+
+		assertThat(userCouponEntity.isUsable()).isFalse();
 	}
 }
