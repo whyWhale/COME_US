@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,8 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.platform.order.common.exception.custom.BusinessException;
 import com.platform.order.common.exception.model.ErrorCode;
-import com.platform.order.common.utils.FileUtils;
+import com.platform.order.common.storage.request.UploadFileRequestDto;
+import com.platform.order.common.storage.response.UploadFileResponseDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -58,19 +58,24 @@ public class AwsStorageService {
 		return s3Client.getUrl(bucket, key).toString();
 	}
 
-	public void upload(Map<String, MultipartFile> multipartFiles, FileSuffixPath path) {
+	/**
+	 * fileName,upload path 들을  전달한다
+	 * @param fileRequestDto
+	 * @param path
+	 * @return
+	 */
+	public List<UploadFileResponseDto> upload(List<UploadFileRequestDto> fileRequestDto, FileSuffixPath path) {
+		List<UploadFileResponseDto> fileResponses = new ArrayList<>();
 		List<String> rollbacks = new ArrayList<>();
 
-		for (String fileName : multipartFiles.keySet()) {
+		for (var requestDto : fileRequestDto) {
 			ObjectMetadata objectMetadata = new ObjectMetadata();
-			MultipartFile multipartFile = multipartFiles.get(fileName);
+			MultipartFile multipartFile = requestDto.multipartFile();
 
 			objectMetadata.setContentType(multipartFile.getContentType());
 			objectMetadata.setContentLength(multipartFile.getSize());
 
-			String extension = FileUtils.getExtension(multipartFile.getOriginalFilename());
-
-			String key = generateKey(path, fileName, extension);
+			String key = generateKey(path, requestDto.fileName(), requestDto.extension());
 			try (InputStream inputStream = multipartFile.getInputStream()) {
 				s3Client.putObject(
 					new PutObjectRequest(bucket, key, inputStream, objectMetadata)
@@ -83,8 +88,12 @@ public class AwsStorageService {
 					MessageFormat.format("upload fail : {0}  ", multipartFile.getOriginalFilename()),
 					ErrorCode.FILE_IO
 				);
+			} finally {
+				fileResponses.add(new UploadFileResponseDto(requestDto.fileName(), key, requestDto.extension(), requestDto.multipartFile()));
 			}
 		}
+
+		return fileResponses;
 	}
 
 	public String delete(FileSuffixPath path, String fullFileName) {
@@ -94,7 +103,7 @@ public class AwsStorageService {
 		return suffixUrl + key;
 	}
 
-	public void rollback(List<String> urlKeys) {
+	private void rollback(List<String> urlKeys) {
 		urlKeys.forEach(key -> s3Client.deleteObject(bucket, key));
 	}
 

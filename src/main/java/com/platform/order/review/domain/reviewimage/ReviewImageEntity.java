@@ -1,7 +1,6 @@
-package com.platform.order.product.domain.productimage.entity;
+package com.platform.order.review.domain.reviewimage;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -9,39 +8,36 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.platform.order.common.supperentity.FileBaseEntity;
-import com.platform.order.product.domain.product.entity.ProductEntity;
+import com.platform.order.review.domain.review.ReviewEntity;
 
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "product_image")
+@NoArgsConstructor
+@Table(name = "review_image")
 @Entity
-public class ProductImageEntity extends FileBaseEntity {
+public class ReviewImageEntity extends FileBaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private Long arrangement;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	private ProductEntity product;
+	@ManyToOne
+	private ReviewEntity review;
 
 	@Builder
-	public ProductImageEntity(
+	public ReviewImageEntity(
 		String originName,
 		String fileName,
 		String path,
 		String extension,
-		Long size,
-		Long arrangement,
-		ProductEntity product
+		Long size
 	) {
 		super(originName, fileName, path, extension, size);
-		this.arrangement = arrangement;
-		this.product = product;
+	}
+
+	public void addReview(ReviewEntity review) {
+		this.review = review;
 	}
 }

@@ -7,7 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum FileSuffixPath {
 	PRODUCT_THUMBNAIL("product/thumbnail/"),
-	PRODUCT_IMAGE("product/image/");
+	PRODUCT_IMAGE("product/image/"),
+	REVIEW_IMAGE("review/image/");
 
 	private String path;
 }
