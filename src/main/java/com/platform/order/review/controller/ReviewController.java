@@ -32,7 +32,7 @@ public class ReviewController {
 
 	private final ReviewService reviewService;
 
-	@PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+	@PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
 	public CreateReviewResponseDto create(
 		@AuthenticationPrincipal
 		JwtAuthentication auth,

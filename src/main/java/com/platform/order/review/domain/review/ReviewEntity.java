@@ -40,6 +40,7 @@ public class ReviewEntity extends BaseEntity {
 	@Lob
 	private String content;
 
+	@Builder.Default
 	@OneToMany(mappedBy = "review", cascade = CascadeType.PERSIST, orphanRemoval = true)
 	private Set<ReviewImageEntity> images = new HashSet<>();
 

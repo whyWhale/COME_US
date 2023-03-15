@@ -13,7 +13,7 @@ public class NotFoundResourceException extends RuntimeException{
 
 	@Override
 	public String toString() {
-		return "[FileIOException] " + errorModel;
+		return "[NotFountResource] " + errorModel;
 	}
 
 }
