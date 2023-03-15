@@ -14,6 +14,8 @@ import com.platform.order.order.domain.orderproduct.entity.OrderProductEntity;
 import com.platform.order.review.controller.dto.request.CreateReviewRequestDto;
 import com.platform.order.review.controller.dto.response.CreateReviewResponseDto;
 import com.platform.order.review.controller.dto.response.CreateReviewResponseDto.CreateReviewImageResponseDto;
+import com.platform.order.review.controller.dto.response.UpdateReviewResponseDto;
+import com.platform.order.review.controller.dto.response.UpdateReviewResponseDto.UpdateReviewImageResponseDto;
 import com.platform.order.review.domain.review.ReviewEntity;
 import com.platform.order.review.domain.reviewimage.ReviewImageEntity;
 
@@ -65,6 +67,20 @@ public class ReviewMapper {
 			review.getUserId(),
 			review.getScore(),
 			createReviewImageResponses
+		);
+	}
+
+	public UpdateReviewResponseDto toUpdateReviewResponses(ReviewEntity foundReview) {
+		List<UpdateReviewImageResponseDto> updateReviewImageResponses = foundReview.getImages()
+			.stream()
+			.map(reviewImage -> new UpdateReviewImageResponseDto(reviewImage.getId(), reviewImage.getPath()))
+			.toList();
+
+		return new UpdateReviewResponseDto(
+			foundReview.getId(),
+			foundReview.getScore(),
+			foundReview.getContent(),
+			updateReviewImageResponses
 		);
 	}
 }

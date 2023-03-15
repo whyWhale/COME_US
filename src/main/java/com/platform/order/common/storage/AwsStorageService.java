@@ -89,7 +89,8 @@ public class AwsStorageService {
 					ErrorCode.FILE_IO
 				);
 			} finally {
-				fileResponses.add(new UploadFileResponseDto(requestDto.fileName(), key, requestDto.extension(), requestDto.multipartFile()));
+				fileResponses.add(new UploadFileResponseDto(requestDto.fileName(), key, requestDto.extension(),
+					requestDto.multipartFile()));
 			}
 		}
 
@@ -101,6 +102,12 @@ public class AwsStorageService {
 		s3Client.deleteObject(bucket, key);
 
 		return suffixUrl + key;
+	}
+
+	public void deleteAll(FileSuffixPath path, List<String> fullFileNames) {
+		fullFileNames.stream()
+			.map(fullFileName -> generateKey(path, fullFileName))
+			.forEach(key -> s3Client.deleteObject(bucket, key));
 	}
 
 	private void rollback(List<String> urlKeys) {

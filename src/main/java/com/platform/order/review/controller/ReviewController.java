@@ -9,6 +9,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -18,7 +20,9 @@ import org.springframework.web.multipart.MultipartFile;
 import com.platform.order.common.security.model.JwtAuthentication;
 import com.platform.order.common.validation.Multipart;
 import com.platform.order.review.controller.dto.request.CreateReviewRequestDto;
+import com.platform.order.review.controller.dto.request.UpdateReviewRequestDto;
 import com.platform.order.review.controller.dto.response.CreateReviewResponseDto;
+import com.platform.order.review.controller.dto.response.UpdateReviewResponseDto;
 import com.platform.order.review.service.ReviewService;
 
 import lombok.RequiredArgsConstructor;
@@ -45,8 +49,28 @@ public class ReviewController {
 		@RequestPart(required = false)
 		List<@Multipart MultipartFile> images
 	) {
-
 		return reviewService.create(auth.id(), createReviewRequest, images);
+	}
+
+	@PatchMapping(
+		value = "/{reviewId}",
+		consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+	public UpdateReviewResponseDto upadte(
+		@AuthenticationPrincipal
+		JwtAuthentication auth,
+
+		@PathVariable
+		Long reviewId,
+
+		@Valid
+		@RequestPart
+		UpdateReviewRequestDto updateReviewRequestDto,
+
+		@Size(max = 3)
+		@RequestPart(required = false)
+		List<@Multipart MultipartFile> images
+	) {
+		return reviewService.update(auth.id(),reviewId, updateReviewRequestDto, images);
 	}
 
 }

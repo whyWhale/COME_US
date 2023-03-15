@@ -19,7 +19,9 @@ import com.platform.order.common.storage.response.UploadFileResponseDto;
 import com.platform.order.order.domain.orderproduct.entity.OrderProductEntity;
 import com.platform.order.order.domain.orderproduct.repository.OrderProductRepository;
 import com.platform.order.review.controller.dto.request.CreateReviewRequestDto;
+import com.platform.order.review.controller.dto.request.UpdateReviewRequestDto;
 import com.platform.order.review.controller.dto.response.CreateReviewResponseDto;
+import com.platform.order.review.controller.dto.response.UpdateReviewResponseDto;
 import com.platform.order.review.domain.review.ReviewEntity;
 import com.platform.order.review.domain.review.ReviewRepository;
 import com.platform.order.review.domain.reviewimage.ReviewImageEntity;
@@ -49,12 +51,7 @@ public class ReviewService {
 		ReviewEntity review = reviewMapper.toReview(authId, createReviewRequest, foundOrderProduct);
 
 		if (images != null) {
-			List<UploadFileRequestDto> uploadFileRequests = images.stream()
-				.map(reviewMapper::toUploadFileRequest)
-				.toList();
-			List<UploadFileResponseDto> uploadResponses = awsStorageService.upload(uploadFileRequests, REVIEW_IMAGE);
-			Map<String, UploadFileResponseDto> fileNames = uploadResponses.stream()
-				.collect(toMap(responseDto -> responseDto.multipartFile().getOriginalFilename(), Function.identity()));
+			Map<String, UploadFileResponseDto> fileNames = uploadImages(images);
 			List<ReviewImageEntity> reviewImages = images.stream()
 				.map(multipartFile -> reviewMapper.toReviewImage(fileNames, multipartFile))
 				.toList();
@@ -64,6 +61,42 @@ public class ReviewService {
 		ReviewEntity savedReview = reviewRepository.save(review);
 
 		return reviewMapper.toCreateReviewResponse(savedReview);
+	}
+
+	public UpdateReviewResponseDto update(
+		Long authId,
+		Long reviewId,
+		UpdateReviewRequestDto updateReviewRequestDto,
+		List<MultipartFile> images
+	) {
+		ReviewEntity foundReview = reviewRepository.findByIdWithImage(reviewId, authId)
+			.orElseThrow(() -> new NotFoundResourceException(format("review : {0} is not found", reviewId)));
+
+		foundReview.update(updateReviewRequestDto.score(), updateReviewRequestDto.contents());
+		if (images != null) {
+			List<String> fullFileNames = foundReview.removeImages().stream()
+				.map(ReviewImageEntity::generateFullFileName)
+				.toList();
+
+			awsStorageService.deleteAll(REVIEW_IMAGE, fullFileNames);
+
+			Map<String, UploadFileResponseDto> fileNames = uploadImages(images);
+			List<ReviewImageEntity> reviewImages = images.stream()
+				.map(multipartFile -> reviewMapper.toReviewImage(fileNames, multipartFile))
+				.toList();
+			foundReview.addReviewImage(reviewImages);
+		}
+
+		return reviewMapper.toUpdateReviewResponses(foundReview);
+	}
+
+	private Map<String, UploadFileResponseDto> uploadImages(List<MultipartFile> images) {
+		List<UploadFileRequestDto> uploadFileRequests = images.stream()
+			.map(reviewMapper::toUploadFileRequest)
+			.toList();
+		List<UploadFileResponseDto> uploadResponses = awsStorageService.upload(uploadFileRequests, REVIEW_IMAGE);
+		return uploadResponses.stream()
+			.collect(toMap(responseDto -> responseDto.multipartFile().getOriginalFilename(), Function.identity()));
 	}
 
 }

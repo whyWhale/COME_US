@@ -48,4 +48,18 @@ public class ReviewEntity extends BaseEntity {
 		reviewImages.forEach(reviewImageEntity -> reviewImageEntity.addReview(this));
 		images.addAll(reviewImages);
 	}
+
+	public void update(int score, String contents) {
+		this.score = score;
+		this.content = contents;
+	}
+
+	//
+	public Set<ReviewImageEntity> removeImages() {
+		Set<ReviewImageEntity> removes = this.images;
+
+		this.images.clear();
+
+		return removes;
+	}
 }

@@ -26,7 +26,6 @@ public enum ErrorCode implements ErrorModel {
 	ALREADY_WISH("B004", "already wish product", PRECONDITION_FAILED),
 	ALREADY_USE_COUPON("B006", "coupon is already use", BAD_REQUEST),
 	NOT_VALID_CANCEL("B007", "delivery is not cancel", BAD_REQUEST);
-
 	private final String code;
 	private final String message;
 	private final HttpStatus httpStatus;
