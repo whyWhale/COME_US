@@ -1,11 +1,11 @@
 package com.platform.order.review.domain.review;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -13,7 +13,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Where;
 
-import com.platform.order.common.supperentity.BaseEntity;
+import com.platform.order.common.superentity.BaseEntity;
 import com.platform.order.order.domain.orderproduct.entity.OrderProductEntity;
 import com.platform.order.review.domain.reviewimage.ReviewImageEntity;
 
@@ -32,7 +32,7 @@ import lombok.NoArgsConstructor;
 public class ReviewEntity extends BaseEntity {
 	Long userId;
 
-	@OneToOne
+	@OneToOne(fetch = FetchType.LAZY)
 	private OrderProductEntity orderProduct;
 
 	private int score;
@@ -42,7 +42,7 @@ public class ReviewEntity extends BaseEntity {
 
 	@Builder.Default
 	@OneToMany(mappedBy = "review", cascade = CascadeType.PERSIST, orphanRemoval = true)
-	private Set<ReviewImageEntity> images = new HashSet<>();
+	private List<ReviewImageEntity> images = new ArrayList<>();
 
 	public void addReviewImage(List<ReviewImageEntity> reviewImages) {
 		reviewImages.forEach(reviewImageEntity -> reviewImageEntity.addReview(this));
@@ -54,10 +54,8 @@ public class ReviewEntity extends BaseEntity {
 		this.content = contents;
 	}
 
-	//
-	public Set<ReviewImageEntity> removeImages() {
-		Set<ReviewImageEntity> removes = this.images;
-
+	public List<ReviewImageEntity> removeImages() {
+		List<ReviewImageEntity> removes = this.images;
 		this.images.clear();
 
 		return removes;

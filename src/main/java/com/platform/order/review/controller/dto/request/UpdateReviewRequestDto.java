@@ -14,6 +14,6 @@ public record UpdateReviewRequestDto(
 	Integer score,
 
 	@NotBlank
-	String contents
+	String content
 ) {
 }

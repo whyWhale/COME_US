@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.platform.order.common.pagedto.offset.PageResponseDto;
+import com.platform.order.common.dto.offset.PageResponseDto;
 import com.platform.order.common.security.model.JwtAuthentication;
 import com.platform.order.common.validation.Multipart;
 import com.platform.order.product.controller.dto.request.product.CreateProductRequestDto;

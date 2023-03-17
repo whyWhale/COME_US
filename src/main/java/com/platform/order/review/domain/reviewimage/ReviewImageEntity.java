@@ -1,13 +1,14 @@
 package com.platform.order.review.domain.reviewimage;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import com.platform.order.common.supperentity.FileBaseEntity;
+import com.platform.order.common.superentity.FileBaseEntity;
 import com.platform.order.review.domain.review.ReviewEntity;
 
 import lombok.Builder;
@@ -23,7 +24,7 @@ public class ReviewImageEntity extends FileBaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	private ReviewEntity review;
 
 	@Builder

@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> {
 
 	@Query(value = "select r from ReviewEntity r "
-		+ "left join fetch ReviewImageEntity ri "
+		+ "left join fetch r.images "
 		+ "where r.id =:reviewId and r.userId =:authId")
 	Optional<ReviewEntity> findByIdWithImage(@Param("reviewId") Long reviewId, @Param("authId") Long authId);
 }

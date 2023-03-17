@@ -1,4 +1,4 @@
-package com.platform.order.common.supperentity;
+package com.platform.order.common.superentity;
 
 import java.time.LocalDateTime;
 

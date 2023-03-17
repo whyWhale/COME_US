@@ -19,7 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.platform.order.common.exception.custom.BusinessException;
 import com.platform.order.common.exception.custom.NotFoundResourceException;
 import com.platform.order.common.exception.model.ErrorCode;
-import com.platform.order.common.pagedto.offset.PageResponseDto;
+import com.platform.order.common.dto.offset.PageResponseDto;
 import com.platform.order.common.storage.AwsStorageService;
 import com.platform.order.product.controller.dto.request.product.CreateProductRequestDto;
 import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto;

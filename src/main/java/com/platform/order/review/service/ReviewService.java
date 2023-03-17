@@ -63,6 +63,7 @@ public class ReviewService {
 		return reviewMapper.toCreateReviewResponse(savedReview);
 	}
 
+	@Transactional
 	public UpdateReviewResponseDto update(
 		Long authId,
 		Long reviewId,
@@ -72,7 +73,7 @@ public class ReviewService {
 		ReviewEntity foundReview = reviewRepository.findByIdWithImage(reviewId, authId)
 			.orElseThrow(() -> new NotFoundResourceException(format("review : {0} is not found", reviewId)));
 
-		foundReview.update(updateReviewRequestDto.score(), updateReviewRequestDto.contents());
+		foundReview.update(updateReviewRequestDto.score(), updateReviewRequestDto.content());
 		if (images != null) {
 			List<String> fullFileNames = foundReview.removeImages().stream()
 				.map(ReviewImageEntity::generateFullFileName)

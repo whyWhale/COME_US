@@ -8,7 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import com.platform.order.common.supperentity.FileBaseEntity;
+import com.platform.order.common.superentity.FileBaseEntity;
 import com.platform.order.product.domain.product.entity.ProductEntity;
 
 import lombok.AccessLevel;

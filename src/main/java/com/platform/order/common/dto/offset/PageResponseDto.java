@@ -1,4 +1,4 @@
-package com.platform.order.common.pagedto.offset;
+package com.platform.order.common.dto.offset;
 
 import java.util.List;
 

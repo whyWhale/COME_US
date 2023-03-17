@@ -5,7 +5,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Where;
 
-import com.platform.order.common.supperentity.BaseEntity;
+import com.platform.order.common.superentity.BaseEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

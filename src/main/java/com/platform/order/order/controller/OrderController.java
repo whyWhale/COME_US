@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.platform.order.common.pagedto.cursor.CursorPageResponseDto;
+import com.platform.order.common.dto.cursor.CursorPageResponseDto;
 import com.platform.order.common.security.model.JwtAuthentication;
 import com.platform.order.order.controller.dto.request.CreateOrderRequestDto;
 import com.platform.order.order.controller.dto.request.OrderPageRequestDto;

@@ -6,7 +6,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import com.platform.order.common.supperentity.FileBaseEntity;
+import com.platform.order.common.superentity.FileBaseEntity;
 
 import lombok.AccessLevel;
 import lombok.Builder;

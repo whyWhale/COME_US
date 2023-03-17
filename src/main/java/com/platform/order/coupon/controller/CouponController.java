@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.platform.order.common.pagedto.offset.PageResponseDto;
+import com.platform.order.common.dto.offset.PageResponseDto;
 import com.platform.order.common.security.model.JwtAuthentication;
 import com.platform.order.coupon.controller.dto.request.coupon.CreateCouponRequestDto;
 import com.platform.order.coupon.controller.dto.request.usercoupon.IssueUserCouponRequestDto;

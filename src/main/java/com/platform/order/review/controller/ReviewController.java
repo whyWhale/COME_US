@@ -36,7 +36,7 @@ public class ReviewController {
 
 	private final ReviewService reviewService;
 
-	@PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public CreateReviewResponseDto create(
 		@AuthenticationPrincipal
 		JwtAuthentication auth,
@@ -54,7 +54,7 @@ public class ReviewController {
 
 	@PatchMapping(
 		value = "/{reviewId}",
-		consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+		consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public UpdateReviewResponseDto upadte(
 		@AuthenticationPrincipal
 		JwtAuthentication auth,
@@ -64,13 +64,13 @@ public class ReviewController {
 
 		@Valid
 		@RequestPart
-		UpdateReviewRequestDto updateReviewRequestDto,
+		UpdateReviewRequestDto updateReviewRequest,
 
 		@Size(max = 3)
 		@RequestPart(required = false)
 		List<@Multipart MultipartFile> images
 	) {
-		return reviewService.update(auth.id(),reviewId, updateReviewRequestDto, images);
+		return reviewService.update(auth.id(),reviewId, updateReviewRequest, images);
 	}
 
 }

@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.platform.order.common.pagedto.cursor.CursorPageResponseDto;
+import com.platform.order.common.dto.cursor.CursorPageResponseDto;
 import com.platform.order.order.controller.dto.response.CreateOrderResponseDto;
 import com.platform.order.order.controller.dto.response.ReadMyOrderResponseDto;
 import com.platform.order.order.domain.order.entity.OrderEntity;

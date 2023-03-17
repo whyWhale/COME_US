@@ -12,7 +12,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
-import com.platform.order.common.supperentity.BaseEntity;
+import com.platform.order.common.superentity.BaseEntity;
 import com.platform.order.common.exception.custom.BusinessException;
 import com.platform.order.common.exception.model.ErrorCode;
 import com.platform.order.coupon.domain.usercoupon.entity.UserCouponEntity;

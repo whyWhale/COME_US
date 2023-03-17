@@ -1,4 +1,4 @@
-package com.platform.order.common.pagedto.cursor;
+package com.platform.order.common.dto.cursor;
 
 import javax.validation.constraints.NotNull;
 

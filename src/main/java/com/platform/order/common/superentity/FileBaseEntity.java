@@ -1,4 +1,4 @@
-package com.platform.order.common.supperentity;
+package com.platform.order.common.superentity;
 
 import javax.persistence.MappedSuperclass;
 
