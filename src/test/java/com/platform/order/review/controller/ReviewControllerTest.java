@@ -20,6 +20,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.ResultActions;
@@ -30,6 +31,7 @@ import com.platform.order.common.config.WebSecurityConfig;
 import com.platform.order.common.security.JwtProviderManager;
 import com.platform.order.common.security.constant.JwtConfig;
 import com.platform.order.review.controller.dto.request.CreateReviewRequestDto;
+import com.platform.order.review.controller.dto.request.UpdateReviewRequestDto;
 import com.platform.order.review.service.ReviewService;
 import com.platform.order.security.WithJwtMockUser;
 import com.platform.order.testenv.ControllerTest;
@@ -72,9 +74,7 @@ class ReviewControllerTest extends ControllerTest {
 		ResultActions perform = mockMvc.perform(
 			multipart(URI_PREFIX)
 				.file((MockMultipartFile)mockfile)
-				.file(
-					createReviewRequestJson
-				)
+				.file(createReviewRequestJson)
 				.contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
 		);
 		// then
@@ -97,6 +97,7 @@ class ReviewControllerTest extends ControllerTest {
 			//then
 			perform.andExpect(status().isBadRequest());
 		}
+
 		@DisplayName("createReviewRequest 객체의 orderProductId가 null이면 BadRequest로 응답한다")
 		@Test
 		void failNullOrderProductIdInRequestDto() throws Exception {
@@ -123,7 +124,7 @@ class ReviewControllerTest extends ControllerTest {
 
 		@DisplayName("createReviewRequest 객체의 score가 1미만 6이상이면 BadRequest로 응답한다")
 		@ParameterizedTest(name = "{index}: score {0}")
-		@ValueSource(ints = {-1,0,6})
+		@ValueSource(ints = {-1, 0, 6})
 		void failNullOutRangeScoreInRequestDto(Integer score) throws Exception {
 			//given
 			CreateReviewRequestDto createReviewRequestDto = new CreateReviewRequestDto(1L, null, "");
@@ -148,6 +149,115 @@ class ReviewControllerTest extends ControllerTest {
 		}
 
 		private MockMultipartFile getCreateReviewRequest(CreateReviewRequestDto createReviewRequestDto) throws
+			JsonProcessingException {
+			return new MockMultipartFile(
+				"createReviewRequest",
+				null,
+				APPLICATION_JSON_VALUE,
+				objectMapper.writeValueAsBytes(createReviewRequestDto)
+			);
+		}
+
+		private ResultActions getPerform(MockMultipartFile createReviewRequestJson) throws Exception {
+			return mockMvc.perform(
+				multipart(URI_PREFIX)
+					.file((MockMultipartFile)mockfile)
+					.file(createReviewRequestJson)
+					.contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+			);
+		}
+	}
+
+	@DisplayName("이미지 파일을 포함하여 리뷰를 수정한다.")
+	@Test
+	void update() throws Exception {
+		// given
+		Long reviewId = 1L;
+		UpdateReviewRequestDto updateReviewRequest = new UpdateReviewRequestDto(1L, 3, "test");
+		MockMultipartFile updateReviewRequestJson = new MockMultipartFile(
+			"updateReviewRequest",
+			null,
+			APPLICATION_JSON_VALUE,
+			objectMapper.writeValueAsBytes(updateReviewRequest));
+		// when
+		ResultActions perform = mockMvc.perform(
+			multipart(HttpMethod.PATCH,URI_PREFIX + "/"+reviewId)
+				.file((MockMultipartFile)mockfile)
+				.file(updateReviewRequestJson)
+				.contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+		);
+		// then
+		perform.andExpect(status().isOk());
+	}
+
+	@Nested
+	@DisplayName("리뷰를 수정할 때,")
+	class UpdateReviewValidation {
+		@DisplayName("updateReviewRequest가 null이면 BadRequest로 응답한다")
+		@Test
+		void failNullRequestDto() throws Exception {
+			//given
+			//when
+			ResultActions perform = mockMvc.perform(
+				multipart(URI_PREFIX)
+					.file((MockMultipartFile)mockfile)
+					.contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+			);
+			//then
+			perform.andExpect(status().isBadRequest());
+		}
+
+		@DisplayName("updateReviewRequest 객체의 orderProductId가 null이면 BadRequest로 응답한다")
+		@Test
+		void failNullOrderProductIdInRequestDto() throws Exception {
+			//given
+			UpdateReviewRequestDto updateReviewRequest = new UpdateReviewRequestDto(null, 3, "");
+			MockMultipartFile createReviewRequestJson = getUpdateReviewRequest(updateReviewRequest);
+			//when
+			ResultActions perform = getPerform(createReviewRequestJson);
+			//then
+			perform.andExpect(status().isBadRequest());
+		}
+
+		@DisplayName("updateReviewRequest 객체의 score가 null이면 BadRequest로 응답한다")
+		@Test
+		void failNullScoreInRequestDto() throws Exception {
+			//given
+			UpdateReviewRequestDto updateReviewRequestDto = new UpdateReviewRequestDto(1L, null, "");
+			MockMultipartFile createReviewRequestJson = getUpdateReviewRequest(updateReviewRequestDto);
+			//when
+			ResultActions perform = getPerform(createReviewRequestJson);
+			//then
+			perform.andExpect(status().isBadRequest());
+		}
+
+		@DisplayName("updateReviewRequest 객체의 score가 1미만 6이상이면 BadRequest로 응답한다")
+		@ParameterizedTest(name = "{index}: score {0}")
+		@ValueSource(ints = {-1, 0, 6})
+		void failNullOutRangeScoreInRequestDto(Integer score) throws Exception {
+			//given
+			UpdateReviewRequestDto updateReviewRequestDto = new UpdateReviewRequestDto(1L, null, "");
+			MockMultipartFile createReviewRequestJson = getUpdateReviewRequest(updateReviewRequestDto);
+			//when
+			ResultActions perform = getPerform(createReviewRequestJson);
+			//then
+			perform.andExpect(status().isBadRequest());
+		}
+
+		@DisplayName("updateReviewRequest 객체의 content가 Null 또는 공백많이 들어 있으면 BadRequest로 응답한다")
+		@NullAndEmptySource
+		@ParameterizedTest(name = "{index}:  {0}")
+		void failNullAndEmptyContentInRequestDto(String content) throws Exception {
+			//given
+			UpdateReviewRequestDto createReviewRequestDto = new UpdateReviewRequestDto(1L, 3, content);
+			MockMultipartFile createReviewRequestJson = getUpdateReviewRequest(createReviewRequestDto);
+			//when
+			ResultActions perform = getPerform(createReviewRequestJson);
+			//then
+			perform.andExpect(status().isBadRequest());
+		}
+
+		private MockMultipartFile getUpdateReviewRequest(UpdateReviewRequestDto createReviewRequestDto) throws
 			JsonProcessingException {
 			return new MockMultipartFile(
 				"createReviewRequest",
