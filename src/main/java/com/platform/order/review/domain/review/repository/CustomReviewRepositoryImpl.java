@@ -1,7 +1,7 @@
 package com.platform.order.review.domain.review.repository;
 
 import static com.platform.order.order.domain.orderproduct.entity.QOrderProductEntity.orderProductEntity;
-import static com.platform.order.review.domain.review.QReviewEntity.reviewEntity;
+import static com.platform.order.review.domain.review.entity.QReviewEntity.reviewEntity;
 import static com.platform.order.review.domain.reviewimage.QReviewImageEntity.reviewImageEntity;
 
 import java.util.ArrayList;
