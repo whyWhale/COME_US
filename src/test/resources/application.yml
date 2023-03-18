@@ -27,12 +27,17 @@ security:
   url-pattern-config:
     ignoring:
       GET:
+        - /v3/api-docs/**
+        - /swagger-ui/**
+        - /swagger-ui.html/**
         - /health
         - /api/products/*
-        - /api/products/**
+        - /api/products
+        - /api/reviews/*
       POST:
         - /api/auth/login
         - /api/users
+        - /test/**
       PATCH: [ ]
       PUT: [ ]
       DELETE: [ ]

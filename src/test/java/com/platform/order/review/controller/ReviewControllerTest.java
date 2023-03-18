@@ -1,6 +1,8 @@
 package com.platform.order.review.controller;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -31,12 +33,13 @@ import com.platform.order.common.config.WebSecurityConfig;
 import com.platform.order.common.security.JwtProviderManager;
 import com.platform.order.common.security.constant.JwtConfig;
 import com.platform.order.review.controller.dto.request.CreateReviewRequestDto;
+import com.platform.order.review.controller.dto.request.ReviewPageRequestDto;
 import com.platform.order.review.controller.dto.request.UpdateReviewRequestDto;
 import com.platform.order.review.service.ReviewService;
 import com.platform.order.security.WithJwtMockUser;
 import com.platform.order.testenv.ControllerTest;
+import com.platform.order.utils.ParameterUtils;
 
-@WithJwtMockUser
 @WebMvcTest({ReviewController.class,
 	WebSecurityConfig.class,
 	JwtProviderManager.class,
@@ -49,7 +52,6 @@ class ReviewControllerTest extends ControllerTest {
 
 	ResourceLoader resourceLoader = new DefaultResourceLoader();
 	MultipartFile mockfile;
-
 	List<MultipartFile> mockfiles;
 
 	@BeforeEach
@@ -60,6 +62,7 @@ class ReviewControllerTest extends ControllerTest {
 		mockfiles = Stream.generate(() -> mockfile).limit(5).toList();
 	}
 
+	@WithJwtMockUser
 	@DisplayName("이미지 파일을 포함하여 리뷰를 생성한다.")
 	@Test
 	void create() throws Exception {
@@ -81,6 +84,7 @@ class ReviewControllerTest extends ControllerTest {
 		perform.andExpect(status().isOk());
 	}
 
+	@WithJwtMockUser
 	@Nested
 	@DisplayName("리뷰를 생성할 때, ")
 	class CreateReviewValidation {
@@ -168,6 +172,7 @@ class ReviewControllerTest extends ControllerTest {
 		}
 	}
 
+	@WithJwtMockUser
 	@DisplayName("이미지 파일을 포함하여 리뷰를 수정한다.")
 	@Test
 	void update() throws Exception {
@@ -181,7 +186,7 @@ class ReviewControllerTest extends ControllerTest {
 			objectMapper.writeValueAsBytes(updateReviewRequest));
 		// when
 		ResultActions perform = mockMvc.perform(
-			multipart(HttpMethod.PATCH,URI_PREFIX + "/"+reviewId)
+			multipart(HttpMethod.PATCH, URI_PREFIX + "/" + reviewId)
 				.file((MockMultipartFile)mockfile)
 				.file(updateReviewRequestJson)
 				.contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -190,6 +195,7 @@ class ReviewControllerTest extends ControllerTest {
 		perform.andExpect(status().isOk());
 	}
 
+	@WithJwtMockUser
 	@Nested
 	@DisplayName("리뷰를 수정할 때,")
 	class UpdateReviewValidation {
@@ -274,6 +280,47 @@ class ReviewControllerTest extends ControllerTest {
 					.file(createReviewRequestJson)
 					.contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
 			);
+		}
+	}
+
+	@Test
+	@DisplayName("상품에 해당하는 리뷰들을 조회한다.")
+	void testReadAll() throws Exception {
+		//given
+		Long productId = 1L;
+		ReviewPageRequestDto pageRequest = new ReviewPageRequestDto(1, 10, null, null);
+		var params = new ParameterUtils<ReviewPageRequestDto>()
+			.toMultiValueParams(objectMapper, pageRequest);
+		//when
+		ResultActions perform = mockMvc.perform(
+			get(URI_PREFIX + "/" + productId.toString())
+				.params(params)
+				.contentType(APPLICATION_JSON)
+		);
+		//then
+		perform.andExpect(status().isOk());
+	}
+
+	@Nested
+	@DisplayName("상품에 해당하는 리뷰들을 조회할 때,")
+	class PageRequestValidation {
+		@DisplayName("별점이 1미만 이거나 5를 초과하면 BadRequest 로 응답한다")
+		@ParameterizedTest(name = "{index}: score {0}")
+		@ValueSource(ints = {-1, 6})
+		void testLower1AndGrater5(int score) throws Exception {
+			//given
+			Long productId = 1L;
+			ReviewPageRequestDto pageRequest = new ReviewPageRequestDto(1, 10, score, null);
+			var params = new ParameterUtils<ReviewPageRequestDto>()
+				.toMultiValueParams(objectMapper, pageRequest);
+			//when
+			ResultActions perform = mockMvc.perform(
+				get(URI_PREFIX + "/" + productId.toString())
+					.params(params)
+					.contentType(APPLICATION_JSON)
+			);
+			//then
+			perform.andExpect(status().isBadRequest());
 		}
 	}
 }

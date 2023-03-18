@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,10 +23,11 @@ import com.platform.order.order.domain.orderproduct.repository.OrderProductRepos
 import com.platform.order.product.domain.product.entity.ProductEntity;
 import com.platform.order.product.domain.product.repository.ProductRepository;
 import com.platform.order.review.controller.dto.request.CreateReviewRequestDto;
+import com.platform.order.review.controller.dto.request.ReviewPageRequestDto;
 import com.platform.order.review.controller.dto.request.UpdateReviewRequestDto;
 import com.platform.order.review.controller.dto.response.CreateReviewResponseDto;
-import com.platform.order.review.domain.review.ReviewEntity;
-import com.platform.order.review.domain.review.ReviewRepository;
+import com.platform.order.review.domain.review.entity.ReviewEntity;
+import com.platform.order.review.domain.review.repository.ReviewRepository;
 import com.platform.order.review.domain.reviewimage.ReviewImageRepository;
 import com.platform.order.review.service.ReviewService;
 import com.platform.order.testenv.IntegrationTest;
@@ -48,6 +51,7 @@ public class ReviewIntegrationTest extends IntegrationTest {
 	ResourceLoader resourceLoader = new DefaultResourceLoader();
 	OrderProductEntity orderProduct;
 	MultipartFile mockFile;
+	ProductEntity product;
 
 	@BeforeEach
 	public void setUp() throws IOException {
@@ -55,9 +59,9 @@ public class ReviewIntegrationTest extends IntegrationTest {
 		Resource resource = resourceLoader.getResource("classpath:/static/" + fileName);
 		mockFile = new MockMultipartFile("file", fileName, "image/png", resource.getInputStream());
 
-		ProductEntity product = productRepository.save(ProductEntity.builder()
+		product = productRepository.save(ProductEntity.builder()
 			.name("test 상품")
-			.quantity(10L)
+			.quantity(1000L)
 			.price(1000L)
 			.isDisplay(true)
 			.build());
@@ -115,5 +119,36 @@ public class ReviewIntegrationTest extends IntegrationTest {
 		assertThat(responseDto.score()).isEqualTo(updateRequestDto.score());
 		assertThat(responseDto.content()).isEqualTo(updateRequestDto.content());
 		assertThat(responseDto.reviewImageResponses().size()).isEqualTo(1);
+	}
+
+	@Test
+	@DisplayName("상품에 해당하는 리뷰를 조회한다")
+	void testReadAll() {
+		//given
+		List<OrderProductEntity> orderProducts = orderProductRepository.saveAll(
+			LongStream.rangeClosed(1, 20)
+				.mapToObj(value -> OrderProductEntity.create(product, 2L))
+				.toList()
+		);
+		List<ReviewEntity> reviewEntities = IntStream.range(0, 20)
+			.mapToObj(val -> ReviewEntity.builder()
+				.userId((long)val)
+				.orderProduct(orderProducts.get(val))
+				.content("test" + val)
+				.score(val % 5)
+				.build())
+			.toList();
+		reviewRepository.saveAll(reviewEntities);
+
+		int requestPage=1;
+		int requestSize=10;
+		int expectedTotalPage = (int)Math.ceil((double)reviewEntities.size() / requestSize);
+		ReviewPageRequestDto pageRequest = new ReviewPageRequestDto(requestPage, requestSize, null, null);
+		//when
+		var pageResponse = reviewService.readAll(product.getId(), pageRequest);
+		//then
+		assertThat(pageResponse.getTotalPage()).isEqualTo(expectedTotalPage);
+		assertThat(pageResponse.getPage()).isEqualTo(requestPage);
+		assertThat(pageResponse.getSize()).isEqualTo(requestSize);
 	}
 }
