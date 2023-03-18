@@ -1,4 +1,4 @@
-package com.platform.order.review.domain.review;
+package com.platform.order.review.domain.review.entity;
 
 import java.util.ArrayList;
 import java.util.List;

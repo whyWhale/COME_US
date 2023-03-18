@@ -9,7 +9,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.platform.order.common.superentity.FileBaseEntity;
-import com.platform.order.review.domain.review.ReviewEntity;
+import com.platform.order.review.domain.review.entity.ReviewEntity;
 
 import lombok.Builder;
 import lombok.Getter;

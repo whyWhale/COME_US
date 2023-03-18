@@ -8,10 +8,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.platform.order.common.dto.offset.PageResponseDto;
 import com.platform.order.common.exception.custom.NotFoundResourceException;
 import com.platform.order.common.storage.AwsStorageService;
 import com.platform.order.common.storage.request.UploadFileRequestDto;
@@ -19,12 +21,17 @@ import com.platform.order.common.storage.response.UploadFileResponseDto;
 import com.platform.order.order.domain.orderproduct.entity.OrderProductEntity;
 import com.platform.order.order.domain.orderproduct.repository.OrderProductRepository;
 import com.platform.order.review.controller.dto.request.CreateReviewRequestDto;
+import com.platform.order.review.controller.dto.request.ReviewPageRequestDto;
 import com.platform.order.review.controller.dto.request.UpdateReviewRequestDto;
 import com.platform.order.review.controller.dto.response.CreateReviewResponseDto;
+import com.platform.order.review.controller.dto.response.ReadReviewResponseDto;
 import com.platform.order.review.controller.dto.response.UpdateReviewResponseDto;
-import com.platform.order.review.domain.review.ReviewEntity;
-import com.platform.order.review.domain.review.ReviewRepository;
+import com.platform.order.review.domain.review.entity.ReviewEntity;
+import com.platform.order.review.domain.review.repository.ReviewRepository;
 import com.platform.order.review.domain.reviewimage.ReviewImageEntity;
+import com.platform.order.review.domain.reviewimage.ReviewImageRepository;
+import com.platform.order.user.domain.entity.UserEntity;
+import com.platform.order.user.domain.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,6 +42,8 @@ public class ReviewService {
 	private final AwsStorageService awsStorageService;
 	private final ReviewRepository reviewRepository;
 	private final OrderProductRepository orderProductRepository;
+	private final ReviewImageRepository reviewImageRepository;
+	private final UserRepository userRepository;
 	private final ReviewMapper reviewMapper;
 
 	@Transactional
@@ -98,6 +107,18 @@ public class ReviewService {
 		List<UploadFileResponseDto> uploadResponses = awsStorageService.upload(uploadFileRequests, REVIEW_IMAGE);
 		return uploadResponses.stream()
 			.collect(toMap(responseDto -> responseDto.multipartFile().getOriginalFilename(), Function.identity()));
+	}
+
+	public PageResponseDto<ReadReviewResponseDto> readAll(Long productId, ReviewPageRequestDto pageRequestDto) {
+		Page<ReviewEntity> reviewPage = reviewRepository.findByAllWithSorts(pageRequestDto, productId);
+		List<ReviewEntity> reviews = reviewPage.getContent();
+		List<Long> userIds = reviews.stream()
+			.map(ReviewEntity::getUserId)
+			.toList();
+		Map<Long, String> users = userRepository.findByIdIn(userIds).stream()
+			.collect(toMap(UserEntity::getId, UserEntity::getNickName));
+
+		return reviewMapper.toPageResponseDto(reviewPage, users);
 	}
 
 }

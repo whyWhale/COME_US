@@ -45,7 +45,7 @@ security:
         - /health
         - /api/products/*
         - /api/products
-        - /test/**
+        - /api/reviews/*
       POST:
         - /api/auth/login
         - /api/users

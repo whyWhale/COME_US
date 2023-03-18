@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.platform.order.common.dto.offset.PageResponseDto;
 import com.platform.order.common.storage.request.UploadFileRequestDto;
 import com.platform.order.common.storage.response.UploadFileResponseDto;
 import com.platform.order.common.utils.FileUtils;
@@ -14,9 +16,10 @@ import com.platform.order.order.domain.orderproduct.entity.OrderProductEntity;
 import com.platform.order.review.controller.dto.request.CreateReviewRequestDto;
 import com.platform.order.review.controller.dto.response.CreateReviewResponseDto;
 import com.platform.order.review.controller.dto.response.CreateReviewResponseDto.CreateReviewImageResponseDto;
+import com.platform.order.review.controller.dto.response.ReadReviewResponseDto;
 import com.platform.order.review.controller.dto.response.UpdateReviewResponseDto;
 import com.platform.order.review.controller.dto.response.UpdateReviewResponseDto.UpdateReviewImageResponseDto;
-import com.platform.order.review.domain.review.ReviewEntity;
+import com.platform.order.review.domain.review.entity.ReviewEntity;
 import com.platform.order.review.domain.reviewimage.ReviewImageEntity;
 
 @Component
@@ -81,6 +84,26 @@ public class ReviewMapper {
 			foundReview.getScore(),
 			foundReview.getContent(),
 			updateReviewImageResponses
+		);
+	}
+
+	public PageResponseDto<ReadReviewResponseDto> toPageResponseDto(
+		Page<ReviewEntity> reviewPage,
+		Map<Long, String> users
+	) {
+		List<ReadReviewResponseDto> readReviewResponses = reviewPage.getContent().stream()
+			.map(review -> new ReadReviewResponseDto(
+				users.get(review.getUserId()),
+				review.getScore(),
+				review.getContent(),
+				review.getImages().stream().map(ReviewImageEntity::getPath).toList())
+			).toList();
+
+		return new PageResponseDto<>(
+			reviewPage.getTotalPages(),
+			reviewPage.getPageable().getPageNumber(),
+			reviewPage.getPageable().getPageSize(),
+			readReviewResponses
 		);
 	}
 }

@@ -140,13 +140,19 @@ jacocoTestReport {
         classDirectories.setFrom(
                 files(classDirectories.files.collect {
                     fileTree(dir: it, excludes: [
-                            "**/*Config*",
-                            "**/*Dto*",
-                            "**/*Request*",
-                            "**/*Response*",
-                            "**/*Exception*",
-                            "**/*Security*",
+                            "**/*config*",
+                            "**/*dto*",
+                            "**/*application*",
+                            "**/*request*",
+                            "**/*response*",
+                            "**/*exception*",
+                            "**/*security*",
                             "**/*Mapper*",
+                            "**/*validation*",
+                            "**/*superentity*",
+                            "**/*utils*",
+                            "**/*aop*",
+                            "**/*scheduler*"
                     ] + Qdomains)
                 })
         )
@@ -176,13 +182,13 @@ jacocoTestCoverageVerification {
             }
 
             excludes = [
-                    "**.*Config*",
-                    "**.*Dto*",
-                    "**.*Request*",
-                    "**.*Response*",
-                    "**.*Exception*",
-                    "**.*Security*",
-                    "**.*Mapper*",
+                    "**.*config*",
+                    "**.*dto*",
+                    "**.*request*",
+                    "**.*response*",
+                    "**.*exception*",
+                    "**.*security*",
+                    "**.*property*"
             ] + Qdomains
         }
     }
