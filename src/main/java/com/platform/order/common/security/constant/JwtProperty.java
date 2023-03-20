@@ -7,7 +7,7 @@ import com.platform.order.common.security.model.Token;
 
 @ConstructorBinding
 @ConfigurationProperties(prefix = "jwt")
-public record JwtConfig(
+public record JwtProperty(
 	Token accessToken,
 	Token refreshToken,
 	String issuer,

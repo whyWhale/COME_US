@@ -31,15 +31,25 @@ public class AuthenticationController {
 
 	@Operation(summary = "로그인", description = "사용자가 아이디와 패스워드를 가지고 로그인을 한다.")
 	@PostMapping("/login")
-	public void login(@Valid @RequestBody LoginAuthRequestDto loginDto, HttpServletResponse response) {
+	public void login(
+		@Valid
+		@RequestBody LoginAuthRequestDto loginDto,
+
+		HttpServletResponse response
+	) {
 		LoginAuthResponseDto loginResponse = authService.login(loginDto);
-		loginSuccessHandler.onAuthenticationSuccess(response, loginResponse);
+		loginSuccessHandler.onLoginSuccess(response, loginResponse);
 	}
 
 	@DeleteMapping("/logout")
-	public void logout(@AuthenticationPrincipal JwtAuthentication principal, HttpServletResponse response) {
+	public void logout(
+		@AuthenticationPrincipal
+		JwtAuthentication principal,
+
+		HttpServletResponse response
+	) {
 		LogoutAuthResponseDto logoutResponse = authService.logout(principal.id());
-		logoutSuccessHandler.clearToCookie(response, logoutResponse);
+		logoutSuccessHandler.onLogoutSuccess(response, logoutResponse);
 	}
 
 }

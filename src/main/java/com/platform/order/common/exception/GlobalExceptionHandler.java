@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.platform.order.common.exception.custom.BusinessException;
-import com.platform.order.common.exception.custom.CustomFileIoException;
+import com.platform.order.common.exception.custom.FileIoException;
 import com.platform.order.common.exception.custom.NotFoundResourceException;
 import com.platform.order.common.exception.model.ErrorCode;
 import com.platform.order.common.exception.model.ErrorModel;
@@ -37,8 +37,8 @@ public class GlobalExceptionHandler {
 		return createResponse(ErrorCode.NOT_FOUND_RESOURCES);
 	}
 
-	@ExceptionHandler(CustomFileIoException.class)
-	public ResponseEntity<ErrorResponse<ErrorModel>> handleCustomFileIoException(CustomFileIoException e) {
+	@ExceptionHandler(FileIoException.class)
+	public ResponseEntity<ErrorResponse<ErrorModel>> handleCustomFileIoException(FileIoException e) {
 		log.error("File IO exception occurred : {}", e.toString(), e);
 
 		return createResponse(ErrorCode.FILE_IO);

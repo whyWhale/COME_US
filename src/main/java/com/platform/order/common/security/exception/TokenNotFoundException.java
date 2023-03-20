@@ -1,8 +1,10 @@
 package com.platform.order.common.security.exception;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TokenNotFoundException extends RuntimeException {
-	private TokenNotFoundException() {
-	}
 
 	public TokenNotFoundException(String message) {
 		super(message);

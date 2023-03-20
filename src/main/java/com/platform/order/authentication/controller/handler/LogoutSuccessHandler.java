@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class LogoutSuccessHandler {
 	private final CookieProperty cookieProperty;
 
-	public void clearToCookie(HttpServletResponse response, LogoutAuthResponseDto logoutResponse) {
+	public void onLogoutSuccess(HttpServletResponse response, LogoutAuthResponseDto logoutResponse) {
 		Assert.notNull(logoutResponse.accessTokenHeader(), "access token header is cannot be null");
 		Assert.notNull(logoutResponse.accessTokenHeader(), "refresh token header is cannot be null");
 
@@ -33,9 +33,9 @@ public class LogoutSuccessHandler {
 		return ResponseCookie.from(header, "")
 			.path("/")
 			.httpOnly(true)
-			.maxAge(0)
 			.secure(cookieProperty.secure())
 			.domain(cookieProperty.domain())
+			.maxAge(0)
 			.build();
 	}
 }

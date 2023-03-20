@@ -23,7 +23,7 @@ import com.platform.order.authentication.controller.dto.response.TokenResponseDt
 import com.platform.order.common.exception.custom.BusinessException;
 import com.platform.order.common.exception.custom.NotFoundResourceException;
 import com.platform.order.common.security.JwtProviderManager;
-import com.platform.order.common.security.constant.JwtConfig;
+import com.platform.order.common.security.constant.JwtProperty;
 import com.platform.order.common.security.model.Token;
 import com.platform.order.testenv.ServiceTest;
 import com.platform.order.user.domain.entity.Role;
@@ -47,17 +47,17 @@ class AuthenticationServiceTest extends ServiceTest {
 	@Mock
 	AuthMapper authMapper;
 
-	JwtConfig concreteJwtConfig;
+	JwtProperty concreteJwtProperty;
 
 	@BeforeEach
 	void setJwtConfig() {
-		concreteJwtConfig = new JwtConfig(
+		concreteJwtProperty = new JwtProperty(
 			new Token("access-token", 1000),
 			new Token("refresh-token", 60000),
 			"order-renewal",
 			"secret-key");
 
-		ReflectionTestUtils.setField(authService, "jwtConfig", concreteJwtConfig);
+		ReflectionTestUtils.setField(authService, "jwtConfig", concreteJwtProperty);
 	}
 
 	@Test
@@ -86,14 +86,14 @@ class AuthenticationServiceTest extends ServiceTest {
 
 		LoginAuthResponseDto expectedResponse = new LoginAuthResponseDto(
 			new TokenResponseDto(
-				concreteJwtConfig.accessToken().header(),
+				concreteJwtProperty.accessToken().header(),
 				expectedToken,
-				concreteJwtConfig.accessToken().expirySeconds()
+				concreteJwtProperty.accessToken().expirySeconds()
 			),
 			new TokenResponseDto(
-				concreteJwtConfig.refreshToken().header(),
+				concreteJwtProperty.refreshToken().header(),
 				expectedToken,
-				concreteJwtConfig.refreshToken().expirySeconds()
+				concreteJwtProperty.refreshToken().expirySeconds()
 			)
 		);
 
@@ -102,7 +102,7 @@ class AuthenticationServiceTest extends ServiceTest {
 		given(jwtProviderManager.generateAccessToken(claim)).willReturn(expectedToken);
 		given(jwtProviderManager.generateRefreshToken(savedUserEntity.getId())).willReturn(expectedToken);
 		given(
-			authMapper.toLoginResponse(expectedToken, expectedToken, concreteJwtConfig)
+			authMapper.toLoginResponse(expectedToken, expectedToken, concreteJwtProperty)
 		).willReturn(expectedResponse);
 
 		//when

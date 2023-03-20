@@ -24,7 +24,7 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.platform.order.authentication.controller.dto.request.LoginAuthRequestDto;
 import com.platform.order.common.security.JwtProviderManager;
-import com.platform.order.common.security.constant.JwtConfig;
+import com.platform.order.common.security.constant.JwtProperty;
 import com.platform.order.testenv.IntegrationTest;
 import com.platform.order.security.WithJwtMockUser;
 import com.platform.order.user.domain.entity.Role;
@@ -52,7 +52,7 @@ class AuthenticationIntegrationTest extends IntegrationTest {
 	JwtProviderManager jwtProviderManager;
 
 	@Autowired
-	JwtConfig jwtConfig;
+	JwtProperty jwtProperty;
 
 	@Test
 	@DisplayName("사용자가 로그인한다.")
@@ -80,16 +80,16 @@ class AuthenticationIntegrationTest extends IntegrationTest {
 
 		//then
 		MvcResult result = perform.andExpect(status().isOk())
-			.andExpect(cookie().exists(jwtConfig.accessToken().header()))
-			.andExpect(cookie().maxAge(jwtConfig.accessToken().header(), jwtConfig.accessToken().expirySeconds()))
-			.andExpect(cookie().exists(jwtConfig.refreshToken().header()))
-			.andExpect(cookie().maxAge(jwtConfig.refreshToken().header(), jwtConfig.refreshToken().expirySeconds()))
+			.andExpect(cookie().exists(jwtProperty.accessToken().header()))
+			.andExpect(cookie().maxAge(jwtProperty.accessToken().header(), jwtProperty.accessToken().expirySeconds()))
+			.andExpect(cookie().exists(jwtProperty.refreshToken().header()))
+			.andExpect(cookie().maxAge(jwtProperty.refreshToken().header(), jwtProperty.refreshToken().expirySeconds()))
 			.andReturn();
 
 		Cookie[] cookies = result.getResponse().getCookies();
 
-		String accessToken = getCookieToken(cookies, jwtConfig.accessToken().header());
-		String refreshToken = getCookieToken(cookies, jwtConfig.refreshToken().header());
+		String accessToken = getCookieToken(cookies, jwtProperty.accessToken().header());
+		String refreshToken = getCookieToken(cookies, jwtProperty.refreshToken().header());
 
 		jwtProviderManager.verify(accessToken);
 		jwtProviderManager.verifyRefreshToken(accessToken, refreshToken);
@@ -129,16 +129,16 @@ class AuthenticationIntegrationTest extends IntegrationTest {
 
 		//then
 		MvcResult result = perform.andExpect(status().isOk())
-			.andExpect(cookie().exists(jwtConfig.accessToken().header()))
-			.andExpect(cookie().maxAge(jwtConfig.accessToken().header(), expectedExpirySeconds))
-			.andExpect(cookie().exists(jwtConfig.refreshToken().header()))
-			.andExpect(cookie().maxAge(jwtConfig.refreshToken().header(), expectedExpirySeconds))
+			.andExpect(cookie().exists(jwtProperty.accessToken().header()))
+			.andExpect(cookie().maxAge(jwtProperty.accessToken().header(), expectedExpirySeconds))
+			.andExpect(cookie().exists(jwtProperty.refreshToken().header()))
+			.andExpect(cookie().maxAge(jwtProperty.refreshToken().header(), expectedExpirySeconds))
 			.andReturn();
 
 		Cookie[] cookies = result.getResponse().getCookies();
 
-		String accessToken = getCookieToken(cookies, jwtConfig.accessToken().header());
-		String refreshToken = getCookieToken(cookies, jwtConfig.refreshToken().header());
+		String accessToken = getCookieToken(cookies, jwtProperty.accessToken().header());
+		String refreshToken = getCookieToken(cookies, jwtProperty.refreshToken().header());
 
 		Assertions.assertThatThrownBy(() ->
 			jwtProviderManager.verify(accessToken)

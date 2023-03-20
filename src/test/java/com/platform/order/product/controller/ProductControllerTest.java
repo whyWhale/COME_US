@@ -31,7 +31,7 @@ import org.springframework.util.MultiValueMap;
 
 import com.platform.order.common.config.WebSecurityConfig;
 import com.platform.order.common.security.JwtProviderManager;
-import com.platform.order.common.security.constant.JwtConfig;
+import com.platform.order.common.security.constant.JwtProperty;
 import com.platform.order.product.controller.dto.request.product.CreateProductRequestDto;
 import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto;
 import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto.ProductCondition;
@@ -46,7 +46,7 @@ import com.platform.order.utils.ParameterUtils;
 @WebMvcTest({ProductController.class,
 	WebSecurityConfig.class,
 	JwtProviderManager.class,
-	JwtConfig.class})
+	JwtProperty.class})
 class ProductControllerTest extends ControllerTest {
 
 	final String URI_PREFIX = "/api/products";

@@ -24,7 +24,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.platform.order.common.security.JwtProviderManager.CustomClaim;
 import com.platform.order.common.security.constant.CookieProperty;
-import com.platform.order.common.security.constant.JwtConfig;
+import com.platform.order.common.security.constant.JwtProperty;
 import com.platform.order.common.security.exception.TokenNotFoundException;
 import com.platform.order.common.security.model.JwtAuthentication;
 import com.platform.order.common.security.model.JwtAuthenticationToken;
@@ -35,7 +35,7 @@ import lombok.RequiredArgsConstructor;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 	private final JwtProviderManager jwtProviderManager;
-	private final JwtConfig jwtConfig;
+	private final JwtProperty jwtProperty;
 	private final CookieProperty cookieProperty;
 
 	@Override
@@ -68,7 +68,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		}
 	}
 
-	private void reIssueAccessToken(String accessToken, HttpServletRequest request, HttpServletResponse response) {
+	private void reIssueAccessToken(
+		String accessToken,
+		HttpServletRequest request,
+		HttpServletResponse response
+	) {
 		try {
 			String refreshToken = jwtProviderManager.extractRefreshToken(request);
 			jwtProviderManager.verifyRefreshToken(accessToken, refreshToken);
@@ -78,21 +82,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			JwtAuthenticationToken authenticationToken = createAuthenticationToken(verifiedClaim, request,
 				reIssuedToken);
 
-			ResponseCookie cookie = ResponseCookie.from(
-					jwtConfig.accessToken().header(),
-					reIssuedToken
-				).path("/")
+			ResponseCookie cookie = ResponseCookie.from(jwtProperty.accessToken().header(), reIssuedToken)
+				.path("/")
 				.httpOnly(true)
 				.sameSite(cookieProperty.sameSite().attributeValue())
 				.domain(cookieProperty.domain())
 				.secure(cookieProperty.secure())
-				.maxAge(jwtConfig.refreshToken().expirySeconds())
+				.maxAge(jwtProperty.refreshToken().expirySeconds())
 				.build();
 
 			response.addHeader(SET_COOKIE, cookie.toString());
 			SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 		} catch (EntityNotFoundException | TokenNotFoundException | JWTVerificationException e) {
-			logger.warn("refresh token expire.");
+			logger.warn("refresh token expire. try login");
 		}
 	}
 
@@ -109,7 +111,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 		JwtAuthentication authentication = new JwtAuthentication(claims.userId, accessToken);
 		JwtAuthenticationToken authenticationToken = JwtAuthenticationToken.create(authentication, authorities);
-
 		authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
 		return authenticationToken;

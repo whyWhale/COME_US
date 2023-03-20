@@ -9,8 +9,6 @@ import java.util.stream.Collectors;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
@@ -22,7 +20,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.platform.order.common.security.constant.JwtConfig;
+import com.platform.order.common.security.constant.JwtProperty;
 import com.platform.order.common.security.exception.TokenNotFoundException;
 import com.platform.order.common.security.service.TokenService;
 
@@ -35,17 +33,17 @@ import lombok.NoArgsConstructor;
 @Component
 public class JwtProviderManager {
 
-	private final JwtConfig jwtConfig;
+	private final JwtProperty jwtProperty;
 	private final Algorithm algorithm;
 	private final JWTVerifier jwtVerifier;
 	private final TokenService tokenService;
 
-	public JwtProviderManager(JwtConfig jwtConfig, TokenService tokenService) {
-		this.jwtConfig = jwtConfig;
+	public JwtProviderManager(JwtProperty jwtProperty, TokenService tokenService) {
+		this.jwtProperty = jwtProperty;
 		this.tokenService = tokenService;
-		this.algorithm = Algorithm.HMAC512(jwtConfig.secretKey());
+		this.algorithm = Algorithm.HMAC512(jwtProperty.secretKey());
 		this.jwtVerifier = JWT.require(algorithm)
-			.withIssuer(this.jwtConfig.issuer())
+			.withIssuer(this.jwtProperty.issuer())
 			.build();
 	}
 
@@ -54,9 +52,9 @@ public class JwtProviderManager {
 		Date now = new Date();
 
 		jwtBuilder.withSubject(customClaim.userId.toString());
-		jwtBuilder.withIssuer(this.jwtConfig.issuer());
+		jwtBuilder.withIssuer(this.jwtProperty.issuer());
 		jwtBuilder.withIssuedAt(now);
-		jwtBuilder.withExpiresAt(new Date(now.getTime() + jwtConfig.accessToken().expirySeconds()));
+		jwtBuilder.withExpiresAt(new Date(now.getTime() + jwtProperty.accessToken().expirySeconds()));
 		jwtBuilder.withClaim("userId", customClaim.userId);
 		jwtBuilder.withArrayClaim("roles", customClaim.roles);
 
@@ -67,12 +65,12 @@ public class JwtProviderManager {
 		Date now = new Date();
 
 		JWTCreator.Builder jwtBuilder = JWT.create();
-		jwtBuilder.withIssuer(this.jwtConfig.issuer());
+		jwtBuilder.withIssuer(this.jwtProperty.issuer());
 		jwtBuilder.withIssuedAt(now);
-		jwtBuilder.withExpiresAt(new Date(now.getTime() + jwtConfig.refreshToken().expirySeconds()));
+		jwtBuilder.withExpiresAt(new Date(now.getTime() + jwtProperty.refreshToken().expirySeconds()));
 
 		String token = jwtBuilder.sign(this.algorithm);
-		tokenService.saveRefreshToken(userId, token, jwtConfig.refreshToken().expirySeconds());
+		tokenService.saveRefreshToken(userId, token, jwtProperty.refreshToken().expirySeconds());
 
 		return token;
 	}
@@ -83,10 +81,10 @@ public class JwtProviderManager {
 		}
 
 		return Arrays.stream(request.getCookies())
-			.filter(cookie -> cookie.getName().equals(jwtConfig.refreshToken().header()))
+			.filter(cookie -> cookie.getName().equals(jwtProperty.refreshToken().header()))
 			.findFirst()
 			.map(Cookie::getValue)
-			.orElseThrow(() -> new TokenNotFoundException("access token value null."));
+			.orElseThrow(() -> new TokenNotFoundException("refresh token value null."));
 	}
 
 	public String extractAccessToken(HttpServletRequest request) {
@@ -95,7 +93,7 @@ public class JwtProviderManager {
 		}
 
 		return Arrays.stream(request.getCookies())
-			.filter(cookie -> cookie.getName().equals(jwtConfig.accessToken().header()))
+			.filter(cookie -> cookie.getName().equals(jwtProperty.accessToken().header()))
 			.findFirst()
 			.map(Cookie::getValue)
 			.orElseThrow(() -> new TokenNotFoundException("access token value null."));

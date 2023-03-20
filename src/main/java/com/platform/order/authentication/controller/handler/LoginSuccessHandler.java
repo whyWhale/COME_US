@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class LoginSuccessHandler {
 	private final CookieProperty cookieProperty;
 
-	public void onAuthenticationSuccess(HttpServletResponse response, LoginAuthResponseDto loginResponse) {
+	public void onLoginSuccess(HttpServletResponse response, LoginAuthResponseDto loginResponse) {
 		ResponseCookie accessCookie = createCookie(loginResponse.accessToken());
 		ResponseCookie refreshCookie = createCookie(loginResponse.refreshToken());
 

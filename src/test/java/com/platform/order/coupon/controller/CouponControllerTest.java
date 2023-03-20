@@ -18,17 +18,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.platform.order.common.config.WebSecurityConfig;
 import com.platform.order.common.security.JwtProviderManager;
-import com.platform.order.common.security.constant.JwtConfig;
-import com.platform.order.common.security.service.TokenService;
+import com.platform.order.common.security.constant.JwtProperty;
 import com.platform.order.coupon.controller.dto.request.coupon.CreateCouponRequestDto;
 import com.platform.order.coupon.controller.dto.request.usercoupon.IssueUserCouponRequestDto;
 import com.platform.order.coupon.service.CouponService;
@@ -39,7 +35,7 @@ import com.platform.order.testenv.ControllerTest;
 @WebMvcTest({CouponController.class,
 	WebSecurityConfig.class,
 	JwtProviderManager.class,
-	JwtConfig.class})
+	JwtProperty.class})
 class CouponControllerTest extends ControllerTest {
 	final String URI_PREFIX = "/api/coupons";
 	@MockBean

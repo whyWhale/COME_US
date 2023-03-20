@@ -31,7 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.platform.order.common.config.WebSecurityConfig;
 import com.platform.order.common.security.JwtProviderManager;
-import com.platform.order.common.security.constant.JwtConfig;
+import com.platform.order.common.security.constant.JwtProperty;
 import com.platform.order.review.controller.dto.request.CreateReviewRequestDto;
 import com.platform.order.review.controller.dto.request.ReviewPageRequestDto;
 import com.platform.order.review.controller.dto.request.UpdateReviewRequestDto;
@@ -43,7 +43,7 @@ import com.platform.order.utils.ParameterUtils;
 @WebMvcTest({ReviewController.class,
 	WebSecurityConfig.class,
 	JwtProviderManager.class,
-	JwtConfig.class})
+	JwtProperty.class})
 class ReviewControllerTest extends ControllerTest {
 	final String URI_PREFIX = "/api/reviews";
 

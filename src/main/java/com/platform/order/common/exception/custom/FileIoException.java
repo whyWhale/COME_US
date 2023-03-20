@@ -3,10 +3,10 @@ package com.platform.order.common.exception.custom;
 import com.platform.order.common.exception.model.ErrorCode;
 import com.platform.order.common.exception.model.ErrorModel;
 
-public class CustomFileIoException extends RuntimeException {
+public class FileIoException extends RuntimeException {
 	private final ErrorModel errorModel;
 
-	public CustomFileIoException(String message) {
+	public FileIoException(String message) {
 		super(message);
 		this.errorModel = ErrorCode.FILE_IO;
 	}

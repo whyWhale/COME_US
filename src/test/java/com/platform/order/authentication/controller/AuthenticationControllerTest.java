@@ -17,10 +17,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.platform.order.authentication.controller.dto.request.LoginAuthRequestDto;
 import com.platform.order.authentication.controller.dto.response.LoginAuthResponseDto;
 import com.platform.order.authentication.controller.dto.response.LogoutAuthResponseDto;
@@ -30,8 +28,7 @@ import com.platform.order.authentication.controller.handler.LogoutSuccessHandler
 import com.platform.order.authentication.service.AuthService;
 import com.platform.order.common.config.WebSecurityConfig;
 import com.platform.order.common.security.JwtProviderManager;
-import com.platform.order.common.security.constant.JwtConfig;
-import com.platform.order.common.security.service.TokenService;
+import com.platform.order.common.security.constant.JwtProperty;
 import com.platform.order.security.WithJwtMockUser;
 import com.platform.order.testenv.ControllerTest;
 import com.platform.order.user.domain.entity.Role;
@@ -43,13 +40,13 @@ import com.platform.order.user.domain.entity.UserEntity;
 	LoginSuccessHandler.class,
 	LogoutSuccessHandler.class,
 	LogoutSuccessHandler.class,
-	JwtConfig.class})
+	JwtProperty.class})
 class AuthenticationControllerTest extends ControllerTest {
 
 	static final String URI_PREFIX = "/api/auth";
 
 	@Autowired
-	JwtConfig jwtConfig;
+	JwtProperty jwtProperty;
 
 	@Autowired
 	LoginSuccessHandler loginSuccessHandler;
@@ -101,8 +98,8 @@ class AuthenticationControllerTest extends ControllerTest {
 	void testLogout() throws Exception {
 		//given
 		var logoutResponse = new LogoutAuthResponseDto(
-			jwtConfig.accessToken().header(),
-			jwtConfig.refreshToken().header());
+			jwtProperty.accessToken().header(),
+			jwtProperty.refreshToken().header());
 
 		given(authService.logout(any())).willReturn(logoutResponse);
 		//when
@@ -111,10 +108,10 @@ class AuthenticationControllerTest extends ControllerTest {
 		);
 		//then
 		perform.andExpect(status().isOk())
-			.andExpect(cookie().exists(jwtConfig.accessToken().header()))
-			.andExpect(cookie().maxAge(jwtConfig.accessToken().header(), 0))
-			.andExpect(cookie().exists(jwtConfig.refreshToken().header()))
-			.andExpect(cookie().maxAge(jwtConfig.refreshToken().header(), 0));
+			.andExpect(cookie().exists(jwtProperty.accessToken().header()))
+			.andExpect(cookie().maxAge(jwtProperty.accessToken().header(), 0))
+			.andExpect(cookie().exists(jwtProperty.refreshToken().header()))
+			.andExpect(cookie().maxAge(jwtProperty.refreshToken().header(), 0));
 		verify(authService, times(1)).logout(any());
 	}
 

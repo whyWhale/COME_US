@@ -21,14 +21,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.platform.order.common.security.JwtAuthenticationFilter;
 import com.platform.order.common.security.JwtProviderManager;
 import com.platform.order.common.security.constant.CookieProperty;
-import com.platform.order.common.security.constant.JwtConfig;
+import com.platform.order.common.security.constant.JwtProperty;
 import com.platform.order.common.security.constant.SecurityUrlProperty;
 
 import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor
-@EnableConfigurationProperties({SecurityUrlProperty.class, JwtConfig.class, CookieProperty.class})
+@EnableConfigurationProperties({SecurityUrlProperty.class, JwtProperty.class, CookieProperty.class})
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
 public class WebSecurityConfig {
@@ -36,7 +36,7 @@ public class WebSecurityConfig {
 	private final JwtProviderManager jwtProviderManager;
 	private final CookieProperty cookieProperty;
 	private final SecurityUrlProperty securityUrlProperty;
-	private final JwtConfig jwtConfig;
+	private final JwtProperty jwtProperty;
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -89,7 +89,7 @@ public class WebSecurityConfig {
 			.authenticationEntryPoint(authenticationEntryPoint())
 			.and()
 			.addFilterBefore(
-				new JwtAuthenticationFilter(jwtProviderManager, jwtConfig, cookieProperty),
+				new JwtAuthenticationFilter(jwtProviderManager, jwtProperty, cookieProperty),
 				UsernamePasswordAuthenticationFilter.class
 			).cors();
 

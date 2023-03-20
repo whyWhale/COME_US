@@ -5,24 +5,30 @@ import org.springframework.stereotype.Component;
 import com.platform.order.authentication.controller.dto.response.LoginAuthResponseDto;
 import com.platform.order.authentication.controller.dto.response.LogoutAuthResponseDto;
 import com.platform.order.authentication.controller.dto.response.TokenResponseDto;
-import com.platform.order.common.security.constant.JwtConfig;
+import com.platform.order.common.security.constant.JwtProperty;
 
 @Component
 public class AuthMapper {
 
-	public LoginAuthResponseDto toLoginResponse(String accessToken, String refreshToken, JwtConfig jwtConfig) {
+	public LoginAuthResponseDto toLoginResponse(String accessToken, String refreshToken, JwtProperty jwtProperty) {
 		return new LoginAuthResponseDto(
-			new TokenResponseDto(jwtConfig.accessToken().header(),
-				accessToken,
-				jwtConfig.accessToken().expirySeconds()),
 			new TokenResponseDto(
-				jwtConfig.refreshToken().header(),
+				jwtProperty.accessToken().header(),
+				accessToken,
+				jwtProperty.accessToken().expirySeconds()
+			),
+			new TokenResponseDto(
+				jwtProperty.refreshToken().header(),
 				refreshToken,
-				jwtConfig.refreshToken().expirySeconds())
+				jwtProperty.refreshToken().expirySeconds()
+			)
 		);
 	}
 
-	public LogoutAuthResponseDto toLogoutResponse(JwtConfig jwtConfig) {
-		return new LogoutAuthResponseDto(jwtConfig.accessToken().header(), jwtConfig.refreshToken().header());
+	public LogoutAuthResponseDto toLogoutResponse(JwtProperty jwtProperty) {
+		return new LogoutAuthResponseDto(
+			jwtProperty.accessToken().header(),
+			jwtProperty.refreshToken().header()
+		);
 	}
 }
