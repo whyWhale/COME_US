@@ -444,4 +444,26 @@ class ProductServiceTest extends ServiceTest {
 		verify(userProductRepository, times(1)).delete(wishUserProduct);
 		verify(productRedisService, times(1)).decreaseWishCount(wishUserProduct.getProduct().getId());
 	}
+
+	@Test
+	@DisplayName("찜이 가장 많은 상품 10개를 조회한다")
+	void testGetMaximumWishProducts() {
+		//given
+		given(productRedisService.getMaximumWishProducts()).willReturn(List.of());
+		//when
+		productService.getMaximumWishProducts();
+		//then
+		verify(productRedisService,times(1)).getMaximumWishProducts();
+	}
+
+	@Test
+	@DisplayName("조회수가 가장 많은 상품 10개를 조회한다")
+	void testGetMaximumReadProducts() {
+		//given
+		given(productRedisService.getMaximumReadProducts()).willReturn(List.of());
+		//when
+		productService.getMaximumReadProducts();
+		//then
+		verify(productRedisService,times(1)).getMaximumReadProducts();
+	}
 }

@@ -47,17 +47,17 @@ class AuthenticationServiceTest extends ServiceTest {
 	@Mock
 	AuthMapper authMapper;
 
-	JwtProperty concreteJwtProperty;
+	JwtProperty jwtProperty;
 
 	@BeforeEach
 	void setJwtConfig() {
-		concreteJwtProperty = new JwtProperty(
+		jwtProperty = new JwtProperty(
 			new Token("access-token", 1000),
 			new Token("refresh-token", 60000),
 			"order-renewal",
 			"secret-key");
 
-		ReflectionTestUtils.setField(authService, "jwtConfig", concreteJwtProperty);
+		ReflectionTestUtils.setField(authService, "jwtProperty", jwtProperty);
 	}
 
 	@Test
@@ -86,14 +86,14 @@ class AuthenticationServiceTest extends ServiceTest {
 
 		LoginAuthResponseDto expectedResponse = new LoginAuthResponseDto(
 			new TokenResponseDto(
-				concreteJwtProperty.accessToken().header(),
+				jwtProperty.accessToken().header(),
 				expectedToken,
-				concreteJwtProperty.accessToken().expirySeconds()
+				jwtProperty.accessToken().expirySeconds()
 			),
 			new TokenResponseDto(
-				concreteJwtProperty.refreshToken().header(),
+				jwtProperty.refreshToken().header(),
 				expectedToken,
-				concreteJwtProperty.refreshToken().expirySeconds()
+				jwtProperty.refreshToken().expirySeconds()
 			)
 		);
 
@@ -102,7 +102,7 @@ class AuthenticationServiceTest extends ServiceTest {
 		given(jwtProviderManager.generateAccessToken(claim)).willReturn(expectedToken);
 		given(jwtProviderManager.generateRefreshToken(savedUserEntity.getId())).willReturn(expectedToken);
 		given(
-			authMapper.toLoginResponse(expectedToken, expectedToken, concreteJwtProperty)
+			authMapper.toLoginResponse(expectedToken, expectedToken, jwtProperty)
 		).willReturn(expectedResponse);
 
 		//when

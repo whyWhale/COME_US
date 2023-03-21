@@ -1,16 +1,18 @@
 package com.platform.order.product.service;
 
-import static com.platform.order.product.service.redis.ProductRedisManager.SET_VIEW;
-import static com.platform.order.product.service.redis.ProductRedisManager.SORTED_SET_WISH;
+import static com.platform.order.product.service.redis.ProductRedisKeyManager.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,13 @@ class ProductRedisServiceTest extends IntegrationTest {
 
 	@Autowired
 	RedisTemplate<String, String> redisTemplate;
+
+	@AfterEach
+	public void setDown() {
+		redisTemplate.delete(SORTED_SET_WISH.getKey());
+		redisTemplate.delete(SORTED_SET_VIEW.getKey());
+		redisTemplate.delete(SET_VIEW.getKey());
+	}
 
 	@Test
 	@DisplayName("찜 상품 1 카운팅하기")
@@ -126,5 +135,43 @@ class ProductRedisServiceTest extends IntegrationTest {
 		Set<String> members = redisTemplate.opsForSet().members(key);
 		assertThat(members).isNotNull();
 		assertThat(members).hasSize(1);
+	}
+
+	@Test
+	@DisplayName("가장 많은 찜 상품 10개 가져오기")
+	void testGetMaximumWishProducts() {
+		//given
+		List<Long> productIds = LongStream.rangeClosed(1, 20)
+			.boxed()
+			.collect(Collectors.toList());
+		productIds.forEach(productId -> {
+			long wishCount = productId;
+			redisTemplate.opsForZSet().incrementScore(SORTED_SET_WISH.getKey(), productId.toString(), wishCount);
+		});
+		List<Long> expectedProductIds = productIds.subList(10, productIds.size());
+		//when
+		List<Long> maximumWishProduct = productRedisService.getMaximumWishProducts();
+		//then
+		assertThat(maximumWishProduct.size()).isEqualTo(10);
+		assertThat(maximumWishProduct).containsAll(expectedProductIds);
+	}
+
+	@Test
+	@DisplayName("가장 많은 조회수를 가진 상품 10개 가져오기")
+	void testGetMaximumReadProducts() {
+		//given
+		List<Long> productIds = LongStream.rangeClosed(1, 20)
+			.boxed()
+			.collect(Collectors.toList());
+		productIds.forEach(productId -> {
+			long readCount = productId;
+			redisTemplate.opsForZSet().incrementScore(SORTED_SET_WISH.getKey(), productId.toString(), readCount);
+		});
+		List<Long> expectedProductIds = productIds.subList(10, productIds.size());
+		//when
+		List<Long> maximumWishProduct = productRedisService.getMaximumReadProducts();
+		//then
+		assertThat(maximumWishProduct.size()).isEqualTo(10);
+		assertThat(maximumWishProduct).containsAll(expectedProductIds);
 	}
 }
