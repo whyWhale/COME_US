@@ -16,10 +16,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.platform.order.common.dto.offset.PageResponseDto;
 import com.platform.order.common.exception.custom.BusinessException;
 import com.platform.order.common.exception.custom.NotFoundResourceException;
 import com.platform.order.common.exception.model.ErrorCode;
-import com.platform.order.common.dto.offset.PageResponseDto;
 import com.platform.order.common.storage.AwsStorageService;
 import com.platform.order.product.controller.dto.request.product.CreateProductRequestDto;
 import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto;
@@ -28,6 +28,8 @@ import com.platform.order.product.controller.dto.request.userproduct.WishUserPro
 import com.platform.order.product.controller.dto.response.product.CreateProductImagesResponseDto;
 import com.platform.order.product.controller.dto.response.product.CreateProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.CreateThumbnailResponseDto;
+import com.platform.order.product.controller.dto.response.product.RankingReadProductResponseDto;
+import com.platform.order.product.controller.dto.response.product.RankingWishProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadAllProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.UpdateProductImageResponseDto;
@@ -343,6 +345,20 @@ public class ProductService {
 		List<ProductImageEntity> productImageEntities = imageRepository.saveAllInBulk(productImages);
 
 		return productMapper.toUpdateProductImageResponseDtos(productImageEntities);
+	}
+
+	public List<RankingWishProductResponseDto> getMaximumWishProducts() {
+		List<Long> productIds = productRedisService.getMaximumWishProducts();
+		List<ProductEntity> rankingProducts = productRepository.findByIdInWithCategoryAndThumbnail(productIds);
+
+		return productMapper.toRankingWishProductResponses(rankingProducts);
+	}
+
+	public List<RankingReadProductResponseDto> getMaximumReadProducts() {
+		List<Long> productIds = productRedisService.getMaximumReadProducts();
+		List<ProductEntity> rankingProducts = productRepository.findByIdInWithCategoryAndThumbnail(productIds);
+
+		return productMapper.toRankingReadProductResponses(rankingProducts);
 	}
 
 	private ProductEntity getProduct(Long productId) {

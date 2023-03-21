@@ -13,6 +13,8 @@ import com.platform.order.product.controller.dto.request.product.UpdateProductRe
 import com.platform.order.product.controller.dto.response.product.CreateProductImagesResponseDto;
 import com.platform.order.product.controller.dto.response.product.CreateProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.CreateThumbnailResponseDto;
+import com.platform.order.product.controller.dto.response.product.RankingReadProductResponseDto;
+import com.platform.order.product.controller.dto.response.product.RankingWishProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadAllProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.UpdateProductImageResponseDto;
@@ -37,7 +39,8 @@ public class ProductMapper {
 	}
 
 	public CreateThumbnailResponseDto toCreateThumbnailResponse(ProductThumbnailEntity thumbnail) {
-		return new CreateThumbnailResponseDto(thumbnail.getFileName(), thumbnail.getOriginName(), thumbnail.getExtension(),
+		return new CreateThumbnailResponseDto(thumbnail.getFileName(), thumbnail.getOriginName(),
+			thumbnail.getExtension(),
 			thumbnail.getPath(), thumbnail.getSize());
 	}
 
@@ -181,5 +184,27 @@ public class ProductMapper {
 			.wisher(auth)
 			.product(foundProduct)
 			.build();
-	};
+	}
+
+	public List<RankingWishProductResponseDto> toRankingWishProductResponses(List<ProductEntity> rankingProducts) {
+		return rankingProducts.stream()
+			.map(product -> new RankingWishProductResponseDto(
+				product.getId(),
+				product.getName(),
+				product.getPrice(),
+				product.getCategory().getCode(),
+				product.getProductThumbnail().getPath()
+			)).toList();
+	}
+
+	public List<RankingReadProductResponseDto> toRankingReadProductResponses(List<ProductEntity> rankingProducts) {
+		return rankingProducts.stream()
+			.map(product -> new RankingReadProductResponseDto(
+				product.getId(),
+				product.getName(),
+				product.getPrice(),
+				product.getCategory().getCode(),
+				product.getProductThumbnail().getPath()
+			)).toList();
+	}
 }

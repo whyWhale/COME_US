@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum ProductRedisManager {
+public enum ProductRedisKeyManager {
 	// sortedSet key
 	SORTED_SET_WISH("ss_product::wishCount"),
 	SORTED_SET_VIEW("ss_product::viewCount"),

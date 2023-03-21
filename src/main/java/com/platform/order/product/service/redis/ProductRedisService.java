@@ -1,7 +1,8 @@
 package com.platform.order.product.service.redis;
 
-import static com.platform.order.product.service.redis.ProductRedisManager.*;
+import static com.platform.order.product.service.redis.ProductRedisKeyManager.*;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -43,7 +44,20 @@ public class ProductRedisService {
 		}
 	}
 
-	private String generateKey(ProductRedisManager redisKey, Long productId) {
+	public List<Long> getMaximumWishProducts(){
+		return redisTemplate.opsForZSet().reverseRange(SORTED_SET_WISH.getKey(), 0,9).stream()
+			.map(Long::parseLong)
+			.toList();
+	}
+
+	public List<Long> getMaximumReadProducts(){
+		return redisTemplate.opsForZSet().reverseRange(SORTED_SET_WISH.getKey(), 0,9).stream()
+			.map(Long::parseLong)
+			.toList();
+	}
+
+
+	private String generateKey(ProductRedisKeyManager redisKey, Long productId) {
 		return redisKey.getKey() + productId;
 	}
 

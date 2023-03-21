@@ -25,6 +25,11 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long>, C
 	);
 
 	List<ProductEntity> findByIdIn(List<Long> ids);
+	@Query(value = "select p from ProductEntity p "
+		+ "join fetch p.category c "
+		+ "join fetch p.productThumbnail t "
+		+ "where p.id in :ids")
+	List<ProductEntity> findByIdInWithCategoryAndThumbnail(List<Long> ids);
 
 	@Query(value = "select p from ProductEntity p "
 		+ "join fetch p.category c "

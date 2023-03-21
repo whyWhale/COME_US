@@ -30,6 +30,8 @@ import com.platform.order.product.controller.dto.request.userproduct.WishUserPro
 import com.platform.order.product.controller.dto.response.product.CreateProductImagesResponseDto;
 import com.platform.order.product.controller.dto.response.product.CreateProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.CreateThumbnailResponseDto;
+import com.platform.order.product.controller.dto.response.product.RankingReadProductResponseDto;
+import com.platform.order.product.controller.dto.response.product.RankingWishProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadAllProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.UpdateProductImageResponseDto;
@@ -69,8 +71,8 @@ public class ProductController {
 		JwtAuthentication principal,
 		@Multipart
 		@RequestPart
-		MultipartFile thumbnail) {
-
+		MultipartFile thumbnail
+	) {
 		return productService.createThumbnail(productId, principal.id(), thumbnail);
 	}
 
@@ -86,8 +88,8 @@ public class ProductController {
 		@Valid
 		@Size(min = 3, max = 10)
 		@RequestPart
-		List<@Valid @Multipart MultipartFile> images) {
-
+		List<@Valid @Multipart MultipartFile> images
+	) {
 		return productService.createImages(productId, principal.id(), images);
 	}
 
@@ -102,8 +104,8 @@ public class ProductController {
 		UpdateProductRequestDto updateProductRequest,
 
 		@PathVariable
-		Long productId) {
-
+		Long productId
+	) {
 		return productService.update(principal.id(), productId, updateProductRequest);
 	}
 
@@ -117,8 +119,8 @@ public class ProductController {
 		JwtAuthentication principal,
 
 		@RequestPart
-		MultipartFile thumbnail) {
-
+		MultipartFile thumbnail
+	) {
 		return productService.updateThumbnail(productId, principal.id(), thumbnail);
 	}
 
@@ -134,8 +136,8 @@ public class ProductController {
 		@Valid
 		@Size(min = 3, max = 10)
 		@RequestPart
-		List<@Valid @Multipart MultipartFile> images) {
-
+		List<@Valid @Multipart MultipartFile> images
+	) {
 		return productService.updateImages(productId, principal.id(), images);
 	}
 
@@ -146,7 +148,8 @@ public class ProductController {
 		JwtAuthentication principal,
 
 		@PathVariable
-		Long productId) {
+		Long productId
+	) {
 
 		return productService.delete(productId, principal.id());
 	}
@@ -165,8 +168,8 @@ public class ProductController {
 	@GetMapping
 	public PageResponseDto<ReadAllProductResponseDto> readAll(
 		@Valid
-		ProductPageRequestDto pageRequest) {
-
+		ProductPageRequestDto pageRequest
+	) {
 		return productService.readAll(pageRequest);
 	}
 
@@ -204,5 +207,15 @@ public class ProductController {
 		Long userProductId) {
 
 		return productService.unWishProduct(principal.id(), userProductId);
+	}
+
+	@GetMapping("/ranking/wish")
+	public List<RankingWishProductResponseDto> getMaximumWishProducts() {
+		return productService.getMaximumWishProducts();
+	}
+
+	@GetMapping("/ranking/read")
+	public List<RankingReadProductResponseDto> getMaximumReadProducts() {
+		return productService.getMaximumReadProducts();
 	}
 }
