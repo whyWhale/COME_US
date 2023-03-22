@@ -19,6 +19,7 @@ import com.platform.order.coupon.domain.coupon.repository.CouponRepository;
 import com.platform.order.coupon.domain.usercoupon.entity.UserCouponEntity;
 import com.platform.order.coupon.domain.usercoupon.repository.UserCouponRepository;
 import com.platform.order.order.controller.dto.request.CreateOrderRequestDto;
+import com.platform.order.order.controller.dto.request.Location;
 import com.platform.order.order.controller.dto.response.CreateOrderResponseDto;
 import com.platform.order.order.domain.order.entity.OrderEntity;
 import com.platform.order.order.domain.order.repository.OrderRepository;
@@ -57,8 +58,9 @@ public class OrderIntegrationTest extends IntegrationTest {
 	ProductEntity product;
 	UserEntity user;
 	UserCouponEntity userCoupon;
-	String address = "서울특별시 강남구 강남동";
+	String address = "서울특별시 강남구 대치동";
 	String zipCode = "123-12";
+	Location location = new Location("서울특별시", "강남구", "대치동");
 
 	@BeforeEach
 	public void setUp() {
@@ -112,7 +114,7 @@ public class OrderIntegrationTest extends IntegrationTest {
 		void testOrder() {
 			//given
 			var orderProductRequest = new OrderProductRequestDto(product.getId(), orderQuantity, null);
-			var requestDto = new CreateOrderRequestDto(address, zipCode, List.of(orderProductRequest));
+			var requestDto = new CreateOrderRequestDto(address, zipCode, List.of(orderProductRequest), location);
 			//when
 			CreateOrderResponseDto createOrderResponse = orderService.order(user.getId(), requestDto);
 			// then
@@ -129,7 +131,7 @@ public class OrderIntegrationTest extends IntegrationTest {
 		void testOrderWithCoupon() {
 			//given
 			var orderProductRequest = new OrderProductRequestDto(product.getId(), orderQuantity, userCoupon.getId());
-			var requestDto = new CreateOrderRequestDto(address, zipCode, List.of(orderProductRequest));
+			var requestDto = new CreateOrderRequestDto(address, zipCode, List.of(orderProductRequest),location);
 			//when
 			CreateOrderResponseDto createOrderResponse = orderService.order(user.getId(), requestDto);
 			// then

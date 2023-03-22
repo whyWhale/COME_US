@@ -29,6 +29,7 @@ import com.platform.order.common.security.JwtProviderManager;
 import com.platform.order.common.security.constant.JwtProperty;
 import com.platform.order.order.controller.dto.request.CreateOrderRequestDto;
 import com.platform.order.order.controller.dto.request.CreateOrderRequestDto.OrderProductRequestDto;
+import com.platform.order.order.controller.dto.request.Location;
 import com.platform.order.order.controller.dto.request.OrderPageRequestDto;
 import com.platform.order.order.service.OrderService;
 import com.platform.order.security.WithJwtMockUser;
@@ -47,8 +48,9 @@ class OrderControllerTest extends ControllerTest {
 	OrderService orderService;
 
 	Long buyingProductId = 1L;
-	String address = "서울특별시 강남구 강남동";
+	String address = "서울특별시 강남구 대치동";
 	String zipCode = "123-12";
+	Location location = new Location("서울특별시", "강남구", "대치동");
 
 	@Test
 	@DisplayName("상품을 주문한다.")
@@ -56,7 +58,7 @@ class OrderControllerTest extends ControllerTest {
 		//given
 		Long orderQuantity = 1L;
 		var orderProductsRequest = new OrderProductRequestDto(buyingProductId, orderQuantity, null);
-		var requestDto = new CreateOrderRequestDto(address, zipCode, List.of(orderProductsRequest));
+		var requestDto = new CreateOrderRequestDto(address, zipCode, List.of(orderProductsRequest), location);
 		//when
 		ResultActions perform = mockMvc.perform(
 			post(URI_PREFIX)
@@ -83,7 +85,7 @@ class OrderControllerTest extends ControllerTest {
 		void failOrderWithNotContainOrderProductRequest() throws Exception {
 			//given
 			List<OrderProductRequestDto> orderProductsRequest = List.of();
-			CreateOrderRequestDto requestDto = new CreateOrderRequestDto(address, zipCode, orderProductsRequest);
+			CreateOrderRequestDto requestDto = new CreateOrderRequestDto(address, zipCode, orderProductsRequest, location);
 			//when
 			ResultActions perform = getPerform(requestDto);
 			//then
@@ -97,7 +99,7 @@ class OrderControllerTest extends ControllerTest {
 		void failOrderWithInvalidAddress(String invalidAddress) throws Exception {
 			//given
 			OrderProductRequestDto orderProductRequest = new OrderProductRequestDto(buyingProductId, 1L, null);
-			var requestDto = new CreateOrderRequestDto(invalidAddress, zipCode, List.of(orderProductRequest));
+			var requestDto = new CreateOrderRequestDto(invalidAddress, zipCode, List.of(orderProductRequest),location);
 			//when
 			ResultActions perform = getPerform(requestDto);
 			//then
@@ -111,7 +113,7 @@ class OrderControllerTest extends ControllerTest {
 		void failOrderWithInvalidZipCode(String invalidZipCode) throws Exception {
 			//given
 			OrderProductRequestDto orderProductRequest = new OrderProductRequestDto(buyingProductId, 1L, null);
-			var requestDto = new CreateOrderRequestDto(address, invalidZipCode, List.of(orderProductRequest));
+			var requestDto = new CreateOrderRequestDto(address, invalidZipCode, List.of(orderProductRequest),location);
 			//when
 			ResultActions perform = getPerform(requestDto);
 			//then
@@ -124,7 +126,7 @@ class OrderControllerTest extends ControllerTest {
 		void failOrderWithInvalidOrderProduct(Long productId, Long orderQuantity) throws Exception {
 			//given
 			var orderProductsRequest = new OrderProductRequestDto(productId, orderQuantity, null);
-			var requestDto = new CreateOrderRequestDto(address, zipCode, List.of(orderProductsRequest));
+			var requestDto = new CreateOrderRequestDto(address, zipCode, List.of(orderProductsRequest),location);
 			//when
 			ResultActions perform = getPerform(requestDto);
 			//then
@@ -278,20 +280,20 @@ class OrderControllerTest extends ControllerTest {
 		);
 		//then
 		perform.andExpect(status().isOk());
-		verify(orderService,times(1)).cancel(any(),any());
+		verify(orderService, times(1)).cancel(any(), any());
 	}
 
 	@Test
 	@DisplayName("주문을 취소할때 주문상품 식별자가 음수이면 BadRequest로 응답한다")
 	void failCancelWithNegativeValue() throws Exception {
-	    //given
+		//given
 		Long invalidOrderProductId = -1L;
-	    //when
+		//when
 		ResultActions perform = mockMvc.perform(
 			patch(URI_PREFIX + "/" + invalidOrderProductId)
 				.contentType(APPLICATION_JSON)
 		);
-	    //then
+		//then
 		perform.andExpect(status().isBadRequest());
 	}
 }

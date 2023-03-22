@@ -29,6 +29,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.platform.order.common.exception.custom.BusinessException;
 import com.platform.order.common.storage.AwsStorageService;
+import com.platform.order.order.controller.dto.request.Location;
+import com.platform.order.order.service.redis.OrderRedisService;
 import com.platform.order.product.controller.dto.request.product.CreateProductRequestDto;
 import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto;
 import com.platform.order.product.controller.dto.request.product.UpdateProductRequestDto;
@@ -67,6 +69,9 @@ class ProductServiceTest extends ServiceTest {
 
 	@Mock
 	ProductRedisService productRedisService;
+
+	@Mock
+	OrderRedisService orderRedisService;
 
 	@Spy
 	ProductMapper productMapper;
@@ -465,5 +470,21 @@ class ProductServiceTest extends ServiceTest {
 		productService.getMaximumReadProducts();
 		//then
 		verify(productRedisService,times(1)).getMaximumReadProducts();
+	}
+
+	@Test
+	@DisplayName("인근 지역에서 가장 많이 주문한 상품을 조회한다")
+	void testGetMaximumOrderProducts(){
+	    //given
+		Location location = new Location("서울시", "강남구", "대치동");
+		given(orderRedisService.getMaximumOrderProductByRegionCity(any())).willReturn(List.of());
+	    given(orderRedisService.getMaximumOrderProductByRegionCountry(any())).willReturn(List.of());
+	    given(orderRedisService.getMaximumOrderProductByRegionDistrict(any())).willReturn(List.of());
+	    //when
+		productService.getMaximumOrderProductsByLocation(location);
+	    //then
+		verify(orderRedisService,times(1)).getMaximumOrderProductByRegionCity(location);
+		verify(orderRedisService,times(1)).getMaximumOrderProductByRegionCountry(location);
+		verify(orderRedisService,times(1)).getMaximumOrderProductByRegionDistrict(location);
 	}
 }

@@ -13,8 +13,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import javax.persistence.OneToMany;
 import javax.servlet.http.Cookie;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -32,6 +34,7 @@ import org.springframework.util.MultiValueMap;
 import com.platform.order.common.config.WebSecurityConfig;
 import com.platform.order.common.security.JwtProviderManager;
 import com.platform.order.common.security.constant.JwtProperty;
+import com.platform.order.order.controller.dto.request.Location;
 import com.platform.order.product.controller.dto.request.product.CreateProductRequestDto;
 import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto;
 import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto.ProductCondition;
@@ -399,5 +402,69 @@ class ProductControllerTest extends ControllerTest {
 				.contentType(APPLICATION_JSON));
 		//then
 		perform.andExpect(status().isOk());
+	}
+
+	@Test
+	@DisplayName("인근 지역에서 가장 많이 주문한 상품을 조회한다.")
+	void testGetMaximumOrderProductsByRegion() throws Exception {
+		//given
+		Location location = new Location("서울시", "강남구", "대치동");
+		var params = new ParameterUtils<Location>().toMultiValueParams(objectMapper, location);
+		//when
+		ResultActions perform = mockMvc.perform(
+			get(URI_PREFIX+"/ranking/order").params(params)
+		);
+		//then
+		perform.andExpect(status().isOk());
+	}
+
+	@Nested
+	@DisplayName("인근 지역에서 가장 많이 주문한 상품을 조회할 때,")
+	class RankingOrderProductValidation{
+	    @DisplayName("city를 입력하지 않으면 BadRequest로 응답한다.")
+		@NullAndEmptySource
+		@ParameterizedTest(name = "{index}:  {0}")
+	    void testNullAndEmptyCity(String city) throws Exception {
+	        //given
+			Location location = new Location(city, "강남구", "대치동");
+			var params = new ParameterUtils<Location>().toMultiValueParams(objectMapper, location);
+	        //when
+			ResultActions perform = getPerform(params);
+			//then
+			perform.andExpect(status().isBadRequest());
+	    }
+
+		@DisplayName("country를 입력하지 않으면 BadRequest로 응답한다.")
+		@NullAndEmptySource
+		@ParameterizedTest(name = "{index}:  {0}")
+		void testNullAndEmptyCountry(String city) throws Exception {
+			//given
+			Location location = new Location("서울특별시", city, "대치동");
+			var params = new ParameterUtils<Location>().toMultiValueParams(objectMapper, location);
+			//when
+			ResultActions perform = getPerform(params);
+			//then
+			perform.andExpect(status().isBadRequest());
+		}
+
+		@DisplayName("country를 입력하지 않으면 BadRequest로 응답한다.")
+		@NullAndEmptySource
+		@ParameterizedTest(name = "{index}:  {0}")
+		void testNullAndEmptyDistrict(String district) throws Exception {
+			//given
+			Location location = new Location("서울특별시", "강남구", district);
+			var params = new ParameterUtils<Location>().toMultiValueParams(objectMapper, location);
+			//when
+			ResultActions perform = getPerform(params);
+			//then
+			perform.andExpect(status().isBadRequest());
+		}
+
+		@NotNull
+		private ResultActions getPerform(MultiValueMap<String, String> params) throws Exception {
+			return mockMvc.perform(
+				get(URI_PREFIX+"/ranking/order").params(params)
+			);
+		}
 	}
 }

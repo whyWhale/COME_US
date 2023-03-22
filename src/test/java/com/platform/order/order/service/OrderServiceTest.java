@@ -4,8 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -25,11 +24,13 @@ import com.platform.order.coupon.domain.usercoupon.entity.UserCouponEntity;
 import com.platform.order.coupon.domain.usercoupon.repository.UserCouponRepository;
 import com.platform.order.order.controller.dto.request.CreateOrderRequestDto;
 import com.platform.order.order.controller.dto.request.CreateOrderRequestDto.OrderProductRequestDto;
+import com.platform.order.order.controller.dto.request.Location;
 import com.platform.order.order.domain.order.entity.OrderEntity;
 import com.platform.order.order.domain.order.entity.OrderStatus;
 import com.platform.order.order.domain.order.repository.OrderRepository;
 import com.platform.order.order.domain.orderproduct.entity.OrderProductEntity;
 import com.platform.order.order.domain.orderproduct.repository.OrderProductRepository;
+import com.platform.order.order.service.redis.OrderRedisService;
 import com.platform.order.product.domain.product.entity.ProductEntity;
 import com.platform.order.product.domain.product.repository.ProductRepository;
 import com.platform.order.testenv.ServiceTest;
@@ -54,14 +55,18 @@ class OrderServiceTest extends ServiceTest {
 	UserCouponRepository userCouponRepository;
 
 	@Mock
+	OrderRedisService orderRedisService;
+
+	@Mock
 	OrderMapper orderMapper;
 
 	UserEntity user;
 	ProductEntity product;
 	UserCouponEntity userCoupon;
-	String address = "서울특별시 강남구 강남동";
+	String address = "서울특별시 강남구 대치동";
 	String zipCode = "123-12";
 	OrderProductEntity orderProduct;
+	Location location = new Location("서울특별시", "강남구", "대치동");
 
 	@BeforeEach
 	public void setUp() {
@@ -105,11 +110,12 @@ class OrderServiceTest extends ServiceTest {
 		//given
 		Long orderQuantity = 1L;
 		var orderProductsRequest = new OrderProductRequestDto(product.getId(), orderQuantity, null);
-		var createOrderRequest = new CreateOrderRequestDto(address, zipCode, List.of(orderProductsRequest));
+		var createOrderRequest = new CreateOrderRequestDto(address, zipCode, List.of(orderProductsRequest), location);
 		OrderEntity order = OrderEntity.create(user.getId(), address, zipCode);
 
 		given(productRepository.findByIdIn(any())).willReturn(List.of(product));
 		given(orderRepository.save(any())).willReturn(order);
+		doNothing().when(orderRedisService).increaseOrderByRegion(any(), any());
 		//when
 		orderService.order(any(), createOrderRequest);
 		//then
@@ -124,11 +130,12 @@ class OrderServiceTest extends ServiceTest {
 		Long orderQuantity = 1L;
 		var orderProductsRequest = new OrderProductRequestDto(product.getId(), orderQuantity, userCoupon.getId());
 		OrderEntity order = OrderEntity.create(user.getId(), address, zipCode);
-		var createOrderRequest = new CreateOrderRequestDto(address, zipCode, List.of(orderProductsRequest));
+		var createOrderRequest = new CreateOrderRequestDto(address, zipCode, List.of(orderProductsRequest), location);
 
 		given(productRepository.findByIdIn(any())).willReturn(List.of(product));
 		given(orderRepository.save(any())).willReturn(order);
 		given(userCouponRepository.findByIdInWithCoupon(any(), any())).willReturn(List.of(userCoupon));
+		doNothing().when(orderRedisService).increaseOrderByRegion(any(), any());
 		//when
 		orderService.order(any(), createOrderRequest);
 		//then
@@ -144,7 +151,7 @@ class OrderServiceTest extends ServiceTest {
 		//given
 		Long orderQuantity = 10L;
 		var orderProductRequest = new OrderProductRequestDto(product.getId(), orderQuantity, null);
-		var createOrderRequest = new CreateOrderRequestDto(address, zipCode, List.of(orderProductRequest));
+		var createOrderRequest = new CreateOrderRequestDto(address, zipCode, List.of(orderProductRequest), location);
 		//when
 		given(productRepository.findByIdIn(any())).willReturn(List.of(product));
 		//then
