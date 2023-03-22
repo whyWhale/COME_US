@@ -16,8 +16,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Service
 public class ProductRedisService {
-	private static final String WISH_RED_LOCK_PREFIX = "product::wishCount::";
-	private static final String VIEW_RED_LOCK_PREFIX = "product::viewCount::";
+	private static final String WISH_RED_LOCK_PREFIX = "lock::product::wishCount::";
+	private static final String VIEW_RED_LOCK_PREFIX = "lock::product::viewCount::";
 
 	private final RedisTemplate<String, String> redisTemplate;
 

@@ -61,7 +61,8 @@ public class OrderController {
 		JwtAuthentication principal,
 
 		@Positive
-		@PathVariable Long orderProductId) {
+		@PathVariable
+		Long orderProductId) {
 
 		return orderService.cancel(principal.id(), orderProductId);
 	}

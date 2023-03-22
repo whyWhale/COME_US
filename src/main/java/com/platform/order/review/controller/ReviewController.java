@@ -57,9 +57,7 @@ public class ReviewController {
 	}
 
 	@PreAuthorize("hasRole('ROLE_USER')")
-	@PatchMapping(
-		value = "/{reviewId}",
-		consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PatchMapping(value = "/{reviewId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public UpdateReviewResponseDto upadte(
 		@AuthenticationPrincipal
 		JwtAuthentication auth,
@@ -85,9 +83,7 @@ public class ReviewController {
 
 		@Valid
 		ReviewPageRequestDto pageRequestDto
-	){
-		return reviewService.readAll(productId,pageRequestDto);
+	) {
+		return reviewService.readAll(productId, pageRequestDto);
 	}
-
-
 }

@@ -1,5 +1,7 @@
 package com.platform.order.product.service;
 
+import static com.platform.order.product.controller.dto.response.product.RankingRegionOrderProductResponseDto.*;
+
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +16,7 @@ import com.platform.order.product.controller.dto.response.product.CreateProductI
 import com.platform.order.product.controller.dto.response.product.CreateProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.CreateThumbnailResponseDto;
 import com.platform.order.product.controller.dto.response.product.RankingReadProductResponseDto;
+import com.platform.order.product.controller.dto.response.product.RankingRegionOrderProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.RankingWishProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadAllProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadProductResponseDto;
@@ -200,6 +203,59 @@ public class ProductMapper {
 	public List<RankingReadProductResponseDto> toRankingReadProductResponses(List<ProductEntity> rankingProducts) {
 		return rankingProducts.stream()
 			.map(product -> new RankingReadProductResponseDto(
+				product.getId(),
+				product.getName(),
+				product.getPrice(),
+				product.getCategory().getCode(),
+				product.getProductThumbnail().getPath()
+			)).toList();
+	}
+
+	public RankingRegionOrderProductResponseDto toRankingRegionOrderProductResponses(
+		List<ProductEntity> maximumOrderProductsByCity,
+		List<ProductEntity> maximumOrderProductsByCountry,
+		List<ProductEntity> maximumOrderProductsByDistrict
+	) {
+
+		List<ProductByCity> productsByCity = toProductByCity(maximumOrderProductsByCity);
+		List<ProductByCountry> producstByCountry = toProductByCountry(maximumOrderProductsByCountry);
+		List<ProductByDistrict> productsByDistrict = toProductByDistrict(maximumOrderProductsByDistrict);
+
+		return new RankingRegionOrderProductResponseDto(
+			productsByCity,
+			producstByCountry,
+			productsByDistrict
+		);
+	}
+
+	public List<ProductByCity> toProductByCity(
+		List<ProductEntity> maximumOrderProductsByCity) {
+		return maximumOrderProductsByCity.stream()
+			.map(product -> new ProductByCity(
+				product.getId(),
+				product.getName(),
+				product.getPrice(),
+				product.getCategory().getCode(),
+				product.getProductThumbnail().getPath()
+			)).toList();
+	}
+
+	public List<ProductByCountry> toProductByCountry(
+		List<ProductEntity> maximumOrderProductsByCity) {
+		return maximumOrderProductsByCity.stream()
+			.map(product -> new ProductByCountry(
+				product.getId(),
+				product.getName(),
+				product.getPrice(),
+				product.getCategory().getCode(),
+				product.getProductThumbnail().getPath()
+			)).toList();
+	}
+
+	public List<ProductByDistrict> toProductByDistrict(
+		List<ProductEntity> maximumOrderProductsByCity) {
+		return maximumOrderProductsByCity.stream()
+			.map(product -> new ProductByDistrict(
 				product.getId(),
 				product.getName(),
 				product.getPrice(),

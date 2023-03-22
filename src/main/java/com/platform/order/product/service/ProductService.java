@@ -21,6 +21,8 @@ import com.platform.order.common.exception.custom.BusinessException;
 import com.platform.order.common.exception.custom.NotFoundResourceException;
 import com.platform.order.common.exception.model.ErrorCode;
 import com.platform.order.common.storage.AwsStorageService;
+import com.platform.order.order.controller.dto.request.Location;
+import com.platform.order.order.service.redis.OrderRedisService;
 import com.platform.order.product.controller.dto.request.product.CreateProductRequestDto;
 import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto;
 import com.platform.order.product.controller.dto.request.product.UpdateProductRequestDto;
@@ -29,6 +31,7 @@ import com.platform.order.product.controller.dto.response.product.CreateProductI
 import com.platform.order.product.controller.dto.response.product.CreateProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.CreateThumbnailResponseDto;
 import com.platform.order.product.controller.dto.response.product.RankingReadProductResponseDto;
+import com.platform.order.product.controller.dto.response.product.RankingRegionOrderProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.RankingWishProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadAllProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadProductResponseDto;
@@ -62,6 +65,7 @@ public class ProductService {
 	private final UserProductRepository userProductRepository;
 	private final AwsStorageService awsStorageService;
 	private final ProductRedisService productRedisService;
+	private final OrderRedisService orderRedisService;
 	private final ProductMapper productMapper;
 
 	@Transactional
@@ -359,6 +363,21 @@ public class ProductService {
 		List<ProductEntity> rankingProducts = productRepository.findByIdInWithCategoryAndThumbnail(productIds);
 
 		return productMapper.toRankingReadProductResponses(rankingProducts);
+	}
+
+	public RankingRegionOrderProductResponseDto getMaximumOrderProductsByLocation(Location location) {
+		List<Long> orderProductIdsByCity = orderRedisService.getMaximumOrderProductByRegionCity(location);
+		var productsByCity = productRepository.findByIdInWithCategoryAndThumbnail(orderProductIdsByCity);
+		List<Long> orderProductIdsByCountry = orderRedisService.getMaximumOrderProductByRegionCountry(location);
+		var productsByCountry = productRepository.findByIdInWithCategoryAndThumbnail(orderProductIdsByCountry);
+		List<Long> orderProductIdsByDistrict = orderRedisService.getMaximumOrderProductByRegionDistrict(location);
+		var productsByDistrict = productRepository.findByIdInWithCategoryAndThumbnail(orderProductIdsByDistrict);
+
+		return productMapper.toRankingRegionOrderProductResponses(
+			productsByCity,
+			productsByCountry,
+			productsByDistrict
+		);
 	}
 
 	private ProductEntity getProduct(Long productId) {

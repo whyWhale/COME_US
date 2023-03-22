@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.platform.order.common.exception.custom.NotFoundResourceException;
 import com.platform.order.common.dto.cursor.CursorPageResponseDto;
+import com.platform.order.common.exception.custom.NotFoundResourceException;
 import com.platform.order.coupon.domain.usercoupon.entity.UserCouponEntity;
 import com.platform.order.coupon.domain.usercoupon.repository.UserCouponRepository;
 import com.platform.order.order.controller.dto.request.CreateOrderRequestDto;
@@ -24,6 +24,7 @@ import com.platform.order.order.domain.order.entity.OrderEntity;
 import com.platform.order.order.domain.order.repository.OrderRepository;
 import com.platform.order.order.domain.orderproduct.entity.OrderProductEntity;
 import com.platform.order.order.domain.orderproduct.repository.OrderProductRepository;
+import com.platform.order.order.service.redis.OrderRedisService;
 import com.platform.order.product.domain.product.repository.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,7 @@ public class OrderService {
 	private final OrderProductRepository orderProductRepository;
 	private final ProductRepository productRepository;
 	private final UserCouponRepository userCouponRepository;
+	private final OrderRedisService orderRedisService;
 	private final OrderMapper orderMapper;
 
 	@Transactional
@@ -60,6 +62,7 @@ public class OrderService {
 		}
 
 		OrderEntity savedOrder = orderRepository.save(order);
+		productIds.forEach(productId ->orderRedisService.increaseOrderByRegion(productId,creatOrderRequest.location()));
 
 		return orderMapper.toCreateOrderResponseDto(savedOrder);
 	}

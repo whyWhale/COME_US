@@ -7,11 +7,11 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ProductRedisKeyManager {
 	// sortedSet key
-	SORTED_SET_WISH("ss_product::wishCount"),
-	SORTED_SET_VIEW("ss_product::viewCount"),
+	SORTED_SET_WISH("product::wishCount"),
+	SORTED_SET_VIEW("product::viewCount"),
 
 	// set key
-	SET_VIEW("s_product::viewCount::");
+	SET_VIEW("product::viewCount::");
 
 	private String key;
 

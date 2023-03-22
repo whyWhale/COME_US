@@ -8,6 +8,7 @@ import javax.validation.constraints.Size;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.platform.order.common.dto.offset.PageResponseDto;
 import com.platform.order.common.security.model.JwtAuthentication;
 import com.platform.order.common.validation.Multipart;
+import com.platform.order.order.controller.dto.request.Location;
 import com.platform.order.product.controller.dto.request.product.CreateProductRequestDto;
 import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto;
 import com.platform.order.product.controller.dto.request.product.UpdateProductRequestDto;
@@ -31,6 +33,7 @@ import com.platform.order.product.controller.dto.response.product.CreateProductI
 import com.platform.order.product.controller.dto.response.product.CreateProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.CreateThumbnailResponseDto;
 import com.platform.order.product.controller.dto.response.product.RankingReadProductResponseDto;
+import com.platform.order.product.controller.dto.response.product.RankingRegionOrderProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.RankingWishProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadAllProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadProductResponseDto;
@@ -42,6 +45,7 @@ import com.platform.order.product.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
 
+@Validated
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/products")
 @RestController
@@ -217,5 +221,13 @@ public class ProductController {
 	@GetMapping("/ranking/read")
 	public List<RankingReadProductResponseDto> getMaximumReadProducts() {
 		return productService.getMaximumReadProducts();
+	}
+
+	@GetMapping("/ranking/order")
+	public RankingRegionOrderProductResponseDto getMaximumOrderProductsByLocation(
+		@Valid
+		Location location
+	) {
+		return productService.getMaximumOrderProductsByLocation(location);
 	}
 }

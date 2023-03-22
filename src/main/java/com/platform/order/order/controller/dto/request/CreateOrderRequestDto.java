@@ -16,7 +16,11 @@ public record CreateOrderRequestDto(
 
 	@Valid
 	@Size(min = 1)
-	List<OrderProductRequestDto> orderProductRequests
+	List<OrderProductRequestDto> orderProductRequests,
+
+	@Valid
+	@NotNull
+	Location location
 ) {
 	public record OrderProductRequestDto(
 		@NotNull
