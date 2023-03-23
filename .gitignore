@@ -40,3 +40,4 @@ out/
 .env
 /src/main/java/com/platform/order/testController.java
 commerce-iam_accessKeys.csv
+/infra/nginx/auth
