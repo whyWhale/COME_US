@@ -9,6 +9,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.15.RELEASE'
     id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
     id 'java'
+    id "org.flywaydb.flyway" version "6.2.4"
     id 'jacoco'
 }
 
@@ -89,6 +90,15 @@ dependencies {
 
     //JASYPT
     implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.4'
+
+    // Flyway
+    implementation "org.flywaydb:flyway-mysql"
+    implementation 'org.flywaydb:flyway-core:7.15.0'
+    testImplementation 'org.flywaydb.flyway-test-extensions:flyway-spring-test:7.0.0'
+}
+
+flyway {
+    configFiles = ['flyway.conf']
 }
 
 tasks.named('test') {

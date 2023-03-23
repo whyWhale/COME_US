@@ -14,10 +14,21 @@ spring:
         jdbc-url: jdbc:mysql://${MYSQL_HOST:localhost}:3307/${MYSQL_DATABASE:order-renewal}
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
     properties:
       hibernate:
         format_sql: true
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306
+    schemas: ${MYSQL_SCHEMA:order-renewal}
+    user: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:password}
+    locations:
+      - filesystem:src/main/resources/db/migration
+      - filesystem:src/main/resources/db/seed
+
   redis:
     cluster:
       nodes:
