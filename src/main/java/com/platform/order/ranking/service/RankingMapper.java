@@ -2,11 +2,14 @@ package com.platform.order.ranking.service;
 
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
 import com.platform.order.product.controller.dto.response.product.RankingReadProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.RankingRegionOrderProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.RankingWishProductResponseDto;
 import com.platform.order.product.domain.product.entity.ProductEntity;
 
+@Component
 public class RankingMapper {
 
 	public List<RankingWishProductResponseDto> toRankingWishProductResponses(List<ProductEntity> rankingProducts) {

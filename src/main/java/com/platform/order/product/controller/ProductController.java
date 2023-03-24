@@ -73,6 +73,7 @@ public class ProductController {
 
 		@AuthenticationPrincipal
 		JwtAuthentication principal,
+
 		@Multipart
 		@RequestPart
 		MultipartFile thumbnail

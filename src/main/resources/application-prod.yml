@@ -47,9 +47,13 @@ security:
         - /swagger-ui.html/**
         - /health
         - /api/products/*
+        - /api/products
+        - /api/reviews/*
+        - /api/rankings/*
       POST:
         - /api/auth/login
         - /api/users
+        - /test/**
       PATCH: [ ]
       PUT: [ ]
       DELETE: [ ]
@@ -81,8 +85,3 @@ cloud:
 
 encryptor:
   key: ${ENCRYPTOR_KEY}
-
-logging:
-  level:
-    org.hibernate.SQL: debug
-    org.hibernate.type: trace
