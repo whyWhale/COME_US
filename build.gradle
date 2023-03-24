@@ -97,13 +97,13 @@ dependencies {
     testImplementation 'org.flywaydb.flyway-test-extensions:flyway-spring-test:7.0.0'
 }
 
-flyway {
-    configFiles = ['flyway.conf']
-}
-
 tasks.named('test') {
     useJUnitPlatform()
     finalizedBy(jacocoTestReport)
+}
+
+flyway {
+    configFiles = ['flyway.conf']
 }
 
 def querydslDir = "$buildDir/generated/querydsl"
