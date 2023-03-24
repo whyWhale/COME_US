@@ -59,6 +59,7 @@ security:
         - /api/products/*
         - /api/products
         - /api/reviews/*
+        - /api/rankings/*
       POST:
         - /api/auth/login
         - /api/users

@@ -449,42 +449,4 @@ class ProductServiceTest extends ServiceTest {
 		verify(userProductRepository, times(1)).delete(wishUserProduct);
 		verify(productRedisService, times(1)).decreaseWishCount(wishUserProduct.getProduct().getId());
 	}
-
-	@Test
-	@DisplayName("찜이 가장 많은 상품 10개를 조회한다")
-	void testGetMaximumWishProducts() {
-		//given
-		given(productRedisService.getMaximumWishProducts()).willReturn(List.of());
-		//when
-		productService.getMaximumWishProducts();
-		//then
-		verify(productRedisService,times(1)).getMaximumWishProducts();
-	}
-
-	@Test
-	@DisplayName("조회수가 가장 많은 상품 10개를 조회한다")
-	void testGetMaximumReadProducts() {
-		//given
-		given(productRedisService.getMaximumReadProducts()).willReturn(List.of());
-		//when
-		productService.getMaximumReadProducts();
-		//then
-		verify(productRedisService,times(1)).getMaximumReadProducts();
-	}
-
-	@Test
-	@DisplayName("인근 지역에서 가장 많이 주문한 상품을 조회한다")
-	void testGetMaximumOrderProducts(){
-	    //given
-		Location location = new Location("서울시", "강남구", "대치동");
-		given(orderRedisService.getMaximumOrderProductByRegionCity(any())).willReturn(List.of());
-	    given(orderRedisService.getMaximumOrderProductByRegionCountry(any())).willReturn(List.of());
-	    given(orderRedisService.getMaximumOrderProductByRegionDistrict(any())).willReturn(List.of());
-	    //when
-		productService.getMaximumOrderProductsByLocation(location);
-	    //then
-		verify(orderRedisService,times(1)).getMaximumOrderProductByRegionCity(location);
-		verify(orderRedisService,times(1)).getMaximumOrderProductByRegionCountry(location);
-		verify(orderRedisService,times(1)).getMaximumOrderProductByRegionDistrict(location);
-	}
 }

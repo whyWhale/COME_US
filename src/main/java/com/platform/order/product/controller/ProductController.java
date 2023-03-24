@@ -154,7 +154,6 @@ public class ProductController {
 		@PathVariable
 		Long productId
 	) {
-
 		return productService.delete(productId, principal.id());
 	}
 
@@ -211,23 +210,5 @@ public class ProductController {
 		Long userProductId) {
 
 		return productService.unWishProduct(principal.id(), userProductId);
-	}
-
-	@GetMapping("/ranking/wish")
-	public List<RankingWishProductResponseDto> getMaximumWishProducts() {
-		return productService.getMaximumWishProducts();
-	}
-
-	@GetMapping("/ranking/read")
-	public List<RankingReadProductResponseDto> getMaximumReadProducts() {
-		return productService.getMaximumReadProducts();
-	}
-
-	@GetMapping("/ranking/order")
-	public RankingRegionOrderProductResponseDto getMaximumOrderProductsByLocation(
-		@Valid
-		Location location
-	) {
-		return productService.getMaximumOrderProductsByLocation(location);
 	}
 }

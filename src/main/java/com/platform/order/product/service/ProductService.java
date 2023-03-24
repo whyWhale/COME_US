@@ -351,35 +351,6 @@ public class ProductService {
 		return productMapper.toUpdateProductImageResponseDtos(productImageEntities);
 	}
 
-	public List<RankingWishProductResponseDto> getMaximumWishProducts() {
-		List<Long> productIds = productRedisService.getMaximumWishProducts();
-		List<ProductEntity> rankingProducts = productRepository.findByIdInWithCategoryAndThumbnail(productIds);
-
-		return productMapper.toRankingWishProductResponses(rankingProducts);
-	}
-
-	public List<RankingReadProductResponseDto> getMaximumReadProducts() {
-		List<Long> productIds = productRedisService.getMaximumReadProducts();
-		List<ProductEntity> rankingProducts = productRepository.findByIdInWithCategoryAndThumbnail(productIds);
-
-		return productMapper.toRankingReadProductResponses(rankingProducts);
-	}
-
-	public RankingRegionOrderProductResponseDto getMaximumOrderProductsByLocation(Location location) {
-		List<Long> orderProductIdsByCity = orderRedisService.getMaximumOrderProductByRegionCity(location);
-		var productsByCity = productRepository.findByIdInWithCategoryAndThumbnail(orderProductIdsByCity);
-		List<Long> orderProductIdsByCountry = orderRedisService.getMaximumOrderProductByRegionCountry(location);
-		var productsByCountry = productRepository.findByIdInWithCategoryAndThumbnail(orderProductIdsByCountry);
-		List<Long> orderProductIdsByDistrict = orderRedisService.getMaximumOrderProductByRegionDistrict(location);
-		var productsByDistrict = productRepository.findByIdInWithCategoryAndThumbnail(orderProductIdsByDistrict);
-
-		return productMapper.toRankingRegionOrderProductResponses(
-			productsByCity,
-			productsByCountry,
-			productsByDistrict
-		);
-	}
-
 	private ProductEntity getProduct(Long productId) {
 		return productRepository.findById(productId)
 			.orElseThrow(() -> new NotFoundResourceException(
