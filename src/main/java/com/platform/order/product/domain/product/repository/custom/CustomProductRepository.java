@@ -7,4 +7,6 @@ import com.platform.order.product.controller.dto.request.product.ProductPageRequ
 
 public interface CustomProductRepository {
 	Page<ProductEntity> findAllWithConditions(ProductPageRequestDto page);
+
+	Page<ProductEntity> findAllWithConditions(ProductPageRequestDto page,String categoryCode);
 }

@@ -59,6 +59,37 @@ public class CustomProductRepositoryImpl implements CustomProductRepository {
 		return PageableExecutionUtils.getPage(products, pageable, count::fetchOne);
 	}
 
+	@Override
+	public Page<ProductEntity> findAllWithConditions(ProductPageRequestDto page, String categoryCode) {
+		Pageable pageable = page.toPageable();
+		List<OrderSpecifier> orderSpecifiers = getAllOrderSpecifiers(pageable);
+
+		List<ProductEntity> products = queryFactory.selectFrom(productEntity)
+			.join(productEntity.productThumbnail, productThumbnailEntity)
+			.join(productEntity.category, categoryEntity)
+			.fetchJoin()
+			.where(
+				productEntity.category.code.eq(categoryCode),
+				graterOrEqualThanMinPrice(page.getMinimumPrice()),
+				lessOrEqualThanMaxPrice(page.getMaximumPrice()),
+				likeProductName(page.getName()))
+			.limit(pageable.getPageSize())
+			.offset(pageable.getOffset())
+			.orderBy(orderSpecifiers.toArray(OrderSpecifier[]::new))
+			.fetch();
+
+		JPAQuery<Long> count = queryFactory.select(productEntity.count())
+			.from(productEntity)
+			.innerJoin(productEntity.productThumbnail, productThumbnailEntity)
+			.innerJoin(productEntity.category, categoryEntity)
+			.where(
+				graterOrEqualThanMinPrice(page.getMinimumPrice()),
+				lessOrEqualThanMaxPrice(page.getMaximumPrice()),
+				likeProductName(page.getName()));
+
+		return PageableExecutionUtils.getPage(products, pageable, count::fetchOne);
+	}
+
 	private BooleanExpression graterOrEqualThanMinPrice(Long minPrice) {
 		return minPrice == null ? null : productEntity.price.goe(minPrice);
 	}

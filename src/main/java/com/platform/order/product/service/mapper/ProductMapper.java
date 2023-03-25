@@ -1,4 +1,4 @@
-package com.platform.order.product.service;
+package com.platform.order.product.service.mapper;
 
 import static com.platform.order.product.controller.dto.response.product.RankingRegionOrderProductResponseDto.*;
 

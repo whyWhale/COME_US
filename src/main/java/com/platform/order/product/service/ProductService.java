@@ -21,7 +21,6 @@ import com.platform.order.common.exception.custom.BusinessException;
 import com.platform.order.common.exception.custom.NotFoundResourceException;
 import com.platform.order.common.exception.model.ErrorCode;
 import com.platform.order.common.storage.AwsStorageService;
-import com.platform.order.order.controller.dto.request.Location;
 import com.platform.order.order.service.redis.OrderRedisService;
 import com.platform.order.product.controller.dto.request.product.CreateProductRequestDto;
 import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto;
@@ -30,9 +29,6 @@ import com.platform.order.product.controller.dto.request.userproduct.WishUserPro
 import com.platform.order.product.controller.dto.response.product.CreateProductImagesResponseDto;
 import com.platform.order.product.controller.dto.response.product.CreateProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.CreateThumbnailResponseDto;
-import com.platform.order.product.controller.dto.response.product.RankingReadProductResponseDto;
-import com.platform.order.product.controller.dto.response.product.RankingRegionOrderProductResponseDto;
-import com.platform.order.product.controller.dto.response.product.RankingWishProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadAllProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.UpdateProductImageResponseDto;
@@ -48,6 +44,7 @@ import com.platform.order.product.domain.productimage.repository.ProductImageRep
 import com.platform.order.product.domain.productthumbnail.entity.ProductThumbnailEntity;
 import com.platform.order.product.domain.userproduct.entity.UserProductEntity;
 import com.platform.order.product.domain.userproduct.repository.UserProductRepository;
+import com.platform.order.product.service.mapper.ProductMapper;
 import com.platform.order.product.service.redis.ProductRedisService;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
@@ -134,7 +131,7 @@ public class ProductService {
 		return productMapper.toReadProductResponseDto(foundProduct, images, wishCount);
 	}
 
-	public PageResponseDto<ReadAllProductResponseDto> readAll(ProductPageRequestDto pageRequest) {
+	public PageResponseDto<ReadAllProductResponseDto> readAll(ProductPageRequestDto pageRequest, String categoryCode) {
 		Page<ProductEntity> productsPage = productRepository.findAllWithConditions(pageRequest);
 
 		if (productsPage.getContent().isEmpty()) {

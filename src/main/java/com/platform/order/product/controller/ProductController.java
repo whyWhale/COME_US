@@ -2,6 +2,7 @@ package com.platform.order.product.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
 
@@ -24,7 +25,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.platform.order.common.dto.offset.PageResponseDto;
 import com.platform.order.common.security.model.JwtAuthentication;
 import com.platform.order.common.validation.Multipart;
-import com.platform.order.order.controller.dto.request.Location;
 import com.platform.order.product.controller.dto.request.product.CreateProductRequestDto;
 import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto;
 import com.platform.order.product.controller.dto.request.product.UpdateProductRequestDto;
@@ -32,9 +32,6 @@ import com.platform.order.product.controller.dto.request.userproduct.WishUserPro
 import com.platform.order.product.controller.dto.response.product.CreateProductImagesResponseDto;
 import com.platform.order.product.controller.dto.response.product.CreateProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.CreateThumbnailResponseDto;
-import com.platform.order.product.controller.dto.response.product.RankingReadProductResponseDto;
-import com.platform.order.product.controller.dto.response.product.RankingRegionOrderProductResponseDto;
-import com.platform.order.product.controller.dto.response.product.RankingWishProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadAllProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.UpdateProductImageResponseDto;
@@ -169,12 +166,15 @@ public class ProductController {
 		return productService.read(productId, visitor);
 	}
 
-	@GetMapping
+	@GetMapping("/category/{categoryCode}")
 	public PageResponseDto<ReadAllProductResponseDto> readAll(
+		@PathVariable
+		String categoryCode,
+
 		@Valid
 		ProductPageRequestDto pageRequest
 	) {
-		return productService.readAll(pageRequest);
+		return productService.readAll(pageRequest,categoryCode);
 	}
 
 	@PreAuthorize("hasRole('ROLE_USER')")
@@ -202,7 +202,7 @@ public class ProductController {
 	}
 
 	@PreAuthorize("hasRole('ROLE_USER')")
-	@DeleteMapping("/wish/{userProductId}")
+	@DeleteMapping("/unwish/{userProductId}")
 	public Long unWishProduct(
 		@AuthenticationPrincipal
 		JwtAuthentication principal,
