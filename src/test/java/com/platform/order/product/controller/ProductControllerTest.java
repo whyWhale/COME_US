@@ -13,10 +13,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import javax.persistence.OneToMany;
 import javax.servlet.http.Cookie;
 
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -34,7 +32,6 @@ import org.springframework.util.MultiValueMap;
 import com.platform.order.common.config.WebSecurityConfig;
 import com.platform.order.common.security.JwtProviderManager;
 import com.platform.order.common.security.constant.JwtProperty;
-import com.platform.order.order.controller.dto.request.Location;
 import com.platform.order.product.controller.dto.request.product.CreateProductRequestDto;
 import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto;
 import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto.ProductCondition;
@@ -292,15 +289,16 @@ class ProductControllerTest extends ControllerTest {
 	@DisplayName("전체 상품들을 조회한다.")
 	void testReadAll() throws Exception {
 		//given
+		String categoryCode = "T001";
 		var productPageRequest = new ProductPageRequestDto(1, 10, null, null, null, null);
 		MultiValueMap<String, String> params = paramUtils.toMultiValueParams(
 			objectMapper, productPageRequest);
 		//when
-		ResultActions perform = mockMvc.perform(get(URI_PREFIX).params(params)
+		ResultActions perform = mockMvc.perform(get(URI_PREFIX + "/category/" + categoryCode).params(params)
 			.contentType(APPLICATION_JSON));
 		//then
 		perform.andExpect(status().isOk());
-		verify(productService, times(1)).readAll(any());
+		verify(productService, times(1)).readAll(any(), any());
 	}
 
 	@Nested
@@ -342,11 +340,12 @@ class ProductControllerTest extends ControllerTest {
 		@DisplayName("정렬 조건이 2개가 넘어가면 BadRequest로 응답한다.")
 		void failReadAllWithInvalidOrdering() throws Exception {
 			//given
+			String category = "/category/T001";
 			var productPageRequest = new ProductPageRequestDto(1, 10, null, null, null, null);
 			MultiValueMap<String, String> params = paramUtils.toMultiValueParams(objectMapper, productPageRequest);
 			//when
 			ResultActions perform = mockMvc.perform(
-				get(URI_PREFIX).params(params)
+				get(URI_PREFIX + category).params(params)
 					.param("sorts", PRICE_ASC.name())
 					.param("sorts", ProductCondition.CREATED_ASC.name())
 					.param("sorts", PRICE_DESC.name())
@@ -357,7 +356,7 @@ class ProductControllerTest extends ControllerTest {
 
 		ResultActions getPerform(MultiValueMap<String, String> params) throws Exception {
 			return mockMvc.perform(
-				get(URI_PREFIX).params(params)
+				get(URI_PREFIX + "/category/T001").params(params)
 					.contentType(APPLICATION_JSON));
 		}
 	}
@@ -398,7 +397,7 @@ class ProductControllerTest extends ControllerTest {
 		Long userProductId = 1L;
 		//when
 		ResultActions perform = mockMvc.perform(
-			delete(URI_PREFIX + "/wish/" + productId)
+			delete(URI_PREFIX + "/unwish/" + productId)
 				.contentType(APPLICATION_JSON));
 		//then
 		perform.andExpect(status().isOk());

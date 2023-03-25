@@ -29,7 +29,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.platform.order.common.exception.custom.BusinessException;
 import com.platform.order.common.storage.AwsStorageService;
-import com.platform.order.order.controller.dto.request.Location;
 import com.platform.order.order.service.redis.OrderRedisService;
 import com.platform.order.product.controller.dto.request.product.CreateProductRequestDto;
 import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto;
@@ -42,6 +41,7 @@ import com.platform.order.product.domain.productimage.repository.ProductImageRep
 import com.platform.order.product.domain.productthumbnail.entity.ProductThumbnailEntity;
 import com.platform.order.product.domain.userproduct.entity.UserProductEntity;
 import com.platform.order.product.domain.userproduct.repository.UserProductRepository;
+import com.platform.order.product.service.mapper.ProductMapper;
 import com.platform.order.product.service.redis.ProductRedisService;
 import com.platform.order.testenv.ServiceTest;
 import com.platform.order.user.domain.entity.Role;
@@ -375,7 +375,7 @@ class ProductServiceTest extends ServiceTest {
 
 		given(productRepository.findAllWithConditions(any())).willReturn(page);
 		//when
-		productService.readAll(pageRequestDto);
+		productService.readAll(pageRequestDto,any());
 		//then
 		verify(productRepository, times(1)).findAllWithConditions(any());
 	}
