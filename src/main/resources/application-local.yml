@@ -1,10 +1,10 @@
-server:
+#server:
 #  ssl:
 #    enabled: false
-#    key-store: ./nginx/auth/minica.jks
-#    key-store-password: 202302
-#    key-password: 202302
-#    key-alias: localhost
+#    key-store: ${KEY_STORE:ENC(R+cuGQ7VPVHzcN0JScSgzPZQls/en958MonvIt5/Wgk=)}
+#    key-store-password: ${KEY_STORE_PASSWORD:ENC(3apBWD+AHiAhdGlL0lWW1A==)}
+#    key-password: ${KEY_PASSWORD:ENC(XT9OuqUWfyWrRrlKeTm0pw==)}
+#    key-alias: ${KEY_ALIAS:ENC(03ZDyJ0w9tlQFsWz54rfpBYsmxZ1AZxf)}
 
 spring:
   datasource:
@@ -29,7 +29,7 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: true
-    locations: classpath:db/migration, classpath:db/seed
+    locations: classpath:db/local/migration, classpath:db/local/seed
 
   redis:
     cluster:
@@ -42,11 +42,11 @@ jwt:
   issuer: come-us
   access-token:
     header: access-token
-    expiry-seconds: ${ACCESS_EXPIRY_SECOND:ENC(43VpAPQWzFtX6I2vbopM+Q==)}
+    expiry-seconds: ${ACCESS_EXPIRY_SECOND:ENC(KAmSYIJu+wv77mlzCEYZUA==)}
   refresh-token:
     header: refresh-token
-    expiry-seconds: ${REFRESH_EXPIRY_SECOND:ENC(jGxk7kBP4xV+MkSyHX/Sjg==)}
-  secret-key: ${SECRET_KEY:ENC(E9Of+Ca7DdsBBGMfwKam9M7ty9QsAvgw)}
+    expiry-seconds: ${REFRESH_EXPIRY_SECOND:ENC(81ub4tNEuQbSiH6p0nGJig==)}
+  secret-key: ${SECRET_KEY:ENC(LX22l9rNrrEg+imiadW9mw==)}
 
 security:
   url-pattern-config:
@@ -56,10 +56,11 @@ security:
         - /swagger-ui/**
         - /swagger-ui.html/**
         - /health
+        - /api/products/category/**
         - /api/products/*
-        - /api/products
         - /api/reviews/*
         - /api/rankings/*
+        - /test/**
       POST:
         - /api/auth/login
         - /api/users
@@ -95,7 +96,7 @@ cloud:
       static: ${STATIC_REGION:ap-northeast-2}
 
 encryptor:
-  key: ${ENCRYPTOR_KEY:order-renewal}
+  key: ${ENCRYPTOR_KEY:come-us}
 
 logging:
   level:
