@@ -74,6 +74,9 @@ services:
       - "6380:6380"
       - "6381:6381"
       - "6379:6379"
+      - "6382:6382"
+      - "6383:6383"
+      - "6384:6384"
 
   redis-node2:
     network_mode: "service:redis-node1"
@@ -93,17 +96,46 @@ services:
       - ./redis-cluster/redis2.conf:/usr/local/etc/redis/redis.conf
     command: redis-server /usr/local/etc/redis/redis.conf
 
+  redis-slave1:
+    network_mode: "service:redis-node1"
+    platform: linux/x86_64
+    image: redis:6.2
+    container_name: redis-slave1
+    volumes:
+      - ./redis-cluster/redis-slave1.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+
+  redis-slave2:
+    network_mode: "service:redis-node1"
+    platform: linux/x86_64
+    image: redis:6.2
+    container_name: redis-slave2
+    volumes:
+      - ./redis-cluster/redis-slave2.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+  redis-slave3:
+    network_mode: "service:redis-node1"
+    platform: linux/x86_64
+    image: redis:6.2
+    container_name: redis-slave3
+    volumes:
+      - ./redis-cluster/redis-slave3.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+
   redis-cluster-entry:
     network_mode: "service:redis-node1"
     platform: linux/x86_64
     image: redis:6.2
     container_name: redis-cluster-entry
-    command: redis-cli --cluster create 127.0.0.1:6379 127.0.0.1:6380 127.0.0.1:6381 --cluster-yes
+    command: redis-cli --cluster create 127.0.0.1:6379 127.0.0.1:6380 127.0.0.1:6381 
+      127.0.0.1:6382 127.0.0.1:6383 127.0.0.1:6384 --cluster-yes --cluster-replicas 1
     depends_on:
       - redis-node1
       - redis-node2
       - redis-node3
     restart: on-failure
+
+
 
   redis-commander:
     image: rediscommander/redis-commander:latest
