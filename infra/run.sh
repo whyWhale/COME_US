@@ -9,8 +9,12 @@ docker volume rm $(docker volume ls  -q --filter dangling=true)
 echo "mysql redo log delete :)"
 rm -r ./mysql-replication/master/data
 
-echo "docker already duplicate container  remove 'ㅅ' "
-docker rm -f mysql-master mysql-slave-1 mysql-phpmyadmin redis redis-commander redis-node1 redis-node2 redis-node3 redis-cluster-entry localstack nginx
+echo "grafana volume delete"
+rm -r ./grafana
+
+echo "docker already duplicate container remove 'ㅅ' "
+docker rm -f mysql-master mysql-slave-1 mysql-phpmyadmin redis redis-commander redis-node1 redis-node2 redis-node3 redis-cluster-entry localstack nginx\
+ redis-slave1 redis-slave2 redis-slave3 prometheus grafana
 
 echo "docker up ready :)"
 docker-compose up

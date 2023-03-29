@@ -61,6 +61,7 @@ security:
         - /api/reviews/*
         - /api/rankings/*
         - /test/**
+        - /actuator/**
       POST:
         - /api/auth/login
         - /api/users

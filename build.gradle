@@ -96,6 +96,9 @@ dependencies {
     implementation "org.flywaydb:flyway-mysql"
     implementation 'org.flywaydb:flyway-core:7.15.0'
     testImplementation 'org.flywaydb.flyway-test-extensions:flyway-spring-test:7.0.0'
+
+    // Prometheus
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 }
 
 tasks.named('test') {

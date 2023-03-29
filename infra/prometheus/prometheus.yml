@@ -1,0 +1,16 @@
+global:
+  scrape_interval: 10s # default=1m
+  scrape_timeout: 10s # default
+  evaluation_interval: 10s # default=1m
+  external_labels:
+    monitor: 'come-us-monitor'
+  query_log_file: query_log_file.log
+
+rule_files:
+  - "rule.yml"
+
+scrape_configs:
+  - job_name: 'come-us_monitoring'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['host.docker.internal:8080']
