@@ -62,13 +62,17 @@ security:
         - /api/rankings/*
         - /test/**
         - /actuator/**
+        - /thumbnail/*
       POST:
         - /api/auth/login
         - /api/users
         - /test/**
-      PATCH: [ ]
-      PUT: [ ]
-      DELETE: [ ]
+      PATCH:
+        - /test/**
+      PUT:
+        - /test/**
+      DELETE:
+        - /test/**
     permit-all:
       GET: [ ]
       POST: [ ]
