@@ -2,7 +2,6 @@ package com.platform.order.product.controller;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
 
@@ -24,7 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.platform.order.common.dto.offset.PageResponseDto;
 import com.platform.order.common.security.model.JwtAuthentication;
-import com.platform.order.common.validation.Multipart;
+import com.platform.order.common.validation.FileContent;
 import com.platform.order.product.controller.dto.request.product.CreateProductRequestDto;
 import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto;
 import com.platform.order.product.controller.dto.request.product.UpdateProductRequestDto;
@@ -71,7 +70,7 @@ public class ProductController {
 		@AuthenticationPrincipal
 		JwtAuthentication principal,
 
-		@Multipart
+		@FileContent
 		@RequestPart
 		MultipartFile thumbnail
 	) {
@@ -90,7 +89,7 @@ public class ProductController {
 		@Valid
 		@Size(min = 3, max = 10)
 		@RequestPart
-		List<@Valid @Multipart MultipartFile> images
+		List<@Valid @FileContent MultipartFile> images
 	) {
 		return productService.createImages(productId, principal.id(), images);
 	}
@@ -138,7 +137,7 @@ public class ProductController {
 		@Valid
 		@Size(min = 3, max = 10)
 		@RequestPart
-		List<@Valid @Multipart MultipartFile> images
+		List<@Valid @FileContent MultipartFile> images
 	) {
 		return productService.updateImages(productId, principal.id(), images);
 	}

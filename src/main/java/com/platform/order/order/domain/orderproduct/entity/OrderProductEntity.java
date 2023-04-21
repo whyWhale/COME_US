@@ -98,7 +98,7 @@ public class OrderProductEntity extends BaseEntity {
 		if (!this.status.isCancel()) {
 			throw new BusinessException(
 				MessageFormat.format("delivery status : {0} is not cancel", this.status),
-				ErrorCode.NOT_VALID_CANCEL
+				ErrorCode.NOT_FOUND_CONTENT
 			);
 		}
 

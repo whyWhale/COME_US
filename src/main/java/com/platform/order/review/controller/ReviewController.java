@@ -20,7 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.platform.order.common.dto.offset.PageResponseDto;
 import com.platform.order.common.security.model.JwtAuthentication;
-import com.platform.order.common.validation.Multipart;
+import com.platform.order.common.validation.FileContent;
 import com.platform.order.review.controller.dto.request.CreateReviewRequestDto;
 import com.platform.order.review.controller.dto.request.ReviewPageRequestDto;
 import com.platform.order.review.controller.dto.request.UpdateReviewRequestDto;
@@ -51,7 +51,7 @@ public class ReviewController {
 
 		@Size(max = 3)
 		@RequestPart(required = false)
-		List<@Multipart MultipartFile> images
+		List<@FileContent MultipartFile> images
 	) {
 		return reviewService.create(auth.id(), createReviewRequest, images);
 	}
@@ -71,7 +71,7 @@ public class ReviewController {
 
 		@Size(max = 3)
 		@RequestPart(required = false)
-		List<@Multipart MultipartFile> images
+		List<@FileContent MultipartFile> images
 	) {
 		return reviewService.update(auth.id(), reviewId, updateReviewRequest, images);
 	}

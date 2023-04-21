@@ -9,8 +9,8 @@ import javax.validation.Constraint;
 
 @Target({ElementType.TYPE_USE, ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = MultipartValidator.class)
-public @interface Multipart {
+@Constraint(validatedBy = FileContentValidator.class)
+public @interface FileContent {
 	String message() default "파일이름과 크기가 있어야 합니다";
 
 	Class[] groups() default {};
