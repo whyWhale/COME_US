@@ -34,7 +34,8 @@ public class RedissionLockAop {
 		RLock rLock = redissonClient.getLock(key);
 
 		try {
-			boolean available = rLock.tryLock(distributeLock.waitTime(), distributeLock.leaseTime(), distributeLock.timeUnit());
+			boolean available = rLock.tryLock(distributeLock.waitTime(), distributeLock.leaseTime(),
+				distributeLock.timeUnit());
 			if (!available) {
 				return false;
 			}

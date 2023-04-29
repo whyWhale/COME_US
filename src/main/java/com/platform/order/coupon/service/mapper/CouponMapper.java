@@ -1,4 +1,4 @@
-package com.platform.order.coupon.service;
+package com.platform.order.coupon.service.mapper;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-import com.platform.order.common.dto.offset.PageResponseDto;
+import com.platform.order.common.dto.offset.OffsetPageResponseDto;
 import com.platform.order.coupon.controller.dto.request.coupon.CreateCouponRequestDto;
 import com.platform.order.coupon.controller.dto.response.coupon.CreateCouponResponseDto;
 import com.platform.order.coupon.controller.dto.response.usercoupon.IssueUserCouponResponseDto;
@@ -40,7 +40,7 @@ public class CouponMapper {
 		);
 	}
 
-	public PageResponseDto<ReadUserCouponResponseDto> toPageResponse(Page<UserCouponEntity> userCouponPage) {
+	public OffsetPageResponseDto<ReadUserCouponResponseDto> toPageResponse(Page<UserCouponEntity> userCouponPage) {
 		Pageable pageable = userCouponPage.getPageable();
 		List<UserCouponEntity> userCoupons = userCouponPage.getContent();
 
@@ -48,7 +48,7 @@ public class CouponMapper {
 			.map(this::toReadUserCouponResponse)
 			.toList();
 
-		return new PageResponseDto<>(
+		return new OffsetPageResponseDto<>(
 			userCouponPage.getTotalPages(),
 			pageable.getPageNumber(),
 			pageable.getPageSize(),

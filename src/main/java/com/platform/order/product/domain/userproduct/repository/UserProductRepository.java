@@ -10,5 +10,6 @@ import com.platform.order.product.domain.userproduct.entity.UserProductEntity;
 
 public interface UserProductRepository extends JpaRepository<UserProductEntity, Long>, CustomUserProductRepository {
 	@Query("select up from UserProductEntity up join fetch up.product p join UserEntity u on up.wisher.id = u.id where up.id =:userProductId and u.id =:userId")
-	Optional<UserProductEntity> findByIdAndWisherId(@Param("userProductId") Long userProductId, @Param("userId") Long userId);
+	Optional<UserProductEntity> findByIdAndWisherId(@Param("userProductId") Long userProductId,
+		@Param("userId") Long userId);
 }

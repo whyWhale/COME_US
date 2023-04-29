@@ -1,7 +1,5 @@
 package com.platform.order.product.service.mapper;
 
-import static com.platform.order.product.controller.dto.response.product.RankingRegionOrderProductResponseDto.*;
-
 import java.util.List;
 import java.util.Map;
 
@@ -9,15 +7,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-import com.platform.order.common.dto.offset.PageResponseDto;
+import com.platform.order.common.dto.offset.OffsetPageResponseDto;
 import com.platform.order.product.controller.dto.request.product.CreateProductRequestDto;
 import com.platform.order.product.controller.dto.request.product.UpdateProductRequestDto;
 import com.platform.order.product.controller.dto.response.product.CreateProductImagesResponseDto;
 import com.platform.order.product.controller.dto.response.product.CreateProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.CreateThumbnailResponseDto;
-import com.platform.order.product.controller.dto.response.product.RankingReadProductResponseDto;
-import com.platform.order.product.controller.dto.response.product.RankingRegionOrderProductResponseDto;
-import com.platform.order.product.controller.dto.response.product.RankingWishProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadAllProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.ReadProductResponseDto;
 import com.platform.order.product.controller.dto.response.product.UpdateProductImageResponseDto;
@@ -112,7 +107,7 @@ public class ProductMapper {
 			wishCount);
 	}
 
-	public PageResponseDto<ReadAllProductResponseDto> toContentPageResponseDto(
+	public OffsetPageResponseDto<ReadAllProductResponseDto> toContentPageResponseDto(
 		Page<ProductEntity> productsPage,
 		Map<Long, Long> wishCounts) {
 		Pageable pageable = productsPage.getPageable();
@@ -128,22 +123,24 @@ public class ProductMapper {
 				wishCounts.get(product.getId())))
 			.toList();
 
-		return new PageResponseDto<>(
+		return new OffsetPageResponseDto<>(
 			productsPage.getTotalPages(),
 			pageable.getPageNumber(),
 			pageable.getPageSize(),
 			productResponses);
 	}
 
-	public PageResponseDto<ReadAllProductResponseDto> toNoContentPageResponseDto(Page<ProductEntity> productsPage) {
-		return new PageResponseDto<>(
+	public OffsetPageResponseDto<ReadAllProductResponseDto> toNoContentPageResponseDto(
+		Page<ProductEntity> productsPage) {
+		return new OffsetPageResponseDto<>(
 			productsPage.getTotalPages(),
 			productsPage.getPageable().getPageNumber(),
 			productsPage.getPageable().getPageSize(),
 			List.of());
 	}
 
-	public PageResponseDto<ReadAllUserProductResponseDto> toPageResponse(Page<UserProductEntity> pageUserProduct) {
+	public OffsetPageResponseDto<ReadAllUserProductResponseDto> toPageResponse(
+		Page<UserProductEntity> pageUserProduct) {
 		Pageable pageable = pageUserProduct.getPageable();
 
 		var readUserProductResponses = pageUserProduct.getContent().stream()
@@ -156,7 +153,7 @@ public class ProductMapper {
 				userProduct.getProduct().getProductThumbnail().getPath()))
 			.toList();
 
-		return new PageResponseDto<>(pageUserProduct.getTotalPages(),
+		return new OffsetPageResponseDto<>(pageUserProduct.getTotalPages(),
 			pageable.getPageNumber(),
 			pageable.getPageSize(),
 			readUserProductResponses);

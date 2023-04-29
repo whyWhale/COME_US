@@ -140,8 +140,8 @@ public class ReviewIntegrationTest extends IntegrationTest {
 			.toList();
 		reviewRepository.saveAll(reviewEntities);
 
-		int requestPage=1;
-		int requestSize=10;
+		int requestPage = 1;
+		int requestSize = 10;
 		int expectedTotalPage = (int)Math.ceil((double)reviewEntities.size() / requestSize);
 		ReviewPageRequestDto pageRequest = new ReviewPageRequestDto(requestPage, requestSize, null, null);
 		//when

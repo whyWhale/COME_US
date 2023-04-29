@@ -12,20 +12,34 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 
-import com.platform.order.common.dto.offset.PageRequestDto;
+import com.platform.order.common.dto.offset.OffsetPageRequestDto;
 import com.platform.order.coupon.domain.coupon.entity.CouponType;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-public class UserCouponPageRequestDto extends PageRequestDto {
+public class UserCouponPageRequestDto extends OffsetPageRequestDto {
+	@Schema(description = "발급 날짜 시작 시점")
 	private LocalDate lowerIssuedAt;
+
+	@Schema(description = "발급 날짜 마지막 시점")
 	private LocalDate upperIssuedAt;
+
+	@Schema(description = "만료 일자 시작 시점")
 	private LocalDate lowerExpiredAt;
+
+	@Schema(description = "만료 일자 마지막 시점")
 	private LocalDate upperExpiredAt;
+
+	@Schema(description = "사용 여부")
 	private Boolean isUsable;
+
+	@Schema(description = "쿠폰 종류")
 	private CouponType couponType;
+
+	@Schema(description = "정렬 기준")
 	private List<UserCouponOrder> sorts;
 
 	public UserCouponPageRequestDto(

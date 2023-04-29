@@ -1,13 +1,13 @@
-package com.platform.order.ranking.service;
+package com.platform.order.ranking.service.mapper;
 
 import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.platform.order.product.controller.dto.response.product.RankingReadProductResponseDto;
-import com.platform.order.product.controller.dto.response.product.RankingRegionOrderProductResponseDto;
-import com.platform.order.product.controller.dto.response.product.RankingWishProductResponseDto;
 import com.platform.order.product.domain.product.entity.ProductEntity;
+import com.platform.order.ranking.controller.dto.response.RankingReadProductResponseDto;
+import com.platform.order.ranking.controller.dto.response.RankingRegionOrderProductResponseDto;
+import com.platform.order.ranking.controller.dto.response.RankingWishProductResponseDto;
 
 @Component
 public class RankingMapper {
@@ -40,9 +40,12 @@ public class RankingMapper {
 		List<ProductEntity> maximumOrderProductsByDistrict
 	) {
 
-		List<RankingRegionOrderProductResponseDto.ProductByCity> productsByCity = toProductByCity(maximumOrderProductsByCity);
-		List<RankingRegionOrderProductResponseDto.ProductByCountry> producstByCountry = toProductByCountry(maximumOrderProductsByCountry);
-		List<RankingRegionOrderProductResponseDto.ProductByDistrict> productsByDistrict = toProductByDistrict(maximumOrderProductsByDistrict);
+		List<RankingRegionOrderProductResponseDto.ProductByCity> productsByCity = toProductByCity(
+			maximumOrderProductsByCity);
+		List<RankingRegionOrderProductResponseDto.ProductByCountry> producstByCountry = toProductByCountry(
+			maximumOrderProductsByCountry);
+		List<RankingRegionOrderProductResponseDto.ProductByDistrict> productsByDistrict = toProductByDistrict(
+			maximumOrderProductsByDistrict);
 
 		return new RankingRegionOrderProductResponseDto(
 			productsByCity,

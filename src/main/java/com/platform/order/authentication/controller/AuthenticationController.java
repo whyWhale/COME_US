@@ -19,8 +19,10 @@ import com.platform.order.authentication.service.AuthService;
 import com.platform.order.common.security.model.JwtAuthentication;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "인증 API")
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
 @RestController
@@ -29,11 +31,12 @@ public class AuthenticationController {
 	private final LoginSuccessHandler loginSuccessHandler;
 	private final LogoutSuccessHandler logoutSuccessHandler;
 
-	@Operation(summary = "로그인", description = "사용자가 아이디와 패스워드를 가지고 로그인을 한다.")
+	@Operation(summary = "인증", description = "인증에 성공하면 엑세스 토큰과 리프레시 토큰을 부여 받습니다.")
 	@PostMapping("/login")
 	public void login(
 		@Valid
-		@RequestBody LoginAuthRequestDto loginDto,
+		@RequestBody
+		LoginAuthRequestDto loginDto,
 
 		HttpServletResponse response
 	) {
@@ -41,6 +44,7 @@ public class AuthenticationController {
 		loginSuccessHandler.onLoginSuccess(response, loginResponse);
 	}
 
+	@Operation(summary = "로그아웃", description = "엑세스 토큰 유효시간을 0으로 변경하고 리프레시 토큰 정보를 삭제합니다.")
 	@DeleteMapping("/logout")
 	public void logout(
 		@AuthenticationPrincipal

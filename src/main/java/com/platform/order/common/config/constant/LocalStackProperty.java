@@ -5,5 +5,5 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 
 @ConstructorBinding
 @ConfigurationProperties(prefix = "cloud.aws.s3")
-public record LocalStackProperty(String endpoint,String bucket) {
+public record LocalStackProperty(String endpoint, String bucket) {
 }

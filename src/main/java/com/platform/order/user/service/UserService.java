@@ -11,6 +11,7 @@ import com.platform.order.user.controller.dto.request.SignUpUserRequestDto;
 import com.platform.order.user.controller.dto.response.SignUpUserResponseDto;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
+import com.platform.order.user.service.mapper.UserMapper;
 
 import lombok.RequiredArgsConstructor;
 

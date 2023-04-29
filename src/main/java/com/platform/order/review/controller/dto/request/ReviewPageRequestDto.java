@@ -11,16 +11,19 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import com.platform.order.common.dto.offset.PageRequestDto;
+import com.platform.order.common.dto.offset.OffsetPageRequestDto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-public class ReviewPageRequestDto extends PageRequestDto {
+public class ReviewPageRequestDto extends OffsetPageRequestDto {
+	@Schema(description = "찾아볼 리뷰 평점")
 	@Range(min = 1, max = 5)
 	private Integer score;
 
+	@Schema(description = "정렬 기준")
 	private List<ReviewOrder> sorts;
 
 	public ReviewPageRequestDto(Integer page, Integer size, Integer score, List<ReviewOrder> sorts) {

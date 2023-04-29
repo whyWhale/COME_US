@@ -19,7 +19,6 @@ import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
 
-
 class CouponRepositoryTest extends RepositoryTest {
 	@Autowired
 	CouponRepository couponRepository;

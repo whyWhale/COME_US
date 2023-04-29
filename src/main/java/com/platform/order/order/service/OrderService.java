@@ -24,6 +24,7 @@ import com.platform.order.order.domain.order.entity.OrderEntity;
 import com.platform.order.order.domain.order.repository.OrderRepository;
 import com.platform.order.order.domain.orderproduct.entity.OrderProductEntity;
 import com.platform.order.order.domain.orderproduct.repository.OrderProductRepository;
+import com.platform.order.order.service.mapper.OrderMapper;
 import com.platform.order.order.service.redis.OrderRedisService;
 import com.platform.order.product.domain.product.repository.ProductRepository;
 
@@ -62,7 +63,8 @@ public class OrderService {
 		}
 
 		OrderEntity savedOrder = orderRepository.save(order);
-		productIds.forEach(productId ->orderRedisService.increaseOrderByRegion(productId,creatOrderRequest.location()));
+		productIds.forEach(
+			productId -> orderRedisService.increaseOrderByRegion(productId, creatOrderRequest.location()));
 
 		return orderMapper.toCreateOrderResponseDto(savedOrder);
 	}

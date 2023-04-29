@@ -1,4 +1,4 @@
-package com.platform.order.order.service;
+package com.platform.order.order.service.mapper;
 
 import java.util.List;
 

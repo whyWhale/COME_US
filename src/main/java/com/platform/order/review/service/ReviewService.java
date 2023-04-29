@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.platform.order.common.dto.offset.PageResponseDto;
+import com.platform.order.common.dto.offset.OffsetPageResponseDto;
 import com.platform.order.common.exception.custom.NotFoundResourceException;
 import com.platform.order.common.storage.AwsStorageService;
 import com.platform.order.common.storage.request.UploadFileRequestDto;
@@ -30,6 +30,7 @@ import com.platform.order.review.domain.review.entity.ReviewEntity;
 import com.platform.order.review.domain.review.repository.ReviewRepository;
 import com.platform.order.review.domain.reviewimage.ReviewImageEntity;
 import com.platform.order.review.domain.reviewimage.ReviewImageRepository;
+import com.platform.order.review.service.mapper.ReviewMapper;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
 
@@ -109,7 +110,7 @@ public class ReviewService {
 			.collect(toMap(responseDto -> responseDto.multipartFile().getOriginalFilename(), Function.identity()));
 	}
 
-	public PageResponseDto<ReadReviewResponseDto> readAll(Long productId, ReviewPageRequestDto pageRequestDto) {
+	public OffsetPageResponseDto<ReadReviewResponseDto> readAll(Long productId, ReviewPageRequestDto pageRequestDto) {
 		Page<ReviewEntity> reviewPage = reviewRepository.findByAllWithSorts(pageRequestDto, productId);
 		List<ReviewEntity> reviews = reviewPage.getContent();
 		List<Long> userIds = reviews.stream()

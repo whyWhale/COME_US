@@ -131,7 +131,7 @@ public class OrderIntegrationTest extends IntegrationTest {
 		void testOrderWithCoupon() {
 			//given
 			var orderProductRequest = new OrderProductRequestDto(product.getId(), orderQuantity, userCoupon.getId());
-			var requestDto = new CreateOrderRequestDto(address, zipCode, List.of(orderProductRequest),location);
+			var requestDto = new CreateOrderRequestDto(address, zipCode, List.of(orderProductRequest), location);
 			//when
 			CreateOrderResponseDto createOrderResponse = orderService.order(user.getId(), requestDto);
 			// then

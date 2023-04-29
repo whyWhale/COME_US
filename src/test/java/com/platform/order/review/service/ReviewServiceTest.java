@@ -34,6 +34,7 @@ import com.platform.order.review.controller.dto.response.UpdateReviewResponseDto
 import com.platform.order.review.domain.review.entity.ReviewEntity;
 import com.platform.order.review.domain.review.repository.ReviewRepository;
 import com.platform.order.review.domain.reviewimage.ReviewImageEntity;
+import com.platform.order.review.service.mapper.ReviewMapper;
 import com.platform.order.testenv.ServiceTest;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;

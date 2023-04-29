@@ -9,21 +9,29 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import com.platform.order.common.dto.offset.PageRequestDto;
+import com.platform.order.common.dto.offset.OffsetPageRequestDto;
 import com.platform.order.common.validation.KeywordSearch;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-public final class ProductPageRequestDto extends PageRequestDto {
+public final class ProductPageRequestDto extends OffsetPageRequestDto {
 
+	@Schema(description = "상품명(최소 2자이상 입력해야합니다.)")
 	@KeywordSearch
 	private String name;
+
+	@Schema(description = "최대 가격")
 	@PositiveOrZero
 	private Long maximumPrice;
+
+	@Schema(description = "최소 가격")
 	@PositiveOrZero
 	private Long minimumPrice;
+
+	@Schema(description = "정렬 조건")
 	@Size(max = 2)
 	private List<ProductCondition> sorts;
 

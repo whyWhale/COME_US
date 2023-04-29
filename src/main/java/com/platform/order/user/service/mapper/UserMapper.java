@@ -1,4 +1,4 @@
-package com.platform.order.user.service;
+package com.platform.order.user.service.mapper;
 
 import org.springframework.stereotype.Component;
 

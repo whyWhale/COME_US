@@ -85,7 +85,8 @@ class OrderControllerTest extends ControllerTest {
 		void failOrderWithNotContainOrderProductRequest() throws Exception {
 			//given
 			List<OrderProductRequestDto> orderProductsRequest = List.of();
-			CreateOrderRequestDto requestDto = new CreateOrderRequestDto(address, zipCode, orderProductsRequest, location);
+			CreateOrderRequestDto requestDto = new CreateOrderRequestDto(address, zipCode, orderProductsRequest,
+				location);
 			//when
 			ResultActions perform = getPerform(requestDto);
 			//then
@@ -99,7 +100,7 @@ class OrderControllerTest extends ControllerTest {
 		void failOrderWithInvalidAddress(String invalidAddress) throws Exception {
 			//given
 			OrderProductRequestDto orderProductRequest = new OrderProductRequestDto(buyingProductId, 1L, null);
-			var requestDto = new CreateOrderRequestDto(invalidAddress, zipCode, List.of(orderProductRequest),location);
+			var requestDto = new CreateOrderRequestDto(invalidAddress, zipCode, List.of(orderProductRequest), location);
 			//when
 			ResultActions perform = getPerform(requestDto);
 			//then
@@ -113,7 +114,7 @@ class OrderControllerTest extends ControllerTest {
 		void failOrderWithInvalidZipCode(String invalidZipCode) throws Exception {
 			//given
 			OrderProductRequestDto orderProductRequest = new OrderProductRequestDto(buyingProductId, 1L, null);
-			var requestDto = new CreateOrderRequestDto(address, invalidZipCode, List.of(orderProductRequest),location);
+			var requestDto = new CreateOrderRequestDto(address, invalidZipCode, List.of(orderProductRequest), location);
 			//when
 			ResultActions perform = getPerform(requestDto);
 			//then
@@ -126,7 +127,7 @@ class OrderControllerTest extends ControllerTest {
 		void failOrderWithInvalidOrderProduct(Long productId, Long orderQuantity) throws Exception {
 			//given
 			var orderProductsRequest = new OrderProductRequestDto(productId, orderQuantity, null);
-			var requestDto = new CreateOrderRequestDto(address, zipCode, List.of(orderProductsRequest),location);
+			var requestDto = new CreateOrderRequestDto(address, zipCode, List.of(orderProductsRequest), location);
 			//when
 			ResultActions perform = getPerform(requestDto);
 			//then

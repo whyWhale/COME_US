@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.platform.order.review.domain.review.entity.ReviewEntity;
-import com.platform.order.review.domain.review.repository.CustomReviewRepository;
 
 public interface ReviewRepository extends JpaRepository<ReviewEntity, Long>, CustomReviewRepository {
 

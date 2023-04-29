@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.LongStream;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,13 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.platform.order.product.domain.category.repository.CategoryRepository;
-import com.platform.order.product.domain.product.repository.ProductRepository;
-import com.platform.order.testenv.RepositoryTest;
 import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto;
 import com.platform.order.product.domain.category.entity.CategoryEntity;
+import com.platform.order.product.domain.category.repository.CategoryRepository;
 import com.platform.order.product.domain.product.entity.ProductEntity;
+import com.platform.order.product.domain.product.repository.ProductRepository;
 import com.platform.order.product.domain.productthumbnail.entity.ProductThumbnailEntity;
+import com.platform.order.testenv.RepositoryTest;
 
 class CustomProductRepositoryImplTest extends RepositoryTest {
 

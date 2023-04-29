@@ -17,13 +17,14 @@ import com.platform.order.order.controller.dto.request.Location;
 import com.platform.order.order.service.redis.OrderRedisService;
 import com.platform.order.product.domain.product.repository.ProductRepository;
 import com.platform.order.product.service.redis.ProductRedisService;
+import com.platform.order.ranking.service.mapper.RankingMapper;
 import com.platform.order.testenv.ServiceTest;
 
 class RankingServiceTest extends ServiceTest {
 
 	@InjectMocks
 	RankingService rankingService;
-	
+
 	@Mock
 	ProductRedisService productRedisService;
 

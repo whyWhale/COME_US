@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.platform.order.common.dto.offset.PageResponseDto;
+import com.platform.order.common.dto.offset.OffsetPageResponseDto;
 import com.platform.order.common.exception.custom.BusinessException;
 import com.platform.order.common.exception.custom.NotFoundResourceException;
 import com.platform.order.common.exception.model.ErrorCode;
@@ -131,7 +131,8 @@ public class ProductService {
 		return productMapper.toReadProductResponseDto(foundProduct, images, wishCount);
 	}
 
-	public PageResponseDto<ReadAllProductResponseDto> readAll(ProductPageRequestDto pageRequest, String categoryCode) {
+	public OffsetPageResponseDto<ReadAllProductResponseDto> readAll(ProductPageRequestDto pageRequest,
+		String categoryCode) {
 		Page<ProductEntity> productsPage = productRepository.findAllWithConditions(pageRequest);
 
 		if (productsPage.getContent().isEmpty()) {
@@ -164,7 +165,7 @@ public class ProductService {
 		return savedUserProduct.getProduct().getId();
 	}
 
-	public PageResponseDto<ReadAllUserProductResponseDto> readAllWishProducts(
+	public OffsetPageResponseDto<ReadAllUserProductResponseDto> readAllWishProducts(
 		Long authId,
 		WishUserProductPageRequestDto pageRequestDto
 	) {

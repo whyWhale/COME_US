@@ -1,4 +1,4 @@
-package com.platform.order.review.service;
+package com.platform.order.review.service.mapper;
 
 import java.util.List;
 import java.util.Map;
@@ -8,7 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.platform.order.common.dto.offset.PageResponseDto;
+import com.platform.order.common.dto.offset.OffsetPageResponseDto;
 import com.platform.order.common.storage.request.UploadFileRequestDto;
 import com.platform.order.common.storage.response.UploadFileResponseDto;
 import com.platform.order.common.utils.FileUtils;
@@ -37,7 +37,7 @@ public class ReviewMapper {
 			.build();
 	}
 
-	ReviewImageEntity toReviewImage(Map<String, UploadFileResponseDto> fileNames,
+	public ReviewImageEntity toReviewImage(Map<String, UploadFileResponseDto> fileNames,
 		MultipartFile multipartFile) {
 		String originName = multipartFile.getOriginalFilename();
 		UploadFileResponseDto uploadFileResponse = fileNames.get(originName);
@@ -51,7 +51,7 @@ public class ReviewMapper {
 			.build();
 	}
 
-	UploadFileRequestDto toUploadFileRequest(MultipartFile multipartFile) {
+	public UploadFileRequestDto toUploadFileRequest(MultipartFile multipartFile) {
 		return new UploadFileRequestDto(
 			UUID.randomUUID().toString(),
 			FileUtils.getExtension(multipartFile.getOriginalFilename()),
@@ -87,7 +87,7 @@ public class ReviewMapper {
 		);
 	}
 
-	public PageResponseDto<ReadReviewResponseDto> toPageResponseDto(
+	public OffsetPageResponseDto<ReadReviewResponseDto> toPageResponseDto(
 		Page<ReviewEntity> reviewPage,
 		Map<Long, String> users
 	) {
@@ -99,7 +99,7 @@ public class ReviewMapper {
 				review.getImages().stream().map(ReviewImageEntity::getPath).toList())
 			).toList();
 
-		return new PageResponseDto<>(
+		return new OffsetPageResponseDto<>(
 			reviewPage.getTotalPages(),
 			reviewPage.getPageable().getPageNumber(),
 			reviewPage.getPageable().getPageSize(),

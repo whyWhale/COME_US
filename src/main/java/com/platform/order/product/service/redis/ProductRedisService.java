@@ -36,7 +36,7 @@ public class ProductRedisService {
 		String productViewCountKey = generateKey(SET_VIEW, productId);
 		int result = Objects.requireNonNull(
 			redisTemplate.opsForSet().add(productViewCountKey, visitor)
-		).intValue() ;
+		).intValue();
 
 		if (result != 0) {
 			redisTemplate.expire(productViewCountKey, 30, TimeUnit.MINUTES);
@@ -44,18 +44,17 @@ public class ProductRedisService {
 		}
 	}
 
-	public List<Long> getMaximumWishProducts(){
-		return redisTemplate.opsForZSet().reverseRange(SORTED_SET_WISH.getKey(), 0,9).stream()
+	public List<Long> getMaximumWishProducts() {
+		return redisTemplate.opsForZSet().reverseRange(SORTED_SET_WISH.getKey(), 0, 9).stream()
 			.map(Long::parseLong)
 			.toList();
 	}
 
-	public List<Long> getMaximumReadProducts(){
-		return redisTemplate.opsForZSet().reverseRange(SORTED_SET_WISH.getKey(), 0,9).stream()
+	public List<Long> getMaximumReadProducts() {
+		return redisTemplate.opsForZSet().reverseRange(SORTED_SET_WISH.getKey(), 0, 9).stream()
 			.map(Long::parseLong)
 			.toList();
 	}
-
 
 	private String generateKey(ProductRedisKeyManager redisKey, Long productId) {
 		return redisKey.getKey() + productId;

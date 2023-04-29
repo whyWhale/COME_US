@@ -40,7 +40,7 @@ public class LocalStackConfig {
 				new BasicAWSCredentials(awsProperty.accessKey(), awsProperty.secretKey()))
 			).build();
 
-		if(!amazonS3.doesBucketExistV2(localStackProperty.bucket())){
+		if (!amazonS3.doesBucketExistV2(localStackProperty.bucket())) {
 			amazonS3.createBucket(new CreateBucketRequest(localStackProperty.bucket(), region));
 		}
 

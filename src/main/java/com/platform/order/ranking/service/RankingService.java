@@ -7,12 +7,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.platform.order.order.controller.dto.request.Location;
 import com.platform.order.order.service.redis.OrderRedisService;
-import com.platform.order.product.controller.dto.response.product.RankingReadProductResponseDto;
-import com.platform.order.product.controller.dto.response.product.RankingRegionOrderProductResponseDto;
-import com.platform.order.product.controller.dto.response.product.RankingWishProductResponseDto;
 import com.platform.order.product.domain.product.entity.ProductEntity;
 import com.platform.order.product.domain.product.repository.ProductRepository;
 import com.platform.order.product.service.redis.ProductRedisService;
+import com.platform.order.ranking.controller.dto.response.RankingReadProductResponseDto;
+import com.platform.order.ranking.controller.dto.response.RankingRegionOrderProductResponseDto;
+import com.platform.order.ranking.controller.dto.response.RankingWishProductResponseDto;
+import com.platform.order.ranking.service.mapper.RankingMapper;
 
 import lombok.RequiredArgsConstructor;
 

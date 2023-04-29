@@ -375,7 +375,7 @@ class ProductServiceTest extends ServiceTest {
 
 		given(productRepository.findAllWithConditions(any())).willReturn(page);
 		//when
-		productService.readAll(pageRequestDto,any());
+		productService.readAll(pageRequestDto, any());
 		//then
 		verify(productRepository, times(1)).findAllWithConditions(any());
 	}

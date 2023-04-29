@@ -9,8 +9,9 @@ import java.util.concurrent.TimeUnit;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RedLock {
-	 // entity 식별자 파라미터명 #{${parameterName}}
+	// entity 식별자 파라미터명 #{${parameterName}}
 	String key();
+
 	// ${prefix}:: + key() 조합으로 RedLock 범위 축소
 	String keyPrefix();
 

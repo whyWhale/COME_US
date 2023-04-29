@@ -19,7 +19,7 @@ public class TestRedisConfig {
 
 	@Bean
 	public RedisConnectionFactory redisConnectionFactory() {
-		return new LettuceConnectionFactory(host,port);
+		return new LettuceConnectionFactory(host, port);
 	}
 
 	@Bean
