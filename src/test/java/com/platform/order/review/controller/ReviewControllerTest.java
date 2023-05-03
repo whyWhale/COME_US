@@ -29,9 +29,13 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.platform.order.authentication.controller.AuthenticationController;
+import com.platform.order.authentication.controller.handler.LoginSuccessHandler;
+import com.platform.order.authentication.controller.handler.LogoutSuccessHandler;
 import com.platform.order.common.config.WebSecurityConfig;
 import com.platform.order.common.security.JwtProviderManager;
 import com.platform.order.common.security.constant.JwtProperty;
+import com.platform.order.common.security.oauth2.Oauth2AuthenticationSuccessHandler;
 import com.platform.order.review.controller.dto.request.CreateReviewRequestDto;
 import com.platform.order.review.controller.dto.request.ReviewPageRequestDto;
 import com.platform.order.review.controller.dto.request.UpdateReviewRequestDto;
@@ -41,8 +45,12 @@ import com.platform.order.testenv.ControllerTest;
 import com.platform.order.utils.ParameterUtils;
 
 @WebMvcTest({ReviewController.class,
+	AuthenticationController.class,
 	WebSecurityConfig.class,
 	JwtProviderManager.class,
+	LoginSuccessHandler.class,
+	LogoutSuccessHandler.class,
+	Oauth2AuthenticationSuccessHandler.class,
 	JwtProperty.class})
 class ReviewControllerTest extends ControllerTest {
 	final String URI_PREFIX = "/api/reviews";

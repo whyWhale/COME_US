@@ -1,4 +1,4 @@
-package com.platform.order.authentication.service;
+package com.platform.order.authentication.service.mapper;
 
 import org.springframework.stereotype.Component;
 

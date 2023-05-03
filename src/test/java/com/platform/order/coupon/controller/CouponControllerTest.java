@@ -22,9 +22,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.ResultActions;
 
+import com.platform.order.authentication.controller.AuthenticationController;
+import com.platform.order.authentication.controller.handler.LoginSuccessHandler;
+import com.platform.order.authentication.controller.handler.LogoutSuccessHandler;
 import com.platform.order.common.config.WebSecurityConfig;
 import com.platform.order.common.security.JwtProviderManager;
 import com.platform.order.common.security.constant.JwtProperty;
+import com.platform.order.common.security.oauth2.Oauth2AuthenticationSuccessHandler;
 import com.platform.order.coupon.controller.dto.request.coupon.CreateCouponRequestDto;
 import com.platform.order.coupon.controller.dto.request.usercoupon.IssueUserCouponRequestDto;
 import com.platform.order.coupon.service.CouponService;
@@ -33,8 +37,12 @@ import com.platform.order.testenv.ControllerTest;
 
 @WithJwtMockUser
 @WebMvcTest({CouponController.class,
+	AuthenticationController.class,
 	WebSecurityConfig.class,
 	JwtProviderManager.class,
+	LoginSuccessHandler.class,
+	LogoutSuccessHandler.class,
+	Oauth2AuthenticationSuccessHandler.class,
 	JwtProperty.class})
 class CouponControllerTest extends ControllerTest {
 	final String URI_PREFIX = "/api/coupons";

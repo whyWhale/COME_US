@@ -39,8 +39,14 @@ dependencies {
     //SECURITY
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
+    // OAUTH2
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
     // JWT
     implementation 'com.auth0:java-jwt:3.18.1'
+
+    // OAUTH
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
     // VALIDATION
     implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -48,14 +54,14 @@ dependencies {
     // JPA
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-    //QUERYDSL
+    // QUERYDSL
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
     implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
 
     // MYSQL
     implementation 'mysql:mysql-connector-java:8.0.28'
 
-    //REDIS
+    // REDIS
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.redisson:redisson-spring-boot-starter:3.17.4'
 
@@ -89,7 +95,7 @@ dependencies {
     // LOCALSTACK
     testImplementation "org.testcontainers:localstack:1.16.3"
 
-    //JASYPT
+    // JASYPT
     implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.4'
 
     // Flyway

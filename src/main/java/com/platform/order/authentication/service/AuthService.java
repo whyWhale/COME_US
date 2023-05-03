@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.platform.order.authentication.controller.dto.request.LoginAuthRequestDto;
 import com.platform.order.authentication.controller.dto.response.LoginAuthResponseDto;
 import com.platform.order.authentication.controller.dto.response.LogoutAuthResponseDto;
+import com.platform.order.authentication.service.mapper.AuthMapper;
 import com.platform.order.common.exception.custom.BusinessException;
 import com.platform.order.common.exception.model.ErrorCode;
 import com.platform.order.common.security.JwtProviderManager;

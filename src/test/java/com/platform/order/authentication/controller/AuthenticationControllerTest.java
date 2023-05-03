@@ -29,17 +29,19 @@ import com.platform.order.authentication.service.AuthService;
 import com.platform.order.common.config.WebSecurityConfig;
 import com.platform.order.common.security.JwtProviderManager;
 import com.platform.order.common.security.constant.JwtProperty;
+import com.platform.order.common.security.oauth2.Oauth2AuthenticationSuccessHandler;
 import com.platform.order.security.WithJwtMockUser;
 import com.platform.order.testenv.ControllerTest;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
+import com.platform.order.user.service.UserService;
 
 @WebMvcTest({AuthenticationController.class,
 	WebSecurityConfig.class,
 	JwtProviderManager.class,
 	LoginSuccessHandler.class,
 	LogoutSuccessHandler.class,
-	LogoutSuccessHandler.class,
+	Oauth2AuthenticationSuccessHandler.class,
 	JwtProperty.class})
 class AuthenticationControllerTest extends ControllerTest {
 
@@ -53,9 +55,6 @@ class AuthenticationControllerTest extends ControllerTest {
 
 	@Autowired
 	LogoutSuccessHandler logoutSuccessHandler;
-
-	@MockBean
-	AuthService authService;
 
 	@Test
 	@DisplayName("로그인에 성공한다.")
@@ -72,7 +71,7 @@ class AuthenticationControllerTest extends ControllerTest {
 		var refreshTokenResponse = new TokenResponseDto("refresh-token", "refresh-token", 60000);
 		var loginResponse = new LoginAuthResponseDto(accessTokenResponse, refreshTokenResponse);
 
-		given(authService.login(loginDto)).willReturn(loginResponse);
+		given(super.authService.login(loginDto)).willReturn(loginResponse);
 		//when
 		ResultActions perform = mockMvc.perform(
 			post(URI_PREFIX + "/login")

@@ -14,17 +14,25 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.util.MultiValueMap;
 
+import com.platform.order.authentication.controller.AuthenticationController;
+import com.platform.order.authentication.controller.handler.LoginSuccessHandler;
+import com.platform.order.authentication.controller.handler.LogoutSuccessHandler;
 import com.platform.order.common.config.WebSecurityConfig;
 import com.platform.order.common.security.JwtProviderManager;
 import com.platform.order.common.security.constant.JwtProperty;
+import com.platform.order.common.security.oauth2.Oauth2AuthenticationSuccessHandler;
 import com.platform.order.order.controller.dto.request.Location;
 import com.platform.order.ranking.service.RankingService;
 import com.platform.order.testenv.ControllerTest;
 import com.platform.order.utils.ParameterUtils;
 
 @WebMvcTest({RankingController.class,
+	AuthenticationController.class,
 	WebSecurityConfig.class,
 	JwtProviderManager.class,
+	LoginSuccessHandler.class,
+	LogoutSuccessHandler.class,
+	Oauth2AuthenticationSuccessHandler.class,
 	JwtProperty.class})
 class RankingControllerTest extends ControllerTest {
 	final String URI_PREFIX = "/api/rankings";

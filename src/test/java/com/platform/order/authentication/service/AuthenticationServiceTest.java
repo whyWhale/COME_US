@@ -20,6 +20,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import com.platform.order.authentication.controller.dto.request.LoginAuthRequestDto;
 import com.platform.order.authentication.controller.dto.response.LoginAuthResponseDto;
 import com.platform.order.authentication.controller.dto.response.TokenResponseDto;
+import com.platform.order.authentication.service.mapper.AuthMapper;
 import com.platform.order.common.exception.custom.BusinessException;
 import com.platform.order.common.exception.custom.NotFoundResourceException;
 import com.platform.order.common.security.JwtProviderManager;

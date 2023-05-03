@@ -29,9 +29,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.util.MultiValueMap;
 
+import com.platform.order.authentication.controller.AuthenticationController;
+import com.platform.order.authentication.controller.handler.LoginSuccessHandler;
+import com.platform.order.authentication.controller.handler.LogoutSuccessHandler;
 import com.platform.order.common.config.WebSecurityConfig;
 import com.platform.order.common.security.JwtProviderManager;
 import com.platform.order.common.security.constant.JwtProperty;
+import com.platform.order.common.security.oauth2.Oauth2AuthenticationSuccessHandler;
 import com.platform.order.product.controller.dto.request.product.CreateProductRequestDto;
 import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto;
 import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto.ProductCondition;
@@ -44,8 +48,12 @@ import com.platform.order.utils.ParameterUtils;
 
 @WithJwtMockUser
 @WebMvcTest({ProductController.class,
+	AuthenticationController.class,
 	WebSecurityConfig.class,
 	JwtProviderManager.class,
+	LoginSuccessHandler.class,
+	LogoutSuccessHandler.class,
+	Oauth2AuthenticationSuccessHandler.class,
 	JwtProperty.class})
 class ProductControllerTest extends ControllerTest {
 

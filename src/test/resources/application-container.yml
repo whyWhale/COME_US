@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
-    url: jdbc:tc:mysql:8.0.24:///test-mysql?TC_REUSABLE=true&rewriteBatchedStatements=true
+    url: jdbc:tc:mysql:8.0.24:///test-mysql?rewriteBatchedStatements=true
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     properties:
@@ -9,6 +9,10 @@ spring:
     hibernate:
       ddl-auto: create
     show-sql: ${SHOW_SQL:true}
+
+testcontainers:
+  reuse:
+    enable=true:
 
 logging:
   level:

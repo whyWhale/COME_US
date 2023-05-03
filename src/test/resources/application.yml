@@ -15,6 +15,24 @@ spring:
   redis:
     port: 6379
     host: localhost
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-name: kakao
+            client-id: ${OAUTH_K_CLIENT_ID:test-id)}
+            client-secret: ${OAUTH_K_CLIENT_SECRET:test-client-secret}
+            scope: ${OAUTH_K_SCOPE:test-scope}
+            redirect-uri: "http://localhost:8080/login/oauth2/code/{registrationId}"
+            authorization-grant-type: authorization_code
+            client-authentication-method: POST
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
 
 jwt:
   issuer: order-renewal

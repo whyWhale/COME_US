@@ -11,18 +11,18 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsUtils;
 
 import com.platform.order.common.security.JwtAuthenticationFilter;
 import com.platform.order.common.security.JwtProviderManager;
 import com.platform.order.common.security.constant.CookieProperty;
 import com.platform.order.common.security.constant.JwtProperty;
 import com.platform.order.common.security.constant.SecurityUrlProperty;
+import com.platform.order.common.security.oauth2.Oauth2AuthenticationSuccessHandler;
 
 import lombok.RequiredArgsConstructor;
 
@@ -37,11 +37,7 @@ public class WebSecurityConfig {
 	private final CookieProperty cookieProperty;
 	private final SecurityUrlProperty securityUrlProperty;
 	private final JwtProperty jwtProperty;
-
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+	private final Oauth2AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler;
 
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {
@@ -63,6 +59,7 @@ public class WebSecurityConfig {
 	public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
 		httpSecurity
 			.authorizeRequests()
+			.requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
 			.antMatchers(HttpMethod.GET, this.securityUrlProperty.urlPatternConfig().permitAll().get("GET"))
 			.permitAll()
 			.antMatchers(HttpMethod.POST, this.securityUrlProperty.urlPatternConfig().permitAll().get("POST"))
@@ -91,7 +88,13 @@ public class WebSecurityConfig {
 			.addFilterBefore(
 				new JwtAuthenticationFilter(jwtProviderManager, jwtProperty, cookieProperty),
 				UsernamePasswordAuthenticationFilter.class
-			).cors();
+			)
+			.cors()
+			.and()
+			.oauth2Login()
+			.authorizationEndpoint()
+			.and()
+			.successHandler(oauth2AuthenticationSuccessHandler);
 
 		return httpSecurity.build();
 	}

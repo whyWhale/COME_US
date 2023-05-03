@@ -7,8 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.platform.order.common.exception.custom.NotFoundResourceException;
+import com.platform.order.common.superentity.BaseEntity;
 import com.platform.order.user.controller.dto.request.SignUpUserRequestDto;
 import com.platform.order.user.controller.dto.response.SignUpUserResponseDto;
+import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
 import com.platform.order.user.service.mapper.UserMapper;
@@ -43,6 +45,22 @@ public class UserService {
 			.orElseThrow(() -> new NotFoundResourceException(
 				MessageFormat.format("user id:{0} is not found.", userId)
 			));
+	}
+
+	@Transactional
+	public Long saveForOAuth2(String provider, String providerId, String nickname) {
+		 return userRepository.findByProviderAndProviderId(provider, providerId)
+			 .map(BaseEntity::getId)
+			 .orElseGet(() -> {
+				 UserEntity savedUser = userRepository.save(UserEntity.builder()
+					 .providerId(providerId)
+					 .nickName(nickname)
+					 .provider(provider)
+					 .role(Role.USER)
+					 .build());
+
+				 return savedUser.getId();
+			 });
 	}
 
 }

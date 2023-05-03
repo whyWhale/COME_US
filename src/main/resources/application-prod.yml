@@ -27,6 +27,25 @@ spring:
         - ${REDIS_HOST1}
         - ${REDIS_HOST2}
         - ${REDIS_HOST3}
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-name: kakao
+            client-id: ${OAUTH_K_CLIENT_ID}
+            client-secret: ${OAUTH_K_CLIENT_SECRET}
+            scope: ${OAUTH_K_SCOPE}
+            redirect-uri: $${REDIRECT_URI}
+            authorization-grant-type: authorization_code
+            client-authentication-method: POST
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+
 
 jwt:
   issuer: ${ISSUER}
