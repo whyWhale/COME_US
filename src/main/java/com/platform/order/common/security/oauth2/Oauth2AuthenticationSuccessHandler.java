@@ -50,23 +50,12 @@ public class Oauth2AuthenticationSuccessHandler extends SavedRequestAwareAuthent
 		HttpServletResponse response,
 		Authentication authentication
 	) throws ServletException, IOException {
-		if (authentication instanceof OAuth2AuthenticationToken) {
-			OAuth2AuthenticationToken authenticationToken = (OAuth2AuthenticationToken)authentication;
+		if (authentication instanceof OAuth2AuthenticationToken authenticationToken) {
 			String provider = authenticationToken.getAuthorizedClientRegistrationId();
 			OAuth2User oAuth2User = authenticationToken.getPrincipal();
-			String providerId = oAuth2User.getName();
-			Map<String, Object> attributes = oAuth2User.getAttributes();
-			if (attributes == null) {
-				throw new OAuth2Exception("oauth structure check...");
-			}
 
-			Map<String, Object> properties = (Map<String, Object>)attributes.get("properties");
-			if (properties == null) {
-				throw new OAuth2Exception("oauth structure check...");
-			}
+			Long id = userService.saveForOAuth2(provider,oAuth2User);
 
-			String nickname = (String)properties.get("nickname");
-			Long id = userService.saveForOAuth2(provider, providerId, nickname);
 			CustomClaim claim = createClaim(id);
 			String accessToken = jwtProviderManager.generateAccessToken(claim);
 			String refreshToken = jwtProviderManager.generateRefreshToken(id);

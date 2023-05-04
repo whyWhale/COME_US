@@ -43,9 +43,10 @@ spring:
             authorization-grant-type: authorization_code
             client-authentication-method: POST
           google:
-            client-id: ${OAUTH_G_CLIENT_ID:ENC(lIW4f4UmbFLKS1OtDiEWzxFCETW56GMYksm7Fv8d1SMxb34oighRVQ==)}
-            client-secret: ${OAUTH_G_CLIENT_SECRET:ENC(VYDlbBHde4cF+xWybaNG90XHvEl1ose/xBn3YDVwHcS+X8lo8Hx+4w==)}
-            scope: ${OAUTH_K_SCOPE:ENC(mKb4Cp/cBkQODrKP32hDP0oP1eN+AeOfeGXMqV6bMCjRDYMivUBLUQ==)}
+            clientName: google
+            client-id: ${OAUTH_G_CLIENT_ID:ENC(OlZ/Is3+3/d8aXfTRM5QYnpb+yd0823hnXmHuCEC+6FZ6/1+w2nzA5N85A31anQHpW+PV7T3V+fmYuaMgLn0X0GDr6CLIybO9rh+kTNcwJeTzzZ7zu80Qg==)}
+            client-secret: ${OAUTH_G_CLIENT_SECRET:ENC(aSrh5NznQMNcb6bhuoPmf+cmHVnUWAHSpQ3Ej3zQs7OGEN+S+QHeuFtslt6gjr6K)}
+            scope: ${OAUTH_G_SCOPE:ENC(8PN/+m11hRReX5PlOYATVqsUslgXgkiI)}
             redirect-uri: "http://localhost:8080/login/oauth2/code/{registrationId}"
             client-authentication-method: POST
         provider:
