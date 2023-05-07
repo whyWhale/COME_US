@@ -1,8 +1,7 @@
-package com.platform.order.user.service;
+package com.platform.order.common.security.oauth2.oauth2service;
 
 import java.util.Map;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 
@@ -15,25 +14,20 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Component
-public class KakaoOAuth2Service implements OAuth2UserService {
+public class GoogleOAuth2Service implements OAuth2UserService {
 
 	private final UserRepository userRepository;
 
 	@Override
 	public Long save(OAuth2User oAuth2User, String provider) {
-
 		String providerId = oAuth2User.getName();
 		Map<String, Object> attributes = oAuth2User.getAttributes();
+
 		if (attributes == null) {
 			throw new OAuth2Exception("oauth structure check...");
 		}
 
-		Map<String, Object> properties = (Map<String, Object>)attributes.get("properties");
-		if (properties == null) {
-			throw new OAuth2Exception("oauth structure check...");
-		}
-
-		String nickname = (String)properties.get("nickname");
+		String nickname = (String)attributes.get("name");
 
 		UserEntity savedUser = userRepository.save(UserEntity.builder()
 			.providerId(providerId)
@@ -47,6 +41,6 @@ public class KakaoOAuth2Service implements OAuth2UserService {
 
 	@Override
 	public boolean isMatchProvider(String provider) {
-		return "kakao".equalsIgnoreCase(provider);
+		return "google".equalsIgnoreCase(provider);
 	}
 }

@@ -9,10 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.platform.order.common.exception.custom.NotFoundResourceException;
+import com.platform.order.common.security.oauth2.oauth2service.OAuth2UserService;
 import com.platform.order.common.superentity.BaseEntity;
 import com.platform.order.user.controller.dto.request.SignUpUserRequestDto;
 import com.platform.order.user.controller.dto.response.SignUpUserResponseDto;
-import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
 import com.platform.order.user.service.mapper.UserMapper;
@@ -41,28 +41,6 @@ public class UserService {
 		UserEntity registeredUser = userRepository.save(user);
 
 		return userMapper.toSignUpUserResponseDto(registeredUser);
-	}
-
-	public UserEntity getUserById(Long userId) {
-		return userRepository.findById(userId)
-			.orElseThrow(() -> new NotFoundResourceException(
-				MessageFormat.format("user id:{0} is not found.", userId)
-			));
-	}
-
-	@Transactional
-	public Long saveForOAuth2(String provider, OAuth2User oAuth2User) {
-		String providerId = oAuth2User.getName();
-
-		return userRepository.findByProviderAndProviderId(provider, providerId)
-			.map(BaseEntity::getId)
-			.orElseGet(() ->
-				oAuth2UserServices.stream()
-					.filter(oAuth2UserService -> oAuth2UserService.isMatchProvider(provider))
-					.findFirst()
-					.orElseThrow(() -> new RuntimeException("지원되는 서비스 OAUTH2인증이 없습니다."))
-					.save(oAuth2User, provider)
-			);
 	}
 
 }

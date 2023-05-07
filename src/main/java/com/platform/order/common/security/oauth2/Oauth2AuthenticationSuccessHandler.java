@@ -1,7 +1,6 @@
 package com.platform.order.common.security.oauth2;
 
 import java.io.IOException;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -21,28 +20,21 @@ import com.platform.order.authentication.controller.handler.LoginSuccessHandler;
 import com.platform.order.common.security.JwtProviderManager;
 import com.platform.order.common.security.JwtProviderManager.CustomClaim;
 import com.platform.order.common.security.constant.JwtProperty;
-import com.platform.order.common.security.exception.OAuth2Exception;
+import com.platform.order.common.security.oauth2.oauth2service.OAuth2Service;
 import com.platform.order.user.domain.entity.Role;
-import com.platform.order.user.service.UserService;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Component
 public class Oauth2AuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
 	private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
-	private final UserService userService;
+	private final OAuth2Service oAuth2Service;
 	private final JwtProperty jwtProperty;
 	private final LoginSuccessHandler loginSuccessHandler;
 	private final JwtProviderManager jwtProviderManager;
 
-	public Oauth2AuthenticationSuccessHandler(
-		UserService userService,
-		JwtProperty jwtProperty, LoginSuccessHandler loginSuccessHandler, JwtProviderManager jwtProviderManager
-	) {
-		this.userService = userService;
-		this.jwtProperty = jwtProperty;
-		this.loginSuccessHandler = loginSuccessHandler;
-		this.jwtProviderManager = jwtProviderManager;
-	}
 
 	@Override
 	public void onAuthenticationSuccess(
@@ -54,7 +46,7 @@ public class Oauth2AuthenticationSuccessHandler extends SavedRequestAwareAuthent
 			String provider = authenticationToken.getAuthorizedClientRegistrationId();
 			OAuth2User oAuth2User = authenticationToken.getPrincipal();
 
-			Long id = userService.saveForOAuth2(provider,oAuth2User);
+			Long id = oAuth2Service.save(provider,oAuth2User);
 
 			CustomClaim claim = createClaim(id);
 			String accessToken = jwtProviderManager.generateAccessToken(claim);

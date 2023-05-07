@@ -1,6 +1,5 @@
-package com.platform.order.user.service;
+package com.platform.order.common.security.oauth2.oauth2service;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 public interface OAuth2UserService  {

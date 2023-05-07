@@ -1,4 +1,4 @@
-package com.platform.order.user.service.mapper;
+package com.platform.order.common.security.oauth2.oauth2service;
 
 import java.util.Map;
 
@@ -9,26 +9,30 @@ import com.platform.order.common.security.exception.OAuth2Exception;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
-import com.platform.order.user.service.OAuth2UserService;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Component
-public class GoogleOAuth2Service implements OAuth2UserService {
+public class KakaoOAuth2Service implements OAuth2UserService {
 
 	private final UserRepository userRepository;
 
 	@Override
 	public Long save(OAuth2User oAuth2User, String provider) {
+
 		String providerId = oAuth2User.getName();
 		Map<String, Object> attributes = oAuth2User.getAttributes();
-
 		if (attributes == null) {
 			throw new OAuth2Exception("oauth structure check...");
 		}
 
-		String nickname = (String)attributes.get("name");
+		Map<String, Object> properties = (Map<String, Object>)attributes.get("properties");
+		if (properties == null) {
+			throw new OAuth2Exception("oauth structure check...");
+		}
+
+		String nickname = (String)properties.get("nickname");
 
 		UserEntity savedUser = userRepository.save(UserEntity.builder()
 			.providerId(providerId)
@@ -42,6 +46,6 @@ public class GoogleOAuth2Service implements OAuth2UserService {
 
 	@Override
 	public boolean isMatchProvider(String provider) {
-		return "google".equalsIgnoreCase(provider);
+		return "kakao".equalsIgnoreCase(provider);
 	}
 }
