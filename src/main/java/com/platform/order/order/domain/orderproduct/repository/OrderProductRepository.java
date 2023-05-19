@@ -18,4 +18,10 @@ public interface OrderProductRepository extends JpaRepository<OrderProductEntity
 		@Param("orderProductId") Long orderProductId,
 		@Param("authId") Long authId
 	);
+
+	@Query(value = "select op from OrderProductEntity op "
+		+ "join fetch op.product "
+		+ "where op.id =:orderProductId")
+	Optional<OrderProductEntity> findByIdWithProduct(
+		@Param("orderProductId") Long orderProductId);
 }

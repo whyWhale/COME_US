@@ -17,6 +17,7 @@ import com.platform.order.review.controller.dto.request.CreateReviewRequestDto;
 import com.platform.order.review.controller.dto.response.CreateReviewResponseDto;
 import com.platform.order.review.controller.dto.response.CreateReviewResponseDto.CreateReviewImageResponseDto;
 import com.platform.order.review.controller.dto.response.ReadReviewResponseDto;
+import com.platform.order.review.controller.dto.response.ReviewProductMetaResponseDto;
 import com.platform.order.review.controller.dto.response.UpdateReviewResponseDto;
 import com.platform.order.review.controller.dto.response.UpdateReviewResponseDto.UpdateReviewImageResponseDto;
 import com.platform.order.review.domain.review.entity.ReviewEntity;
@@ -105,5 +106,9 @@ public class ReviewMapper {
 			reviewPage.getPageable().getPageSize(),
 			readReviewResponses
 		);
+	}
+
+	public ReviewProductMetaResponseDto toReviewProductMetaResponseDto(long count, int average) {
+		return new ReviewProductMetaResponseDto(average, count);
 	}
 }

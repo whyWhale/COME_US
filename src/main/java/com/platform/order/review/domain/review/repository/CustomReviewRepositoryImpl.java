@@ -32,14 +32,11 @@ public class CustomReviewRepositoryImpl implements CustomReviewRepository {
 		Pageable pageable = page.toPageable();
 		List<OrderSpecifier> orderSpecifiers = getAllOrderSpecifiers(pageable);
 
-		//여기서 1:n 관계인데 페이징 처리가 제래도 델런지 	review 1개 3장 식 들어있으면
-		// join 해서 1 리뷰 레코드당 이미지가 3개 붙어서 나온느데..
 		List<ReviewEntity> reviews = queryFactory.selectFrom(reviewEntity)
 			.join(reviewEntity.orderProduct, orderProductEntity)
-			.where(orderProductEntity.product.id.eq(productId))
+			.where(orderProductEntity.product.id.eq(productId), equalScore(page.getScore()))
 			.limit(pageable.getPageSize())
 			.offset(pageable.getOffset())
-			.where(equalScore(page.getScore()))
 			.orderBy(orderSpecifiers.toArray(OrderSpecifier[]::new))
 			.fetch();
 		List<Long> ids = reviews.stream()

@@ -25,12 +25,13 @@ import com.platform.order.review.controller.dto.request.ReviewPageRequestDto;
 import com.platform.order.review.controller.dto.request.UpdateReviewRequestDto;
 import com.platform.order.review.controller.dto.response.CreateReviewResponseDto;
 import com.platform.order.review.controller.dto.response.ReadReviewResponseDto;
+import com.platform.order.review.controller.dto.response.ReviewProductMetaResponseDto;
 import com.platform.order.review.controller.dto.response.UpdateReviewResponseDto;
 import com.platform.order.review.domain.review.entity.ReviewEntity;
 import com.platform.order.review.domain.review.repository.ReviewRepository;
 import com.platform.order.review.domain.reviewimage.ReviewImageEntity;
-import com.platform.order.review.domain.reviewimage.ReviewImageRepository;
 import com.platform.order.review.service.mapper.ReviewMapper;
+import com.platform.order.review.service.redis.ReviewRedisService;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
 
@@ -43,8 +44,8 @@ public class ReviewService {
 	private final AwsStorageService awsStorageService;
 	private final ReviewRepository reviewRepository;
 	private final OrderProductRepository orderProductRepository;
-	private final ReviewImageRepository reviewImageRepository;
 	private final UserRepository userRepository;
+	private final ReviewRedisService reviewRedisService;
 	private final ReviewMapper reviewMapper;
 
 	@Transactional
@@ -54,7 +55,7 @@ public class ReviewService {
 		List<MultipartFile> images
 	) {
 		Long orderProductId = createReviewRequest.orderProductId();
-		OrderProductEntity foundOrderProduct = orderProductRepository.findById(orderProductId)
+		OrderProductEntity foundOrderProduct = orderProductRepository.findByIdWithProduct(orderProductId)
 			.orElseThrow(() -> new NotFoundResourceException(
 				format("order product : {0} is not found", orderProductId)
 			));
@@ -69,6 +70,7 @@ public class ReviewService {
 		}
 
 		ReviewEntity savedReview = reviewRepository.save(review);
+		reviewRedisService.increaseReviewCount(foundOrderProduct.getProduct().getId());
 
 		return reviewMapper.toCreateReviewResponse(savedReview);
 	}
@@ -82,8 +84,18 @@ public class ReviewService {
 	) {
 		ReviewEntity foundReview = reviewRepository.findByIdWithImage(reviewId, authId)
 			.orElseThrow(() -> new NotFoundResourceException(format("review : {0} is not found", reviewId)));
+		OrderProductEntity foundOrderProduct = orderProductRepository.findByIdWithProduct(updateReviewRequestDto.orderProductId())
+			.orElseThrow(() -> new NotFoundResourceException(
+				format("order product : {0} is not found", updateReviewRequestDto.orderProductId())
+			));
+
+		if(foundReview.isDifferentFromBefore(updateReviewRequestDto.score())){
+			reviewRedisService.decreaseReviewScore(foundOrderProduct.getProduct().getId(), updateReviewRequestDto.score());
+			reviewRedisService.increaseReviewScore(foundOrderProduct.getProduct().getId(), updateReviewRequestDto.score());
+		}
 
 		foundReview.update(updateReviewRequestDto.score(), updateReviewRequestDto.content());
+
 		if (images != null) {
 			List<String> fullFileNames = foundReview.removeImages().stream()
 				.map(ReviewImageEntity::generateFullFileName)
@@ -101,15 +113,6 @@ public class ReviewService {
 		return reviewMapper.toUpdateReviewResponses(foundReview);
 	}
 
-	private Map<String, UploadFileResponseDto> uploadImages(List<MultipartFile> images) {
-		List<UploadFileRequestDto> uploadFileRequests = images.stream()
-			.map(reviewMapper::toUploadFileRequest)
-			.toList();
-		List<UploadFileResponseDto> uploadResponses = awsStorageService.upload(uploadFileRequests, REVIEW_IMAGE);
-		return uploadResponses.stream()
-			.collect(toMap(responseDto -> responseDto.multipartFile().getOriginalFilename(), Function.identity()));
-	}
-
 	public OffsetPageResponseDto<ReadReviewResponseDto> readAll(Long productId, ReviewPageRequestDto pageRequestDto) {
 		Page<ReviewEntity> reviewPage = reviewRepository.findByAllWithSorts(pageRequestDto, productId);
 		List<ReviewEntity> reviews = reviewPage.getContent();
@@ -122,4 +125,19 @@ public class ReviewService {
 		return reviewMapper.toPageResponseDto(reviewPage, users);
 	}
 
+	private Map<String, UploadFileResponseDto> uploadImages(List<MultipartFile> images) {
+		List<UploadFileRequestDto> uploadFileRequests = images.stream()
+			.map(reviewMapper::toUploadFileRequest)
+			.toList();
+		List<UploadFileResponseDto> uploadResponses = awsStorageService.upload(uploadFileRequests, REVIEW_IMAGE);
+		return uploadResponses.stream()
+			.collect(toMap(responseDto -> responseDto.multipartFile().getOriginalFilename(), Function.identity()));
+	}
+
+	public ReviewProductMetaResponseDto readReviewProductMeta(Long productId) {
+		long count = reviewRedisService.getCount(productId);
+		int average = reviewRedisService.getAverage(productId, count);
+
+		return reviewMapper.toReviewProductMetaResponseDto(count, average);
+	}
 }

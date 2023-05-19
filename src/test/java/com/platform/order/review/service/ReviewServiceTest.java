@@ -35,6 +35,7 @@ import com.platform.order.review.domain.review.entity.ReviewEntity;
 import com.platform.order.review.domain.review.repository.ReviewRepository;
 import com.platform.order.review.domain.reviewimage.ReviewImageEntity;
 import com.platform.order.review.service.mapper.ReviewMapper;
+import com.platform.order.review.service.redis.ReviewRedisService;
 import com.platform.order.testenv.ServiceTest;
 import com.platform.order.user.domain.entity.Role;
 import com.platform.order.user.domain.entity.UserEntity;
@@ -51,6 +52,9 @@ class ReviewServiceTest extends ServiceTest {
 
 	@Mock
 	AwsStorageService awsStorageService;
+
+	@Mock
+	ReviewRedisService reviewRedisService;
 
 	@Spy
 	ReviewMapper reviewMapper;
@@ -106,13 +110,13 @@ class ReviewServiceTest extends ServiceTest {
 			.content("test")
 			.build();
 		CreateReviewRequestDto createReviewRequest = new CreateReviewRequestDto(1L, 3, "review 글 작성");
-		given(orderProductRepository.findById(any())).willReturn(Optional.of(orderProduct));
+		given(orderProductRepository.findByIdWithProduct(any())).willReturn(Optional.of(orderProduct));
 		given(awsStorageService.upload(any(), any())).willReturn(uploadFileResponses);
 		given(reviewRepository.save(any())).willReturn(expectedReview);
 		//when
 		reviewService.create(any(), createReviewRequest, List.of(mockFile));
 		//then
-		verify(orderProductRepository, times(1)).findById(any());
+		verify(orderProductRepository, times(1)).findByIdWithProduct(any());
 		verify(awsStorageService, times(1)).upload(any(), any());
 		verify(reviewRepository, times(1)).save(any());
 	}
@@ -143,7 +147,7 @@ class ReviewServiceTest extends ServiceTest {
 			.content("test")
 			.build();
 		List<MultipartFile> updateRequestImages = List.of(mockFile);
-
+		given(orderProductRepository.findByIdWithProduct(any())).willReturn(Optional.of(orderProduct));
 		given(reviewRepository.findByIdWithImage(any(), any())).willReturn(Optional.of(savedReviewEntity));
 		doNothing().when(awsStorageService).deleteAll(any(), any());
 		given(awsStorageService.upload(any(), any())).willReturn(uploadFileResponses);

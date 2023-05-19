@@ -373,11 +373,11 @@ class ProductServiceTest extends ServiceTest {
 		var pageRequestDto = new ProductPageRequestDto(1, 10, null, null, null, null);
 		PageImpl<ProductEntity> page = new PageImpl<>(List.of(), pageRequestDto.toPageable(), 0);
 
-		given(productRepository.findAllWithConditions(any())).willReturn(page);
+		given(productRepository.findAllWithConditions(pageRequestDto,category.getCode())).willReturn(page);
 		//when
-		productService.readAll(pageRequestDto, any());
+		productService.readAll(pageRequestDto, category.getCode());
 		//then
-		verify(productRepository, times(1)).findAllWithConditions(any());
+		verify(productRepository, times(1)).findAllWithConditions(pageRequestDto,category.getCode());
 	}
 
 	@Test

@@ -27,6 +27,7 @@ import com.platform.order.review.controller.dto.request.ReviewPageRequestDto;
 import com.platform.order.review.controller.dto.request.UpdateReviewRequestDto;
 import com.platform.order.review.controller.dto.response.CreateReviewResponseDto;
 import com.platform.order.review.controller.dto.response.ReadReviewResponseDto;
+import com.platform.order.review.controller.dto.response.ReviewProductMetaResponseDto;
 import com.platform.order.review.controller.dto.response.UpdateReviewResponseDto;
 import com.platform.order.review.service.ReviewService;
 
@@ -96,5 +97,15 @@ public class ReviewController {
 		ReviewPageRequestDto pageRequestDto
 	) {
 		return reviewService.readAll(productId, pageRequestDto);
+	}
+
+	@Operation(summary = "리뷰 글 개수 및 평균 점수 조회", description = "해당 상품에 작성된 리뷰글 개수 및 평균 평가점수를 조회합니다.")
+	@GetMapping(value = "/meta/{productId}")
+	public ReviewProductMetaResponseDto readReviewProductMeta(
+		@Parameter(description = "상품 아이디", required = true)
+		@PathVariable
+		Long productId
+	) {
+		return reviewService.readReviewProductMeta(productId);
 	}
 }

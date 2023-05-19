@@ -21,7 +21,6 @@ import com.platform.order.common.exception.custom.BusinessException;
 import com.platform.order.common.exception.custom.NotFoundResourceException;
 import com.platform.order.common.exception.model.ErrorCode;
 import com.platform.order.common.storage.AwsStorageService;
-import com.platform.order.order.service.redis.OrderRedisService;
 import com.platform.order.product.controller.dto.request.product.CreateProductRequestDto;
 import com.platform.order.product.controller.dto.request.product.ProductPageRequestDto;
 import com.platform.order.product.controller.dto.request.product.UpdateProductRequestDto;
@@ -46,6 +45,7 @@ import com.platform.order.product.domain.userproduct.entity.UserProductEntity;
 import com.platform.order.product.domain.userproduct.repository.UserProductRepository;
 import com.platform.order.product.service.mapper.ProductMapper;
 import com.platform.order.product.service.redis.ProductRedisService;
+import com.platform.order.review.domain.review.repository.ReviewRepository;
 import com.platform.order.user.domain.entity.UserEntity;
 import com.platform.order.user.domain.repository.UserRepository;
 
@@ -60,9 +60,10 @@ public class ProductService {
 	private final CategoryRepository categoryRepository;
 	private final ProductImageRepository imageRepository;
 	private final UserProductRepository userProductRepository;
+
+	private final ReviewRepository reviewRepository;
 	private final AwsStorageService awsStorageService;
 	private final ProductRedisService productRedisService;
-	private final OrderRedisService orderRedisService;
 	private final ProductMapper productMapper;
 
 	@Transactional
@@ -131,9 +132,11 @@ public class ProductService {
 		return productMapper.toReadProductResponseDto(foundProduct, images, wishCount);
 	}
 
-	public OffsetPageResponseDto<ReadAllProductResponseDto> readAll(ProductPageRequestDto pageRequest,
-		String categoryCode) {
-		Page<ProductEntity> productsPage = productRepository.findAllWithConditions(pageRequest);
+	public OffsetPageResponseDto<ReadAllProductResponseDto> readAll(
+		ProductPageRequestDto pageRequest,
+		String categoryCode
+	) {
+		Page<ProductEntity> productsPage = productRepository.findAllWithConditions(pageRequest, categoryCode);
 
 		if (productsPage.getContent().isEmpty()) {
 			return productMapper.toNoContentPageResponseDto(productsPage);

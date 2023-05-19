@@ -10,6 +10,7 @@ import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Where;
 
@@ -30,15 +31,16 @@ import lombok.NoArgsConstructor;
 @Table(name = "review")
 @Entity
 public class ReviewEntity extends BaseEntity {
-	Long userId;
+	@NotNull
+	private int score;
+
+	@NotNull
+	private Long userId;
+	@Lob
+	private String content;
 
 	@OneToOne(fetch = FetchType.LAZY)
 	private OrderProductEntity orderProduct;
-
-	private int score;
-
-	@Lob
-	private String content;
 
 	@Builder.Default
 	@OneToMany(mappedBy = "review", cascade = CascadeType.PERSIST, orphanRemoval = true)
@@ -52,6 +54,10 @@ public class ReviewEntity extends BaseEntity {
 	public void update(int score, String contents) {
 		this.score = score;
 		this.content = contents;
+	}
+
+	public boolean isDifferentFromBefore(int score) {
+		return this.score != score;
 	}
 
 	public List<ReviewImageEntity> removeImages() {
