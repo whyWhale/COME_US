@@ -2,6 +2,8 @@ package com.platform.order.common.scheduler;
 
 import java.time.LocalDate;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 @Component
 public class ScheduleService {
 
+	private static final Logger log = LoggerFactory.getLogger(ScheduleService.class.getName());
 	private final CouponRepository couponRepository;
 
 	/**
@@ -28,5 +31,6 @@ public class ScheduleService {
 	public void expireCoupon() {
 		couponRepository.expireAllBatch(LocalDate.now());
 	}
+
 }
 

@@ -3,8 +3,10 @@ package com.platform.order.review.service.redis;
 import static com.platform.order.review.service.redis.ReviewRedisKeyManager.REVIEW_PRODUCT_KEY_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Objects;
 import java.util.stream.IntStream;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,11 @@ class ReviewRedisServiceTest extends IntegrationTest {
 	ReviewService reviewService;
 	Long productId = 1L;
 	String reviewProductCountKey = REVIEW_PRODUCT_KEY_PREFIX + productId.toString();
+
+	@BeforeEach
+	public void setUp(){
+		Objects.requireNonNull(redisTemplate.getConnectionFactory()).getConnection().flushAll();
+	}
 
 	@Test
 	@DisplayName("상품리뷰를 작성할 때마다 리뷰가 카운팅된다.")
@@ -55,4 +62,5 @@ class ReviewRedisServiceTest extends IntegrationTest {
 		//then
 		assertThat(average).isEqualTo(expectedAverage);
 	}
+
 }
