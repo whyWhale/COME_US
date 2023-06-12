@@ -52,24 +52,13 @@ public class ReviewRedisService {
 	}
 
 	public int getAverage(Long productId, Long count) {
-		RedisSerializer<String> stringSerializer = redisTemplate.getStringSerializer();
-
-		List<Long> scores = redisTemplate.executePipelined((RedisCallback<Object>)connection -> {
-				IntStream.rangeClosed(1, 5)
-					.forEach(score -> {
-						String key = generateKey(productId, score);
-						connection.stringCommands().get(Objects.requireNonNull(stringSerializer.serialize(key)));
-					});
-
-				return null;
-			}).stream()
-			.map(String::valueOf)
-			.map(Long::parseLong)
-			.toList();
-
 		long totalScore = IntStream.rangeClosed(1, 5)
-			.mapToLong(multiValue -> scores.get(multiValue - 1) * multiValue)
-			.reduce(0, Long::sum);
+			.mapToLong(score -> {
+				String key = generateKey(productId, score);
+				return Long.parseLong(
+					Objects.requireNonNull(redisTemplate.opsForValue().get(key))
+				) * score;
+			}).reduce(0, Long::sum);
 		double avg = totalScore / (double)count;
 
 		return (int)Math.round(avg);
